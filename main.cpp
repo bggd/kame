@@ -4,6 +4,7 @@
 
 
 using namespace std;
+using namespace kame::math;
 
 int main(int artc, char** argv)
 {
@@ -24,5 +25,12 @@ int main(int artc, char** argv)
     win.closeWindow();
     kame::kameShutdown();
     cout << "Hello World!" << endl;
+
+    Vector3f(-1, -2, -3) + Vector3f(1, 2, 3);
+    Vector3f(-1, -2, -3) - Vector3f(1, 2, 3);
+    Vector3f(-1, -2, -3) * Vector3f(1, 2, 3);
+    Vector3f(-1, -2, -3) / Vector3f(1, 2, 3);
+
+    Matrix4x4f(Vector4f(1, 0, 0, 0), Vector4f(0, 1, 0, 0), Vector4f(0, 0, 1, 0), Vector4f(0, 0, 0, 1));
     return 0;
 }
