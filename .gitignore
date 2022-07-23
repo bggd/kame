@@ -35,5 +35,6 @@
 .vs
 CMakeSettings.json
 SDL
+SDL_image
 spdlog
 out

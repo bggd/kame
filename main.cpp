@@ -19,9 +19,11 @@ int main(int artc, char** argv)
         auto state = win.getState();
         if (state.isCloseRequest) break;
         //cout << state.deltaTime << endl;
-        kame::ogl21::clear(GL_COLOR_BUFFER_BIT);
+        kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(1, 1, 1, 1));
         win.swapWindow();
     }
+    //auto* s = kame::ogl21::createShader("", "");
+    //kame::ogl21::deleteShader(s);
     win.closeWindow();
     kame::kameShutdown();
     cout << "Hello World!" << endl;

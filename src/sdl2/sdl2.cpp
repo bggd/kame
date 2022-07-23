@@ -33,7 +33,7 @@ void Window::openWindow(const char* title, int w, int h)
 
     int version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
     assert(version != 0);
-    SPDLOG_INFO("Opengl: {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MAJOR(version));
+    SPDLOG_INFO("Opengl: {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
     assert(GLAD_GL_VERSION_2_1);
     assert(GLAD_GL_EXT_framebuffer_object);

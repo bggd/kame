@@ -10,6 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 
 add_subdirectory(SDL)
+add_subdirectory(SDL_image)
 add_subdirectory(spdlog)
 
 add_library(kame
@@ -20,7 +21,7 @@ add_library(kame
 	src/ogl21/ogl21.cpp
 )
 
-target_link_libraries(kame PRIVATE SDL2::SDL2 SDL2::SDL2main spdlog::spdlog)
+target_link_libraries(kame PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2_image::SDL2_image spdlog::spdlog)
 
 target_include_directories(kame
     PUBLIC
@@ -31,6 +32,9 @@ target_include_directories(kame
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 
-add_executable(kameExe
-main.cpp)
-target_link_libraries(kameExe kame)
+add_executable(kameHelloWorld
+examples/00-helloworld/helloworld.cpp)
+target_link_libraries(kameHelloWorld kame)
+add_executable(kameTriangle
+examples/01-triangle/triangle.cpp)
+target_link_libraries(kameTriangle kame)
