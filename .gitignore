@@ -32,6 +32,8 @@
 *.app
 
 *.swp
+*.png
+*.jpg
 .vs
 CMakeSettings.json
 SDL

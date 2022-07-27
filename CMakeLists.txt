@@ -38,3 +38,6 @@ target_link_libraries(kameHelloWorld kame)
 add_executable(kameTriangle
 examples/01-triangle/triangle.cpp)
 target_link_libraries(kameTriangle kame)
+add_executable(kameImage
+examples/02-image/image.cpp)
+target_link_libraries(kameImage kame)

@@ -8,6 +8,16 @@
 
 namespace kame::ogl21 {
 
+struct Context {
+    int versionMajor, versionMinor;
+
+private:
+    Context() {}
+
+public:
+    static Context& getInstance();
+};
+
 struct VertexAttribute {
     const char* name;
     GLuint location;
@@ -42,6 +52,14 @@ struct InputLayout {
     }
 };
 
+struct VertexBuffer {
+    GLuint id;
+    GLsizeiptr numBytes;
+    GLenum usage;
+
+    void setBuffer(const float* vertices);
+};
+
 struct Shader {
     GLint id;
     VertexAttribute* attributes;
@@ -51,18 +69,12 @@ struct Shader {
     void begin();
     void end();
     void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m);
-};
-
-struct VertexBuffer {
-    GLuint id;
-    GLsizeiptr numBytes;
-    GLenum usage;
-
-    void setBuffer(const float* vertices);
+    void drawArrays(VertexBuffer* vbo, GLenum mode, GLint first, GLsizei count);
 };
 
 struct Texture2D {
     GLuint id;
+    void setTexParameteri(GLenum pname, GLint param);
 };
 
 struct RenderState {
@@ -89,15 +101,21 @@ struct RenderStateBuilder {
     }
 };
 
+const char* getGlslVersionString();
+
 void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 void setClearBuffer(GLbitfield mask, kame::math::Vector4f color);
 void setRenderState(RenderState state);
-void drawArrays(const VertexBuffer* vbo, GLenum mode, GLint first, GLsizei count);
+void setTexture2D(GLuint slot, Texture2D* tex);
 
 Shader* createShader(const char* vert, const char* frag, InputLayout layout);
 void deleteShader(Shader* shader);
 
 VertexBuffer* createVertexBuffer(GLsizeiptr numBytes, GLenum usage);
 void deleteVertexBuffer(VertexBuffer* vbo);
+
+Texture2D* loadTexture2D(const char* path);
+Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len);
+void deleteTexture2D(Texture2D* tex);
 
 } // namespace kame::ogl21

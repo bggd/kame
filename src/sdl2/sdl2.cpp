@@ -12,6 +12,17 @@ void Window::openWindow(const char* title, int w, int h)
 
     SDL_Init(SDL_INIT_EVERYTHING);
 
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+    if (isOGL21DebugMode)
+    {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+    }
+    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -33,18 +44,31 @@ void Window::openWindow(const char* title, int w, int h)
 
     int version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
     assert(version != 0);
-    SPDLOG_INFO("Opengl: {0}.{1}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+    SPDLOG_INFO("OpenGL Version: {0} {1}", glGetString(GL_VERSION), glGetString(GL_RENDERER));
+    SPDLOG_INFO("GLSL Version: {0}", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    kame::ogl21::Context::getInstance().versionMajor = GLAD_VERSION_MAJOR(version);
+    kame::ogl21::Context::getInstance().versionMinor = GLAD_VERSION_MINOR(version);
 
     assert(GLAD_GL_VERSION_2_1);
     assert(GLAD_GL_EXT_framebuffer_object);
 
-    if (isOGL21DebugMode)
+    if (isOGL21DebugMode && GLAD_GL_KHR_debug)
     {
-        assert(GLAD_GL_KHR_debug);
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         glDebugMessageCallback(debugGLMessageCallback, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    }
+
+    if (GLAD_VERSION_MAJOR(version) > 2 && GLAD_GL_ARB_vertex_array_object)
+    {
+        GLuint VAO;
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+    }
+    else
+    {
+        glEnable(GL_TEXTURE_2D);
     }
 
     freq = SDL_GetPerformanceFrequency();
