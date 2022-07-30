@@ -36,7 +36,10 @@
 *.jpg
 .vs
 CMakeSettings.json
-SDL
-SDL_image
-spdlog
-out
+SDL/
+spdlog/
+assimp/
+out/
+!include/kame/assimp
+!src/assimp
+p5/

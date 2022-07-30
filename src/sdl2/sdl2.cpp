@@ -44,10 +44,13 @@ void Window::openWindow(const char* title, int w, int h)
 
     int version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
     assert(version != 0);
-    SPDLOG_INFO("OpenGL Version: {0} {1}", glGetString(GL_VERSION), glGetString(GL_RENDERER));
-    SPDLOG_INFO("GLSL Version: {0}", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    SPDLOG_INFO("OpenGL Version: {0}", (const char*)glGetString(GL_VERSION));
+    SPDLOG_INFO("OpenGL Renderer: {0}", (const char*)glGetString(GL_RENDERER));
+    SPDLOG_INFO("GLSL Version: {0}", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
     kame::ogl21::Context::getInstance().versionMajor = GLAD_VERSION_MAJOR(version);
     kame::ogl21::Context::getInstance().versionMinor = GLAD_VERSION_MINOR(version);
+
+    kame::ogl21::Context::getInstance().isAvaliable = true;
 
     assert(GLAD_GL_VERSION_2_1);
     assert(GLAD_GL_EXT_framebuffer_object);
@@ -77,6 +80,7 @@ void Window::openWindow(const char* title, int w, int h)
 
 void Window::closeWindow()
 {
+    kame::ogl21::Context::getInstance().isAvaliable = false;
     SDL_GL_DeleteContext(glc);
     SDL_DestroyWindow(window);
     SDL_Quit();

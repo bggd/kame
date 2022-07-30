@@ -10,3 +10,5 @@ void kameShutdown();
 #include "sdl2/sdl2.hpp"
 #include "ogl21/ogl21.hpp"
 #include "math/math.hpp"
+#include "assimp/assimp.hpp"
+#include "p5/p5.hpp"

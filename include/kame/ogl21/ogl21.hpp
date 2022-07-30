@@ -10,6 +10,7 @@ namespace kame::ogl21 {
 
 struct Context {
     int versionMajor, versionMinor;
+    bool isAvaliable;
 
 private:
     Context() {}
@@ -60,6 +61,14 @@ struct VertexBuffer {
     void setBuffer(const float* vertices);
 };
 
+struct IndexBuffer {
+    GLuint id;
+    GLsizeiptr numBytes;
+    GLenum usage;
+
+    void setBuffer(const unsigned int* vertices);
+};
+
 struct Shader {
     GLint id;
     VertexAttribute* attributes;
@@ -70,16 +79,21 @@ struct Shader {
     void end();
     void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m);
     void drawArrays(VertexBuffer* vbo, GLenum mode, GLint first, GLsizei count);
+    void drawElements(IndexBuffer* ibo, VertexBuffer* vbo, GLenum mode, GLsizei count);
 };
 
 struct Texture2D {
     GLuint id;
+    int width, height;
     void setTexParameteri(GLenum pname, GLint param);
 };
 
 struct RenderState {
     bool useBlend = false;
+    bool useDepth = false;
     GLenum srcRGB, srcA, dstRGB, dstA;
+    GLenum blendEqRGB, blendEqA;
+    GLenum depthFunc;
 };
 
 struct RenderStateBuilder {
@@ -92,6 +106,18 @@ struct RenderStateBuilder {
         state.dstRGB = dstRGB;
         state.dstA = dstA;
         state.useBlend = true;
+        return *this;
+    }
+
+    RenderStateBuilder& blendEquation(GLenum modeRGB, GLenum modeA) {
+        state.blendEqRGB = modeRGB;
+        state.blendEqA = modeA;
+        return *this;
+    }
+
+    RenderStateBuilder& depthFunc(GLenum func) {
+        state.depthFunc = func;
+        state.useDepth = true;
         return *this;
     }
 
@@ -113,6 +139,9 @@ void deleteShader(Shader* shader);
 
 VertexBuffer* createVertexBuffer(GLsizeiptr numBytes, GLenum usage);
 void deleteVertexBuffer(VertexBuffer* vbo);
+
+IndexBuffer* createIndexBuffer(GLsizeiptr numBytes, GLenum usage);
+void deleteIndexBuffer(IndexBuffer* ibo);
 
 Texture2D* loadTexture2D(const char* path);
 Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len);

@@ -5,6 +5,7 @@ namespace kame::ogl21 {
 Context& Context::getInstance()
 {
     static Context ctx;
+    ctx.isAvaliable = false;
     return ctx;
 }
 
@@ -78,10 +79,21 @@ void setRenderState(RenderState state)
     {
         glEnable(GL_BLEND);
         glBlendFuncSeparate(state.srcRGB, state.dstRGB, state.srcA, state.dstA);
+        glBlendEquationSeparate(state.blendEqRGB, state.blendEqA);
     }
     else
     {
         glDisable(GL_BLEND);
+    }
+
+    if (state.useDepth)
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(state.depthFunc);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
     }
 }
 
@@ -156,7 +168,7 @@ void Shader::end()
 
 void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m)
 {
-    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, false, (const GLfloat*)&m);
+    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_TRUE, (const GLfloat*)&m);
 }
 
 void Shader::drawArrays(VertexBuffer* vbo, GLenum mode, GLint first, GLsizei count)
@@ -171,6 +183,22 @@ void Shader::drawArrays(VertexBuffer* vbo, GLenum mode, GLint first, GLsizei cou
         offset += i.componentSize * sizeof(float);
     }
     glDrawArrays(mode, first, count);
+}
+
+void Shader::drawElements(IndexBuffer* ibo, VertexBuffer* vbo, GLenum mode, GLsizei count)
+{
+    assert(ibo);
+    assert(vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo->id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo->id);
+    uint32_t offset = 0;
+    for (const auto& i : inputLayout.attributes)
+    {
+        glEnableVertexAttribArray(i.location);
+        glVertexAttribPointer(i.location, i.componentSize, GL_FLOAT, GL_FALSE, inputLayout.stride, (const void*)(uintptr_t)offset);
+        offset += i.componentSize * sizeof(float);
+    }
+    glDrawElements(mode, count, GL_UNSIGNED_INT, NULL);
 }
 
 VertexBuffer* createVertexBuffer(GLsizeiptr numBytes, GLenum usage)
@@ -205,6 +233,37 @@ void VertexBuffer::setBuffer(const float* vertices)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+IndexBuffer* createIndexBuffer(GLsizeiptr numBytes, GLenum usage)
+{
+    IndexBuffer* ibo = new IndexBuffer();
+    assert(ibo);
+
+    GLuint buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, NULL, usage);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    ibo->id = buffer;
+    ibo->numBytes = numBytes;
+    ibo->usage = usage;
+    return ibo;
+}
+void deleteIndexBuffer(IndexBuffer* ibo)
+{
+    glDeleteBuffers(1, &ibo->id);
+    delete ibo;
+    ibo = nullptr;
+}
+
+void IndexBuffer::setBuffer(const unsigned int* vertices)
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, NULL, usage); // orphaning
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 Texture2D* loadTexture2D(const char* path)
 {
     Texture2D* t = new Texture2D();
@@ -234,6 +293,8 @@ Texture2D* loadTexture2D(const char* path)
     stbi_image_free(data);
 
     t->id = tex;
+    t->width = x;
+    t->height = y;
     return t;
 }
 
@@ -246,7 +307,6 @@ Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len)
     unsigned char* data = stbi_load_from_memory(src, len, &x, &y, &c, 4);
     SPDLOG_INFO("loadTexture2DFromMemory: (width:{0}, height:{1}, channel:{2})", x, y, c);
     assert(data);
-    assert(c == 4);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -260,6 +320,8 @@ Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len)
     stbi_image_free(data);
 
     t->id = tex;
+    t->width = x;
+    t->height = y;
     return t;
 }
 

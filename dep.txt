@@ -4,11 +4,11 @@
 git clone --depth 1 --branch release-2.0.22 https://github.com/libsdl-org/SDL.git
 
 
-- SDL_image
-
-git clone --depth 1 --branch release-2.6.0 https://github.com/libsdl-org/SDL_image.git
-
-
 - spdlog
 
 git clone --depth 1 --branch v1.10.0 https://github.com/gabime/spdlog.git
+
+
+- assimp
+
+git clone --depth 1 --branch v5.2.3 https://github.com/assimp/assimp.git
