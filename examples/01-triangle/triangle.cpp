@@ -37,14 +37,11 @@ int main(int argc, char** argv)
     win.openWindow();
     win.setVsync(true);
 
-    kame::ogl21::InputLayout layout;
-    layout.add(kame::ogl21::VertexAttributeBuilder().name("aPos").componentSize(3).build());
-
     std::string vs = kame::ogl21::getGlslVersionString();
     vs += vert;
     std::string fs = kame::ogl21::getGlslVersionString();
     fs += frag;
-    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str(), layout);
+    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str());
 
     const float vtx[] = {
         0.0f, 0.5f, 0.0f,
@@ -54,6 +51,10 @@ int main(int argc, char** argv)
     auto* vbo = kame::ogl21::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
     vbo->setBuffer(vtx);
 
+    auto vao = kame::ogl21::VertexArrayObjectBuilder()
+                   .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 3 * sizeof(float), 0)
+                   .build();
+
     for (;;)
     {
         win.update();
@@ -62,9 +63,8 @@ int main(int argc, char** argv)
             break;
         kame::ogl21::setViewport(0, 0, 640, 480);
         kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(0, 0, 0, 1));
-        shader->begin();
-        shader->drawArrays(vbo, GL_TRIANGLES, 0, 3);
-        shader->end();
+        kame::ogl21::setShader(shader);
+        kame::ogl21::drawArrays(vao, GL_TRIANGLES, 0, 3);
         win.swapWindow();
     }
 

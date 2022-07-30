@@ -47,15 +47,11 @@ int main(int argc, char** argv)
     win.openWindow();
     win.setVsync(true);
 
-    kame::ogl21::InputLayout layout;
-    layout.add(kame::ogl21::VertexAttributeBuilder().name("aPos").componentSize(3).build());
-    layout.add(kame::ogl21::VertexAttributeBuilder().name("aTexCoord").componentSize(2).build());
-
     std::string vs = kame::ogl21::getGlslVersionString();
     vs += vert;
     std::string fs = kame::ogl21::getGlslVersionString();
     fs += frag;
-    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str(), layout);
+    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str());
 
     const float vtx[] = {
         0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
@@ -67,6 +63,11 @@ int main(int argc, char** argv)
 
     auto* vbo = kame::ogl21::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
     vbo->setBuffer(vtx);
+
+    auto vao = kame::ogl21::VertexArrayObjectBuilder()
+                   .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 5 * sizeof(float), 0)
+                   .bindAttribute(shader->getAttribLocation("aTexCoord"), vbo, 2, 5 * sizeof(float), 3 * sizeof(float))
+                   .build();
 
     unsigned char img[] = {
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
@@ -92,10 +93,9 @@ int main(int argc, char** argv)
             break;
         kame::ogl21::setViewport(0, 0, 640, 480);
         kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(0, 0, 0, 1));
-        shader->begin();
+        kame::ogl21::setShader(shader);
+        kame::ogl21::drawArrays(vao, GL_TRIANGLES, 0, 6);
         kame::ogl21::setTexture2D(0, tex);
-        shader->drawArrays(vbo, GL_TRIANGLES, 0, 6);
-        shader->end();
         win.swapWindow();
     }
 

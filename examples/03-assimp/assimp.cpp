@@ -66,15 +66,11 @@ int main(int argc, char** argv)
     win.openWindow();
     win.setVsync(true);
 
-    kame::ogl21::InputLayout layout;
-    layout.add(kame::ogl21::VertexAttributeBuilder().name("vPos").componentSize(3).build());
-    layout.add(kame::ogl21::VertexAttributeBuilder().name("vUV").componentSize(2).build());
-
     std::string vs = kame::ogl21::getGlslVersionString();
     vs += vert;
     std::string fs = kame::ogl21::getGlslVersionString();
     fs += frag;
-    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str(), layout);
+    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str());
 
     auto* model = kame::assimp::loadModelFromMemory(gltf, gltf_len, "gltf");
     SPDLOG_INFO("Model Positions Size: {0}", model->mesh.positions.size() * 3);
@@ -96,8 +92,20 @@ int main(int argc, char** argv)
     }
     vbo->setBuffer((const float*)vertices);
 
+    auto* vboPositions = kame::ogl21::createVertexBuffer(model->mesh.positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
+    vboPositions->setBuffer((const float*)&model->mesh.positions[0]);
+
+    auto* vboTexCoords = kame::ogl21::createVertexBuffer(model->mesh.texCoords.size() * 2 * sizeof(float), GL_STATIC_DRAW);
+    vboTexCoords->setBuffer((const float*)&model->mesh.texCoords[0]);
+
     auto* ibo = kame::ogl21::createIndexBuffer(model->mesh.indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
     ibo->setBuffer((const unsigned int*)&model->mesh.indices[0]);
+
+    auto vao = kame::ogl21::VertexArrayObjectBuilder()
+                   .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
+                   .bindAttribute(shader->getAttribLocation("vUV"), vboTexCoords, 2, 2 * sizeof(float), 0)
+                   .bindIndexBuffer(ibo)
+                   .build();
 
     auto* tex = kame::ogl21::loadTexture2DFromMemory(uvgrid_png, uvgrid_png_len);
 
@@ -117,7 +125,7 @@ int main(int argc, char** argv)
                                                    .depthFunc(GL_LESS)
                                                    .build();
         kame::ogl21::setRenderState(renderState);
-        shader->begin();
+        kame::ogl21::setShader(shader);
         angle += 1.0f;
         if (angle > 360.0f)
         {
@@ -127,14 +135,15 @@ int main(int argc, char** argv)
         auto S = kame::math::Matrix4x4f::createScale(0.5f);
         shader->setMatrix4x4f("uModel", S * R);
         kame::ogl21::setTexture2D(0, tex);
-        shader->drawElements(ibo, vbo, GL_TRIANGLES, model->mesh.indices.size());
-        shader->end();
+        kame::ogl21::drawElements(vao, GL_TRIANGLES, model->mesh.indices.size());
         win.swapWindow();
     }
 
     kame::ogl21::deleteTexture2D(tex);
     kame::ogl21::deleteIndexBuffer(ibo);
     kame::ogl21::deleteVertexBuffer(vbo);
+    kame::ogl21::deleteVertexBuffer(vboTexCoords);
+    kame::ogl21::deleteVertexBuffer(vboPositions);
     kame::assimp::deleteModel(model);
     kame::ogl21::deleteShader(shader);
 

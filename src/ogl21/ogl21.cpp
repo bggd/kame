@@ -97,13 +97,41 @@ void setRenderState(RenderState state)
     }
 }
 
+void setShader(Shader* shader)
+{
+    glUseProgram(shader->id);
+}
+
 void setTexture2D(GLuint slot, Texture2D* tex)
 {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, tex->id);
 }
 
-Shader* createShader(const char* vert, const char* frag, InputLayout layout)
+void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count)
+{
+    for (const auto& i : vao.attributes)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, i.vbo_id);
+        glEnableVertexAttribArray(i.location);
+        glVertexAttribPointer(i.location, i.componentSize, i.type, i.normalized, i.stride, (const void*)i.offset);
+    }
+    glDrawArrays(mode, first, count);
+}
+
+void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count)
+{
+    for (const auto& i : vao.attributes)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, i.vbo_id);
+        glEnableVertexAttribArray(i.location);
+        glVertexAttribPointer(i.location, i.componentSize, i.type, i.normalized, i.stride, (const void*)i.offset);
+    }
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao.ibo_id);
+    glDrawElements(mode, count, GL_UNSIGNED_INT, NULL);
+}
+
+Shader* createShader(const char* vert, const char* frag)
 {
     Shader* s = new Shader();
     assert(s);
@@ -136,16 +164,7 @@ Shader* createShader(const char* vert, const char* frag, InputLayout layout)
     glDeleteShader(vs);
     glDeleteShader(fs);
 
-    GLsizei stride = 0;
-    for (auto& i : layout.attributes)
-    {
-        i.location = glGetAttribLocation(program, i.name);
-        stride += i.componentSize * sizeof(float);
-    }
-
     s->id = program;
-    s->inputLayout = layout;
-    s->inputLayout.stride = stride;
     return s;
 }
 
@@ -156,14 +175,10 @@ void deleteShader(Shader* shader)
     shader = nullptr;
 }
 
-void Shader::begin()
+GLuint Shader::getAttribLocation(const char* name)
 {
-    glUseProgram(id);
-}
-
-void Shader::end()
-{
-    glUseProgram(0);
+    GLint loc = glGetAttribLocation(id, name);
+    return (GLuint)loc;
 }
 
 void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m)
@@ -171,34 +186,28 @@ void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m)
     glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_TRUE, (const GLfloat*)&m);
 }
 
-void Shader::drawArrays(VertexBuffer* vbo, GLenum mode, GLint first, GLsizei count)
+VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
 {
-    assert(vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo->id);
-    uint32_t offset = 0;
-    for (const auto& i : inputLayout.attributes)
-    {
-        glEnableVertexAttribArray(i.location);
-        glVertexAttribPointer(i.location, i.componentSize, GL_FLOAT, GL_FALSE, inputLayout.stride, (const void*)(uintptr_t)offset);
-        offset += i.componentSize * sizeof(float);
-    }
-    glDrawArrays(mode, first, count);
+    assert(componentSize >= 1 || componentSize <= 4);
+
+    VertexArrayObject::Attribute attr;
+    attr.location = location;
+    attr.vbo_id = vbo->id;
+    attr.componentSize = componentSize;
+    attr.type = GL_FLOAT;
+    attr.normalized = GL_FALSE;
+    attr.stride = stride;
+    attr.offset = offset;
+
+    vao.attributes.push_back(attr);
+
+    return *this;
 }
 
-void Shader::drawElements(IndexBuffer* ibo, VertexBuffer* vbo, GLenum mode, GLsizei count)
+VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindIndexBuffer(const IndexBuffer* ibo)
 {
-    assert(ibo);
-    assert(vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo->id);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo->id);
-    uint32_t offset = 0;
-    for (const auto& i : inputLayout.attributes)
-    {
-        glEnableVertexAttribArray(i.location);
-        glVertexAttribPointer(i.location, i.componentSize, GL_FLOAT, GL_FALSE, inputLayout.stride, (const void*)(uintptr_t)offset);
-        offset += i.componentSize * sizeof(float);
-    }
-    glDrawElements(mode, count, GL_UNSIGNED_INT, NULL);
+    vao.ibo_id = ibo->id;
+    return *this;
 }
 
 VertexBuffer* createVertexBuffer(GLsizeiptr numBytes, GLenum usage)

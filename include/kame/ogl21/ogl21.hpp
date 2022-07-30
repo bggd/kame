@@ -19,40 +19,6 @@ public:
     static Context& getInstance();
 };
 
-struct VertexAttribute {
-    const char* name;
-    GLuint location;
-    GLuint componentSize;
-};
-
-struct VertexAttributeBuilder {
-    VertexAttribute attr;
-    VertexAttributeBuilder& name(const char* s)
-    {
-        attr.name = s;
-        return *this;
-    }
-    VertexAttributeBuilder& componentSize(GLuint n)
-    {
-        attr.componentSize = n;
-        return *this;
-    }
-    VertexAttribute build()
-    {
-        return attr;
-    }
-};
-
-struct InputLayout {
-    std::vector<VertexAttribute> attributes;
-    GLsizei stride;
-
-    void add(VertexAttribute attr)
-    {
-        attributes.push_back(attr);
-    }
-};
-
 struct VertexBuffer {
     GLuint id;
     GLsizeiptr numBytes;
@@ -69,17 +35,33 @@ struct IndexBuffer {
     void setBuffer(const unsigned int* vertices);
 };
 
+struct VertexArrayObject {
+    struct Attribute {
+        GLuint vbo_id;
+        GLuint location;
+        GLuint componentSize;
+        GLenum type;
+        GLboolean normalized;
+        GLsizei stride;
+        uintptr_t offset;
+    };
+    std::vector<VertexArrayObject::Attribute> attributes;
+    GLuint ibo_id = 0;
+};
+
+struct VertexArrayObjectBuilder {
+    VertexArrayObject vao;
+
+    VertexArrayObjectBuilder& bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset);
+    VertexArrayObjectBuilder& bindIndexBuffer(const IndexBuffer* ibo);
+    VertexArrayObject build() { return vao; }
+};
+
 struct Shader {
     GLint id;
-    VertexAttribute* attributes;
-    GLuint numAttr;
-    InputLayout inputLayout;
 
-    void begin();
-    void end();
+    GLuint getAttribLocation(const char* name);
     void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m);
-    void drawArrays(VertexBuffer* vbo, GLenum mode, GLint first, GLsizei count);
-    void drawElements(IndexBuffer* ibo, VertexBuffer* vbo, GLenum mode, GLsizei count);
 };
 
 struct Texture2D {
@@ -109,13 +91,15 @@ struct RenderStateBuilder {
         return *this;
     }
 
-    RenderStateBuilder& blendEquation(GLenum modeRGB, GLenum modeA) {
+    RenderStateBuilder& blendEquation(GLenum modeRGB, GLenum modeA)
+    {
         state.blendEqRGB = modeRGB;
         state.blendEqA = modeA;
         return *this;
     }
 
-    RenderStateBuilder& depthFunc(GLenum func) {
+    RenderStateBuilder& depthFunc(GLenum func)
+    {
         state.depthFunc = func;
         state.useDepth = true;
         return *this;
@@ -132,9 +116,12 @@ const char* getGlslVersionString();
 void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 void setClearBuffer(GLbitfield mask, kame::math::Vector4f color);
 void setRenderState(RenderState state);
+void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
+void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count);
+void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count);
 
-Shader* createShader(const char* vert, const char* frag, InputLayout layout);
+Shader* createShader(const char* vert, const char* frag);
 void deleteShader(Shader* shader);
 
 VertexBuffer* createVertexBuffer(GLsizeiptr numBytes, GLenum usage);
