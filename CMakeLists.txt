@@ -11,15 +11,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 
 add_subdirectory(SDL)
 add_subdirectory(spdlog)
-set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT  OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ASSIMP_VIEW OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
-add_subdirectory(assimp)
 
 add_library(kame
     STATIC
@@ -27,12 +18,11 @@ add_library(kame
     src/sdl2/sdl2.cpp
 	src/ogl21/glad.cpp
 	src/ogl21/ogl21.cpp
-	src/assimp/assimp.cpp
 	src/gltf/gltf.cpp
 	pystring/pystring.cpp
 )
 
-target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog assimp)
+target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog)
 
 target_include_directories(kame
     PUBLIC
@@ -53,9 +43,6 @@ target_link_libraries(kameTriangle kame)
 add_executable(kameImage
 examples/02-image/image.cpp)
 target_link_libraries(kameImage kame)
-add_executable(kameAssimp
-examples/03-assimp/assimp.cpp)
-target_link_libraries(kameAssimp kame)
 add_executable(kameGltf
 examples/04-gltf/gltf.cpp)
 target_link_libraries(kameGltf kame)

@@ -11,4 +11,3 @@ void kameShutdown();
 #include "ogl21/ogl21.hpp"
 #include "math/math.hpp"
 #include "gltf/gltf.hpp"
-#include "assimp/assimp.hpp"
