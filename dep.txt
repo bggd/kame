@@ -12,3 +12,11 @@ git clone --depth 1 --branch v1.10.0 https://github.com/gabime/spdlog.git
 - assimp
 
 git clone --depth 1 --branch v5.2.3 https://github.com/assimp/assimp.git
+
+- nlohmann/json
+
+git clone --depth 1 --branch v3.11.1 https://github.com/nlohmann/json.git
+
+- pystring (commit hash: 089194ddaf62a9cd536caf0e9ed7f0054979efa5 )
+
+git clone --depth 1 https://github.com/imageworks/pystring

@@ -40,11 +40,6 @@ void main() {
 }
 )";
 
-struct Vertex {
-    Vector3f vPos;
-    Vector2f vUV;
-};
-
 float deg2rad(float degree)
 {
     return degree * (3.14159265358979323846F / 180.0F);
@@ -73,33 +68,18 @@ int main(int argc, char** argv)
     auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str());
 
     auto* model = kame::assimp::loadModelFromMemory(gltf, gltf_len, "gltf");
-    SPDLOG_INFO("Model Positions Size: {0}", model->mesh.positions.size() * 3);
-    SPDLOG_INFO("Model TexCoords Size: {0}", model->mesh.texCoords.size() * 2);
-    SPDLOG_INFO("Model Indices Size: {0}", model->mesh.indices.size());
+    SPDLOG_INFO("Model Positions Size: {0}", model->meshes[0].positions.size() * 3);
+    SPDLOG_INFO("Model TexCoords Size: {0}", model->meshes[0].texCoords[0].size() * 2);
+    SPDLOG_INFO("Model Indices Size: {0}", model->meshes[0].indices.size());
 
-    auto* vbo = kame::ogl21::createVertexBuffer(model->mesh.positions.size() * 5 * sizeof(float), GL_STATIC_DRAW);
-    Vertex* vertices = new Vertex[model->mesh.positions.size()];
-    assert(vertices);
-    for (unsigned int i = 0; i < model->mesh.positions.size(); ++i)
-    {
-        Vertex v;
-        v.vPos.x = model->mesh.positions[i].x;
-        v.vPos.y = model->mesh.positions[i].y;
-        v.vPos.z = model->mesh.positions[i].z;
-        v.vUV.x = model->mesh.texCoords[i].x;
-        v.vUV.y = model->mesh.texCoords[i].y;
-        vertices[i] = v;
-    }
-    vbo->setBuffer((const float*)vertices);
+    auto* vboPositions = kame::ogl21::createVertexBuffer(model->meshes[0].positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
+    vboPositions->setBuffer((const float*)&model->meshes[0].positions[0]);
 
-    auto* vboPositions = kame::ogl21::createVertexBuffer(model->mesh.positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
-    vboPositions->setBuffer((const float*)&model->mesh.positions[0]);
+    auto* vboTexCoords = kame::ogl21::createVertexBuffer(model->meshes[0].texCoords[0].size() * 2 * sizeof(float), GL_STATIC_DRAW);
+    vboTexCoords->setBuffer((const float*)&model->meshes[0].texCoords[0][0]);
 
-    auto* vboTexCoords = kame::ogl21::createVertexBuffer(model->mesh.texCoords.size() * 2 * sizeof(float), GL_STATIC_DRAW);
-    vboTexCoords->setBuffer((const float*)&model->mesh.texCoords[0]);
-
-    auto* ibo = kame::ogl21::createIndexBuffer(model->mesh.indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
-    ibo->setBuffer((const unsigned int*)&model->mesh.indices[0]);
+    auto* ibo = kame::ogl21::createIndexBuffer(model->meshes[0].indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
+    ibo->setBuffer((const unsigned int*)&model->meshes[0].indices[0]);
 
     auto vao = kame::ogl21::VertexArrayObjectBuilder()
                    .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
@@ -133,15 +113,14 @@ int main(int argc, char** argv)
         }
         auto R = kame::math::Matrix4x4f::createRotationY(deg2rad(angle));
         auto S = kame::math::Matrix4x4f::createScale(0.5f);
-        shader->setMatrix4x4f("uModel", S * R);
+        shader->setMatrix4x4f("uModel", S * R, true);
         kame::ogl21::setTexture2D(0, tex);
-        kame::ogl21::drawElements(vao, GL_TRIANGLES, model->mesh.indices.size());
+        kame::ogl21::drawElements(vao, GL_TRIANGLES, model->meshes[0].indices.size(), GL_UNSIGNED_INT);
         win.swapWindow();
     }
 
     kame::ogl21::deleteTexture2D(tex);
     kame::ogl21::deleteIndexBuffer(ibo);
-    kame::ogl21::deleteVertexBuffer(vbo);
     kame::ogl21::deleteVertexBuffer(vboTexCoords);
     kame::ogl21::deleteVertexBuffer(vboPositions);
     kame::assimp::deleteModel(model);

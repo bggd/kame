@@ -11,6 +11,8 @@
 
 #include "stb_image.h"
 
+#include "../pystring/pystring.h"
+
 #include <cassert>
 #include <cstdio>
 #include <cstdint>
@@ -19,3 +21,5 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <unordered_set>
+#include <fstream>

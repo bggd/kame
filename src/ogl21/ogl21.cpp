@@ -119,7 +119,7 @@ void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei 
     glDrawArrays(mode, first, count);
 }
 
-void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count)
+void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count, GLenum type)
 {
     for (const auto& i : vao.attributes)
     {
@@ -128,7 +128,7 @@ void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count)
         glVertexAttribPointer(i.location, i.componentSize, i.type, i.normalized, i.stride, (const void*)i.offset);
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao.ibo_id);
-    glDrawElements(mode, count, GL_UNSIGNED_INT, NULL);
+    glDrawElements(mode, count, type, NULL);
 }
 
 Shader* createShader(const char* vert, const char* frag)
@@ -181,9 +181,9 @@ GLuint Shader::getAttribLocation(const char* name)
     return (GLuint)loc;
 }
 
-void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m)
+void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose)
 {
-    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_TRUE, (const GLfloat*)&m);
+    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
 }
 
 VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
@@ -234,6 +234,14 @@ void deleteVertexBuffer(VertexBuffer* vbo)
     vbo = nullptr;
 }
 
+void VertexBuffer::setBuffer(const unsigned char* vertices)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, id);
+    glBufferData(GL_ARRAY_BUFFER, numBytes, NULL, usage); // orphaning
+    glBufferData(GL_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void VertexBuffer::setBuffer(const float* vertices)
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -263,6 +271,22 @@ void deleteIndexBuffer(IndexBuffer* ibo)
     glDeleteBuffers(1, &ibo->id);
     delete ibo;
     ibo = nullptr;
+}
+
+void IndexBuffer::setBuffer(const unsigned char* vertices)
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, NULL, usage); // orphaning
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void IndexBuffer::setBuffer(const unsigned short* vertices)
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, NULL, usage); // orphaning
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void IndexBuffer::setBuffer(const unsigned int* vertices)

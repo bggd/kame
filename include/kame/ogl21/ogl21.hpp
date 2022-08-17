@@ -24,6 +24,7 @@ struct VertexBuffer {
     GLsizeiptr numBytes;
     GLenum usage;
 
+    void setBuffer(const unsigned char* vertices);
     void setBuffer(const float* vertices);
 };
 
@@ -32,6 +33,8 @@ struct IndexBuffer {
     GLsizeiptr numBytes;
     GLenum usage;
 
+    void setBuffer(const unsigned char* vertices);
+    void setBuffer(const unsigned short* vertices);
     void setBuffer(const unsigned int* vertices);
 };
 
@@ -61,7 +64,7 @@ struct Shader {
     GLint id;
 
     GLuint getAttribLocation(const char* name);
-    void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m);
+    void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose);
 };
 
 struct Texture2D {
@@ -119,7 +122,7 @@ void setRenderState(RenderState state);
 void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
 void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count);
-void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count);
+void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count, GLenum type);
 
 Shader* createShader(const char* vert, const char* frag);
 void deleteShader(Shader* shader);

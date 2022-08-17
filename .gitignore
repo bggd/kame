@@ -34,10 +34,17 @@
 *.swp
 *.png
 *.jpg
+*.gltf
+*.py
+*.user
 .vs
 CMakeSettings.json
 SDL/
 spdlog/
+json/
+pystring
+!include/kame/json
+!src/json
 assimp/
 out/
 !include/kame/assimp

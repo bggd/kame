@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(kame LANGUAGES CXX)
+project(kame LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,6 +28,8 @@ add_library(kame
 	src/ogl21/glad.cpp
 	src/ogl21/ogl21.cpp
 	src/assimp/assimp.cpp
+	src/gltf/gltf.cpp
+	pystring/pystring.cpp
 )
 
 target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog assimp)
@@ -54,3 +56,6 @@ target_link_libraries(kameImage kame)
 add_executable(kameAssimp
 examples/03-assimp/assimp.cpp)
 target_link_libraries(kameAssimp kame)
+add_executable(kameGltf
+examples/04-gltf/gltf.cpp)
+target_link_libraries(kameGltf kame)
