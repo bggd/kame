@@ -270,6 +270,29 @@ Gltf* loadGLTF(const char* path)
     return gltf;
 }
 
+Gltf* loadGLTFFromMemory(const char* jsonString)
+{
+    Gltf* gltf = new Gltf();
+    assert(gltf);
+
+    json j = json::parse(jsonString);
+
+    if (j.contains("scene"))
+    {
+        gltf->scene = j["scene"].get<integer>();
+        gltf->hasScene = true;
+    }
+
+    loadScenes(gltf, j);
+    loadNodes(gltf, j);
+    loadBuffers(gltf, j);
+    loadBufferViews(gltf, j);
+    loadAccessors(gltf, j);
+    loadMeshes(gltf, j);
+
+    return gltf;
+}
+
 void deleteGLTF(Gltf* gltf)
 {
     delete gltf;

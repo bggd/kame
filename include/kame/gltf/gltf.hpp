@@ -96,6 +96,7 @@ struct Gltf {
 };
 
 Gltf* loadGLTF(const char* path);
+Gltf* loadGLTFFromMemory(const char* jsonString);
 void deleteGLTF(Gltf* gltf);
 
 } // namespace kame::gltf
