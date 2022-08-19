@@ -95,6 +95,38 @@ void setRenderState(RenderState state)
     {
         glDisable(GL_DEPTH_TEST);
     }
+
+    if (state.useFrameBuffer)
+    {
+        auto& ctx = Context::getInstance();
+        if (ctx.fboID == 0)
+        {
+            glGenFramebuffers(1, &ctx.fboID);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, ctx.fboID);
+        for (unsigned int i = 0; i < state.colorBuffers.size(); ++i)
+        {
+            auto& b = state.colorBuffers[i];
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, b->id, 0);
+        }
+        if (state.depthBuffer)
+        {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state.depthBuffer->id, 0);
+        }
+        if (!state.drawBuffers.empty())
+        {
+            glDrawBuffers(state.drawBuffers.size(), (const GLenum*)state.drawBuffers.data());
+        }
+        else
+        {
+            GLenum buf[] = {GL_NONE};
+            glDrawBuffers(1, buf);
+        }
+    }
+    else
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 }
 
 void setShader(Shader* shader)
@@ -355,6 +387,26 @@ Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len)
     t->id = tex;
     t->width = x;
     t->height = y;
+    return t;
+}
+
+Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum format, GLenum type)
+{
+    Texture2D* t = new Texture2D();
+    assert(t);
+
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, NULL);
+
+    t->id = tex;
+    t->width = width;
+    t->height = height;
     return t;
 }
 

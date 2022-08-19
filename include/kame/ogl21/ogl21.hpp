@@ -11,6 +11,7 @@ namespace kame::ogl21 {
 struct Context {
     int versionMajor, versionMinor;
     bool isAvaliable;
+    GLuint fboID;
 
 private:
     Context() {}
@@ -76,9 +77,13 @@ struct Texture2D {
 struct RenderState {
     bool useBlend = false;
     bool useDepth = false;
+    bool useFrameBuffer = false;
     GLenum srcRGB, srcA, dstRGB, dstA;
     GLenum blendEqRGB, blendEqA;
     GLenum depthFunc;
+    std::vector<Texture2D*> colorBuffers;
+    Texture2D* depthBuffer = nullptr;
+    std::vector<GLenum> drawBuffers;
 };
 
 struct RenderStateBuilder {
@@ -105,6 +110,21 @@ struct RenderStateBuilder {
     {
         state.depthFunc = func;
         state.useDepth = true;
+        return *this;
+    }
+
+    RenderStateBuilder& attachDepthBuffer(Texture2D* tex)
+    {
+        state.depthBuffer = tex;
+        state.useFrameBuffer = true;
+        return *this;
+    }
+
+    RenderStateBuilder& attachColorBuffer(Texture2D* tex)
+    {
+        state.drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + state.colorBuffers.size());
+        state.colorBuffers.push_back(tex);
+        state.useFrameBuffer = true;
         return *this;
     }
 
@@ -135,6 +155,7 @@ void deleteIndexBuffer(IndexBuffer* ibo);
 
 Texture2D* loadTexture2D(const char* path);
 Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len);
+Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum format, GLenum type);
 void deleteTexture2D(Texture2D* tex);
 
 } // namespace kame::ogl21

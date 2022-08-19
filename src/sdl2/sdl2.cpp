@@ -1,5 +1,6 @@
 #include <all.hpp>
 
+void printSDL_GL_GetAttribute();
 void debugGLMessageCallback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
 void spdlogSDL2(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
@@ -12,19 +13,11 @@ void Window::openWindow(const char* title, int w, int h)
 
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
     if (isOGL21DebugMode)
     {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     }
-    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     if (isOGL21DebugMode)
@@ -41,6 +34,7 @@ void Window::openWindow(const char* title, int w, int h)
     glc = SDL_GL_CreateContext(window);
     assert(glc);
     SDL_GL_MakeCurrent(window, glc);
+    printSDL_GL_GetAttribute();
 
     int version = gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
     assert(version != 0);
@@ -53,14 +47,31 @@ void Window::openWindow(const char* title, int w, int h)
     kame::ogl21::Context::getInstance().isAvaliable = true;
 
     assert(GLAD_GL_VERSION_2_1);
-    assert(GLAD_GL_EXT_framebuffer_object);
-
-    if (isOGL21DebugMode && GLAD_GL_KHR_debug)
+    if (GLAD_VERSION_MAJOR(version) < 3)
     {
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageCallback(debugGLMessageCallback, nullptr);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+        assert(GLAD_GL_ARB_framebuffer_object || GLAD_GL_EXT_framebuffer_object);
+        if (!GLAD_GL_ARB_framebuffer_object && GLAD_GL_EXT_framebuffer_object)
+        {
+            glGenFramebuffers = glGenFramebuffersEXT;
+            glBindFramebuffer = glBindFramebufferEXT;
+            glFramebufferTexture2D = glFramebufferTexture2DEXT;
+        }
+    }
+
+    if (isOGL21DebugMode)
+    {
+        if (GLAD_GL_KHR_debug)
+        {
+            SPDLOG_INFO("GL_KHR_debug is avaliable");
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(debugGLMessageCallback, nullptr);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+        }
+        else
+        {
+            SPDLOG_INFO("GL_KHR_debug is unavaliable");
+        }
     }
 
     if (GLAD_VERSION_MAJOR(version) > 2 && GLAD_GL_ARB_vertex_array_object)
@@ -150,6 +161,29 @@ const State& Window::getState()
     return state;
 }
 } // namespace kame::sdl2
+
+void printSDL_GL_GetAttribute()
+{
+    int v;
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &v);
+    SPDLOG_INFO("SDL_GL_CONTEXT_MAJOR_VERSION: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &v);
+    SPDLOG_INFO("SDL_GL_CONTEXT_MINOR_VERSION: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &v);
+    SPDLOG_INFO("SDL_GL_DOUBLEBUFFER: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &v);
+    SPDLOG_INFO("SDL_GL_RED_SIZE: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &v);
+    SPDLOG_INFO("SDL_GL_GREEN_SIZE: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &v);
+    SPDLOG_INFO("SDL_GL_BLUE_SIZE: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &v);
+    SPDLOG_INFO("SDL_GL_ALPHA_SIZE: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &v);
+    SPDLOG_INFO("SDL_GL_DEPTH_SIZE: {0}", v);
+    SDL_GL_GetAttribute(SDL_GL_BUFFER_SIZE, &v);
+    SPDLOG_INFO("SDL_GL_BUFFER_SIZE: {0}", v);
+}
 
 void debugGLMessageCallback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
 {
