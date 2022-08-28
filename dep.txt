@@ -1,7 +1,7 @@
 
 - SDL2
 
-git clone --depth 1 --branch release-2.0.22 https://github.com/libsdl-org/SDL.git
+git clone --depth 1 --branch release-2.24.0 https://github.com/libsdl-org/SDL.git
 
 
 - spdlog
