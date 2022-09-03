@@ -37,6 +37,7 @@
 *.gltf
 *.py
 *.user
+tags
 .vs
 CMakeSettings.json
 SDL/
