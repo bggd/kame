@@ -159,12 +159,15 @@ int main(int argc, char** argv)
         kame::ogl21::setViewport(0, 0, 640, 480);
         kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4f(0, 0, 0, 1));
         kame::ogl21::setShader(shader);
-        kame::ogl21::RenderState renderState = kame::ogl21::RenderStateBuilder()
-                                                   .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
-                                                   .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-                                                   .depthFunc(GL_LESS)
-                                                   .build();
-        kame::ogl21::setRenderState(renderState);
+        kame::ogl21::BlendState blendState = kame::ogl21::BlendStateBuilder()
+                                                 .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
+                                                 .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+                                                 .build();
+        kame::ogl21::DepthStencilState depthState = kame::ogl21::DepthStencilStateBuilder()
+                                                        .depthFunc(GL_LESS)
+                                                        .build();
+        kame::ogl21::setBlendState(blendState);
+        kame::ogl21::setDepthStencilState(depthState);
         kame::ogl21::setTexture2D(0, tex);
         angle += 1.0f;
         if (angle > 360.0f)

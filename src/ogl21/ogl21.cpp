@@ -73,7 +73,7 @@ void setClearBuffer(GLbitfield mask, kame::math::Vector4f color)
     glClearColor(color.x, color.y, color.z, color.w);
 }
 
-void setRenderState(RenderState state)
+void setBlendState(BlendState state)
 {
     if (state.useBlend)
     {
@@ -85,7 +85,10 @@ void setRenderState(RenderState state)
     {
         glDisable(GL_BLEND);
     }
+}
 
+void setDepthStencilState(DepthStencilState state)
+{
     if (state.useDepth)
     {
         glEnable(GL_DEPTH_TEST);
@@ -94,38 +97,6 @@ void setRenderState(RenderState state)
     else
     {
         glDisable(GL_DEPTH_TEST);
-    }
-
-    if (state.useFrameBuffer)
-    {
-        auto& ctx = Context::getInstance();
-        if (ctx.fboID == 0)
-        {
-            glGenFramebuffers(1, &ctx.fboID);
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, ctx.fboID);
-        for (unsigned int i = 0; i < state.colorBuffers.size(); ++i)
-        {
-            auto& b = state.colorBuffers[i];
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, b->id, 0);
-        }
-        if (state.depthBuffer)
-        {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state.depthBuffer->id, 0);
-        }
-        if (!state.drawBuffers.empty())
-        {
-            glDrawBuffers(state.drawBuffers.size(), (const GLenum*)state.drawBuffers.data());
-        }
-        else
-        {
-            GLenum buf[] = {GL_NONE};
-            glDrawBuffers(1, buf);
-        }
-    }
-    else
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 }
 

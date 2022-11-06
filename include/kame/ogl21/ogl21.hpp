@@ -5,13 +5,13 @@
 #include <kame/math/math.hpp>
 
 #include <vector>
+#include <cassert>
 
 namespace kame::ogl21 {
 
 struct Context {
     int versionMajor, versionMinor;
     bool isAvaliable;
-    GLuint fboID;
 
 private:
     Context() {}
@@ -74,61 +74,65 @@ struct Texture2D {
     void setTexParameteri(GLenum pname, GLint param);
 };
 
-struct RenderState {
+struct BlendState {
     bool useBlend = false;
-    bool useDepth = false;
-    bool useFrameBuffer = false;
     GLenum srcRGB, srcA, dstRGB, dstA;
     GLenum blendEqRGB, blendEqA;
-    GLenum depthFunc;
-    std::vector<Texture2D*> colorBuffers;
-    Texture2D* depthBuffer = nullptr;
-    std::vector<GLenum> drawBuffers;
 };
 
-struct RenderStateBuilder {
-    RenderState state;
+struct BlendStateBuilder {
+    bool useBlendFn = false;
+    bool useBlendEq = false;
+    BlendState state;
 
-    RenderStateBuilder& blendFunction(GLenum srcRGB, GLenum dstRGB, GLenum srcA, GLenum dstA)
+    BlendStateBuilder& blendFunction(GLenum srcRGB, GLenum dstRGB, GLenum srcA, GLenum dstA)
     {
         state.srcRGB = srcRGB;
         state.srcA = srcA;
         state.dstRGB = dstRGB;
         state.dstA = dstA;
-        state.useBlend = true;
+        useBlendFn = true;
         return *this;
     }
 
-    RenderStateBuilder& blendEquation(GLenum modeRGB, GLenum modeA)
+    BlendStateBuilder& blendEquation(GLenum modeRGB, GLenum modeA)
     {
         state.blendEqRGB = modeRGB;
         state.blendEqA = modeA;
+        useBlendEq = true;
         return *this;
     }
 
-    RenderStateBuilder& depthFunc(GLenum func)
+    BlendState build()
+    {
+        if (useBlendFn && useBlendEq)
+        {
+            state.useBlend = true;
+        }
+        else
+        {
+            assert(!useBlendFn && !useBlendEq);
+        }
+        return state;
+    }
+};
+
+struct DepthStencilState {
+    bool useDepth = false;
+    GLenum depthFunc;
+};
+
+struct DepthStencilStateBuilder {
+    DepthStencilState state;
+
+    DepthStencilStateBuilder& depthFunc(GLenum func)
     {
         state.depthFunc = func;
         state.useDepth = true;
         return *this;
     }
 
-    RenderStateBuilder& attachDepthBuffer(Texture2D* tex)
-    {
-        state.depthBuffer = tex;
-        state.useFrameBuffer = true;
-        return *this;
-    }
-
-    RenderStateBuilder& attachColorBuffer(Texture2D* tex)
-    {
-        state.drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + state.colorBuffers.size());
-        state.colorBuffers.push_back(tex);
-        state.useFrameBuffer = true;
-        return *this;
-    }
-
-    RenderState build()
+    DepthStencilState build()
     {
         return state;
     }
@@ -138,7 +142,8 @@ const char* getGlslVersionString();
 
 void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 void setClearBuffer(GLbitfield mask, kame::math::Vector4f color);
-void setRenderState(RenderState state);
+void setBlendState(BlendState state);
+void setDepthStencilState(DepthStencilState state);
 void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
 void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count);
