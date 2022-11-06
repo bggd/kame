@@ -1,21 +1,15 @@
 
 - SDL2
 
-git clone --depth 1 --branch release-2.24.0 https://github.com/libsdl-org/SDL.git
-
+git clone --depth 1 --branch release-2.24.2 https://github.com/libsdl-org/SDL.git
 
 - spdlog
 
-git clone --depth 1 --branch v1.10.0 https://github.com/gabime/spdlog.git
-
-
-- assimp
-
-git clone --depth 1 --branch v5.2.3 https://github.com/assimp/assimp.git
+git clone --depth 1 --branch v1.11.0 https://github.com/gabime/spdlog.git
 
 - nlohmann/json
 
-git clone --depth 1 --branch v3.11.1 https://github.com/nlohmann/json.git
+git clone --depth 1 --branch v3.11.2 https://github.com/nlohmann/json.git
 
 - pystring (commit hash: 089194ddaf62a9cd536caf0e9ed7f0054979efa5 )
 
