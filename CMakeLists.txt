@@ -14,8 +14,8 @@ add_subdirectory(spdlog)
 
 add_library(kame
     STATIC
-	src/kame.cpp
-    src/sdl2/sdl2.cpp
+        src/kame.cpp
+        src/sdl2/sdl2.cpp
 	src/ogl21/glad.cpp
 	src/ogl21/ogl21.cpp
 	src/gltf/gltf.cpp
@@ -26,23 +26,26 @@ target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog)
 
 target_include_directories(kame
     PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/SDL/include>
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include>
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/assimp/include>
-	PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/SDL/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/assimp/include>
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 
 add_executable(kameHelloWorld
-examples/00-helloworld/helloworld.cpp)
+    examples/00-helloworld/helloworld.cpp)
 target_link_libraries(kameHelloWorld kame)
+
 add_executable(kameTriangle
-examples/01-triangle/triangle.cpp)
+    examples/01-triangle/triangle.cpp)
 target_link_libraries(kameTriangle kame)
+
 add_executable(kameImage
-examples/02-image/image.cpp)
+    examples/02-image/image.cpp)
 target_link_libraries(kameImage kame)
+
 add_executable(kameGltf
-examples/04-gltf/gltf.cpp)
+    examples/04-gltf/gltf.cpp)
 target_link_libraries(kameGltf kame)
