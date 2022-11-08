@@ -74,6 +74,16 @@ struct Texture2D {
     void setTexParameteri(GLenum pname, GLint param);
 };
 
+struct FrameBuffer {
+    GLuint id;
+    GLuint depthRBO;
+    bool useDepthRBO;
+
+    void setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel);
+    void setDepthAttachmentFromRenderBuffer(int width, int height);
+    bool checkStatus();
+};
+
 struct BlendState {
     bool useBlend = false;
     GLenum srcRGB, srcA, dstRGB, dstA;
@@ -162,5 +172,8 @@ Texture2D* loadTexture2D(const char* path);
 Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len);
 Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum format, GLenum type);
 void deleteTexture2D(Texture2D* tex);
+
+FrameBuffer* createFrameBuffer();
+void deleteFrameBuffer(FrameBuffer* fbo);
 
 } // namespace kame::ogl21

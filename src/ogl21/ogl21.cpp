@@ -384,6 +384,7 @@ Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum f
 void deleteTexture2D(Texture2D* tex)
 {
     glDeleteTextures(1, &tex->id);
+    delete tex;
     tex = nullptr;
 }
 
@@ -391,6 +392,61 @@ void Texture2D::setTexParameteri(GLenum pname, GLint param)
 {
     glBindTexture(GL_TEXTURE_2D, id);
     glTexParameteri(GL_TEXTURE_2D, pname, param);
+}
+
+FrameBuffer* createFrameBuffer()
+{
+    FrameBuffer* fbo = new FrameBuffer();
+    assert(fbo);
+
+    GLuint buffer;
+    glGenFramebuffers(1, &buffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    fbo->id = buffer;
+    fbo->depthRBO = 0;
+    return fbo;
+}
+
+void deleteFrameBuffer(FrameBuffer* fbo)
+{
+    if (fbo->useDepthRBO)
+    {
+        glDeleteRenderbuffers(1, &fbo->depthRBO);
+    }
+    glDeleteFramebuffers(1, &fbo->id);
+    delete fbo;
+    fbo = nullptr;
+}
+
+void FrameBuffer::setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel = 0)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, tex->id, mipmapLevel);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::setDepthAttachmentFromRenderBuffer(int width, int height)
+{
+    assert(useDepthRBO == false);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    glGenRenderbuffers(1, &depthRBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthRBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthRBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    useDepthRBO = true;
+}
+
+bool FrameBuffer::checkStatus()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return status == GL_FRAMEBUFFER_COMPLETE;
 }
 
 } // namespace kame::ogl21
