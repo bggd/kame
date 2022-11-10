@@ -296,7 +296,6 @@ Gltf* loadGLTFFromMemory(const char* jsonString)
 void deleteGLTF(Gltf* gltf)
 {
     delete gltf;
-    gltf = nullptr;
 }
 
 int b64ToInt(std::string c)

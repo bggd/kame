@@ -175,7 +175,6 @@ void deleteShader(Shader* shader)
 {
     glDeleteProgram(shader->id);
     delete shader;
-    shader = nullptr;
 }
 
 GLuint Shader::getAttribLocation(const char* name)
@@ -234,7 +233,6 @@ void deleteVertexBuffer(VertexBuffer* vbo)
 {
     glDeleteBuffers(1, &vbo->id);
     delete vbo;
-    vbo = nullptr;
 }
 
 void VertexBuffer::setBuffer(const unsigned char* vertices)
@@ -273,7 +271,6 @@ void deleteIndexBuffer(IndexBuffer* ibo)
 {
     glDeleteBuffers(1, &ibo->id);
     delete ibo;
-    ibo = nullptr;
 }
 
 void IndexBuffer::setBuffer(const unsigned char* vertices)
@@ -385,7 +382,6 @@ void deleteTexture2D(Texture2D* tex)
 {
     glDeleteTextures(1, &tex->id);
     delete tex;
-    tex = nullptr;
 }
 
 void Texture2D::setTexParameteri(GLenum pname, GLint param)
@@ -417,7 +413,6 @@ void deleteFrameBuffer(FrameBuffer* fbo)
     }
     glDeleteFramebuffers(1, &fbo->id);
     delete fbo;
-    fbo = nullptr;
 }
 
 void FrameBuffer::setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel = 0)
