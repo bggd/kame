@@ -51,7 +51,7 @@ void loadNodes(Gltf* gltf, json& j)
             if (e.contains("mesh"))
             {
                 node.mesh = e["mesh"].get<integer>();
-                node.hasMatrix = true;
+                node.hasMesh = true;
             }
             if (e.contains("matrix"))
             {

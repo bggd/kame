@@ -7,6 +7,7 @@ void kameShutdown();
 
 } // namespace kame
 
+#include "squirtle/squirtle.hpp" // squirtle render engine
 #include "sdl2/sdl2.hpp"
 #include "ogl21/ogl21.hpp"
 #include "math/math.hpp"

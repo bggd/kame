@@ -1,5 +1,9 @@
 #pragma once
 
+namespace kame::math {
+struct Matrix4x4f;
+}
+
 #include <cmath>
 
 namespace kame::math {
@@ -19,6 +23,11 @@ struct Vector3f {
     static Vector3f Zero()
     {
         return {0.0f, 0.0f, 0.0f};
+    }
+
+    static Vector3f One()
+    {
+        return {1.0f, 1.0f, 1.0f};
     }
 
     static float dot(Vector3f a, Vector3f b)
@@ -58,6 +67,8 @@ struct Vector3f {
             a.z * b.x - a.x * b.z,
             a.x * b.y - a.y * b.x};
     }
+
+    static Vector3f transform(Vector3f v, const kame::math::Matrix4x4f& m);
 };
 
 static Vector3f operator+(Vector3f a, Vector3f b)

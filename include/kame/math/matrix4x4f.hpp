@@ -44,6 +44,11 @@ struct Matrix4x4f {
         return Matrix4x4f(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     }
 
+    static Matrix4x4f Identity()
+    {
+        return Matrix4x4f(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    }
+
     static Matrix4x4f Multiply(Matrix4x4f& a, Matrix4x4f& b)
     {
         Matrix4x4f m = Matrix4x4f::Zero();
@@ -64,17 +69,15 @@ struct Matrix4x4f {
         return m;
     }
 
-    static Matrix4x4f createLookAt(Vector3f cameraPosition, Vector3f cameraTarget, Vector3f cameraUp)
+    static Matrix4x4f createLookAt_RH(Vector3f cameraPosition, Vector3f cameraTarget, Vector3f cameraUp)
     {
-        Vector3f cameraDirection = Vector3f::normalize(cameraPosition - cameraTarget);
-        Vector3f cameraRight = Vector3f::normalize(Vector3f::cross(cameraUp, cameraDirection));
-        cameraUp = Vector3f::cross(cameraDirection, cameraRight);
-
-        Matrix4x4f m(
-            cameraRight.x, cameraUp.x, cameraDirection.x, 0.0F,
-            cameraRight.y, cameraUp.y, cameraDirection.y, 0.0F,
-            cameraRight.z, cameraUp.z, cameraDirection.z, 0.0F,
-            -cameraPosition.x, -cameraPosition.y, -cameraPosition.z, 1.0F);
+        Vector3f f = Vector3f::normalize(cameraTarget - cameraPosition);
+        Vector3f s = Vector3f::normalize(Vector3f::cross(f, cameraUp));
+        Vector3f u = Vector3f::cross(s, f);
+        Matrix4x4f m(s.x, u.x, -f.x, 0.0f,
+                     s.y, u.y, -f.y, 0.0f,
+                     s.z, u.z, -f.z, 0.0f,
+                     -Vector3f::dot(s, cameraPosition), -Vector3f::dot(u, cameraPosition), Vector3f::dot(f, cameraPosition), 1.0f);
         return m;
     }
 
@@ -90,21 +93,18 @@ struct Matrix4x4f {
             0.0F, 2.0F / (top - bottom), 0.0F, 0.0F,
             0.0F, 0.0F, -2.0F / (zFarPlane - zNearPlane), 0.0F,
             tX, tY, tZ, 1.0F);
-
         return m;
     }
 
     // Right Handed, Negative One to One Depth([-1.0, 1.0])
     static Matrix4x4f createPerspectiveFieldOfView_RH_NO(float fovYRadian, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
     {
-        float f = 1.0F / tanf(fovYRadian / 2.0F);
+        float a = 1.0f / tanf(fovYRadian / 2.0f);
 
-        Matrix4x4f m(
-            f / aspectRatio, 0.0F, 0.0F, 0.0F,
-            0.0F, f, 0.0F, 0.0F,
-            0.0F, 0.0F, (farPlaneDistance + nearPlaneDistance) / (nearPlaneDistance - farPlaneDistance), -1.0F,
-            0.0F, 0.0F, (2.0F * farPlaneDistance * nearPlaneDistance) / (nearPlaneDistance - farPlaneDistance), 0.0F);
-
+        Matrix4x4f m(a / aspectRatio, 0.0f, 0.0f, 0.0f,
+                     0.0f, a, 0.0f, 0.0f,
+                     0.0f, 0.0f, -((farPlaneDistance + nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), -1.0f,
+                     0.0f, 0.0f, -((2.0f * farPlaneDistance * nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), 0.0f);
         return m;
     }
 

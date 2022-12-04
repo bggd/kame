@@ -44,6 +44,9 @@ SDL/
 spdlog/
 json/
 pystring
+fltk/
+glm/
+googletest/
 !include/kame/json
 !src/json
 assimp/
