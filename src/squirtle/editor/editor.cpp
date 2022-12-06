@@ -12,12 +12,57 @@
 
 using namespace kame::math;
 
+float sign(float x)
+{
+    if (x > 0)
+        return 1;
+    if (x < 0)
+        return -1;
+    return 0;
+}
+
 struct CameraArcballNode : kame::squirtle::CameraNode {
     Vector3f camTarget = Vector3f::Zero();
+    Vector3f upVector = Vector3f(0.0f, 1.0f, 0.0f);
+    int32_t lastMouseX = 0;
+    int32_t lastMouseY = 0;
 
     Matrix4x4f getViewMatrix() override
     {
-        return Matrix4x4f::createLookAt_RH(getGlobalLocation(), camTarget, Vector3f(0.0f, 1.0f, 0.0f));
+        return Matrix4x4f::createLookAt_RH(getGlobalLocation(), camTarget, upVector);
+    }
+
+    void handleRotateArcball(bool isDrag, int32_t mouseX, int mouseY, uint32_t viewportWidth, uint32_t viewportHeight)
+    {
+        if (isDrag)
+        {
+            Vector3f position = getLocation();
+            Vector3f pivot = camTarget;
+
+            Vector2f deltaAngle(2 * M_PI / viewportWidth, M_PI / viewportHeight);
+            Vector2f angle((lastMouseX - mouseX) * deltaAngle.x, (lastMouseY - mouseY) * deltaAngle.y);
+
+            Matrix4x4f viewMatrix = Matrix4x4f::transpose(getViewMatrix());
+            Vector3f viewDir(-viewMatrix.m31, -viewMatrix.m32, -viewMatrix.m33);
+
+            float cosAngle = Vector3f::dot(viewDir, upVector);
+            if (cosAngle * sign(angle.y) > 0.99f)
+            {
+                angle.y = 0.0f;
+            }
+
+            Matrix4x4f rotationMatrixX = Matrix4x4f::createFromAxisAngle(upVector, angle.x);
+            position = Vector3f::transform(position - pivot, rotationMatrixX) + pivot;
+
+            Vector3f rightVector(viewMatrix.m11, viewMatrix.m12, viewMatrix.m13);
+            Matrix4x4f rotationMatrixY = Matrix4x4f::createFromAxisAngle(rightVector, angle.y);
+            Vector3f finalPosition = Vector3f::transform(position - pivot, rotationMatrixY) + pivot;
+
+            setLocation(finalPosition);
+        }
+
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
     }
 };
 
@@ -146,6 +191,8 @@ struct Editor {
             if (state.isCloseRequest)
                 break;
             engine.updateNodes(state.deltaTime);
+            CameraArcballNode* cam = (CameraArcballNode*)engine.currentCamera;
+            cam->handleRotateArcball(state.isDownLMB, state.mouseX, state.mouseY, 640, 480);
             kame::ogl21::setViewport(0, 0, 640, 480);
             kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4f(0.5, 0.5, 0.5, 1));
             engine.drawNodes();

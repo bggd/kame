@@ -171,6 +171,31 @@ struct Matrix4x4f {
     {
         return createScale(Vector3f(scales));
     }
+
+    static Matrix4x4f transpose(const Matrix4x4f& m)
+    {
+        Matrix4x4f ret;
+        ret.m11 = m.m11;
+        ret.m12 = m.m21;
+        ret.m13 = m.m31;
+        ret.m14 = m.m41;
+
+        ret.m21 = m.m12;
+        ret.m22 = m.m22;
+        ret.m23 = m.m32;
+        ret.m24 = m.m42;
+
+        ret.m31 = m.m13;
+        ret.m32 = m.m23;
+        ret.m33 = m.m33;
+        ret.m34 = m.m43;
+
+        ret.m41 = m.m14;
+        ret.m42 = m.m24;
+        ret.m43 = m.m34;
+        ret.m44 = m.m44;
+        return ret;
+    }
 };
 
 static Matrix4x4f operator*(Matrix4x4f& a, Matrix4x4f& b)

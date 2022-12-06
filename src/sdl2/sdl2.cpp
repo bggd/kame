@@ -149,11 +149,23 @@ void Window::update()
     SDL_Event ev;
     while (SDL_PollEvent(&ev) != 0)
     {
-        if (ev.type == SDL_QUIT)
+        switch (ev.type)
         {
-            state.isCloseRequest = true;
+            case SDL_QUIT:
+                state.isCloseRequest = true;
+                break;
+            default:
+                break;
         }
     }
+
+    auto buttonState = SDL_GetMouseState(&state.mouseX, &state.mouseY);
+    state.isDownLMB = state.isDownMMB = state.isDownRMB = state.isDownX1 = state.isDownX2 = false;
+    state.isDownLMB = buttonState & SDL_BUTTON_LEFT;
+    state.isDownMMB = buttonState & SDL_BUTTON_MIDDLE;
+    state.isDownRMB = buttonState & SDL_BUTTON_RIGHT;
+    state.isDownX1 = buttonState & SDL_BUTTON_X1;
+    state.isDownX2 = buttonState & SDL_BUTTON_X2;
 }
 
 const State& Window::getState()

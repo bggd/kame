@@ -7,6 +7,13 @@ namespace kame::sdl2 {
 struct State {
     bool isCloseRequest = false;
     double deltaTime = 0.0;
+    int32_t mouseX = 0;
+    int32_t mouseY = 0;
+    bool isDownLMB = false;
+    bool isDownMMB = false;
+    bool isDownRMB = false;
+    bool isDownX1 = false;
+    bool isDownX2 = false;
 };
 
 struct Window {

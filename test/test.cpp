@@ -100,6 +100,19 @@ TEST(Matrix4x4, MVP)
     }
 }
 
+TEST(Matrix4x4, Transpose)
+{
+    Matrix4x4f tp = Matrix4x4f::transpose(Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0)));
+
+    glm::mat4 glmTp = glm::transpose(glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+
+    float* M = (float*)&tp;
+    for (int i = 0; i < 16; ++i)
+    {
+        EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmTp)[i]);
+    }
+}
+
 TEST(Vector3, Transform)
 {
     Matrix4x4f View = Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0));
