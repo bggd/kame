@@ -6,12 +6,14 @@ void loadMesh(kame::squirtle::MeshNode* meshNode, const kame::gltf::Gltf* gltf, 
 {
     std::vector<kame::math::Vector3f> positions;
     std::vector<kame::math::Vector2f> texcoords;
+    std::vector<kame::math::Vector3f> normals;
     std::vector<uint32_t> indices;
 
     auto& m = gltf->meshes[gltfNode.mesh];
 
     for (auto& pri : m.primitives)
     {
+        assert(pri.mode == 4); // require TRIANGLES == mesh.primitive.mode
         if (pri.hasIndices)
         {
             auto& acc = gltf->accessors[pri.indices];
@@ -60,11 +62,23 @@ void loadMesh(kame::squirtle::MeshNode* meshNode, const kame::gltf::Gltf* gltf, 
                     texcoords.push_back(v);
                 }
             }
+            else if (item.first == "NORMAL")
+            {
+                auto& acc = gltf->accessors[item.second];
+                auto& bv = gltf->bufferViews[acc.bufferView];
+                auto& b = gltf->buffers[bv.buffer];
+                for (unsigned int i = 0; i < acc.count; ++i)
+                {
+                    auto v = ((kame::math::Vector3f*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    normals.push_back(v);
+                }
+            }
         }
     }
 
     meshNode->mesh->positions = std::move(positions);
     meshNode->mesh->texCoords = std::move(texcoords);
+    meshNode->mesh->normals = std::move(normals);
     meshNode->mesh->indices = std::move(indices);
 
     meshNode->bufferedVBO.init(meshNode->mesh);

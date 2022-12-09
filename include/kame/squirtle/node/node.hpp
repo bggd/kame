@@ -7,7 +7,8 @@
 enum SquirtleNodeType {
     kSquirtleNode = 0,
     kSquirtleCameraNode,
-    kSquirtleMeshNode
+    kSquirtleMeshNode,
+    kSquirtleLightNode
 };
 
 namespace kame::squirtle {

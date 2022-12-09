@@ -66,6 +66,9 @@ struct Shader {
 
     GLuint getAttribLocation(const char* name);
     void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose = false);
+    void setVector4f(const char* name, kame::math::Vector4f v);
+    void setVector3f(const char* name, kame::math::Vector3f v);
+    void setFloat(const char* name, float x);
 };
 
 struct Texture2D {

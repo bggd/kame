@@ -13,6 +13,11 @@ struct Vector4f {
     {
         return Vector4f(-x, -y, -z, -w);
     }
+
+    static Vector4f Zero()
+    {
+        return {0.0f, 0.0f, 0.0f, 0.0f};
+    }
 };
 
 static Vector4f operator+(Vector4f a, Vector4f b)

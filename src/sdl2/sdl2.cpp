@@ -20,11 +20,6 @@ void Window::openWindow(const char* title, int w, int h)
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    if (isOGL21DebugMode)
-    {
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-    }
-
     window = SDL_CreateWindow(title,
                               SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               w, h,
@@ -60,7 +55,9 @@ void Window::openWindow(const char* title, int w, int h)
 
     if (isOGL21DebugMode)
     {
-        if (GLAD_GL_KHR_debug)
+        int flags;
+        glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        if (GLAD_GL_KHR_debug && (flags & GL_CONTEXT_FLAG_DEBUG_BIT))
         {
             SPDLOG_INFO("GL_KHR_debug is avaliable");
             glEnable(GL_DEBUG_OUTPUT);
@@ -84,6 +81,9 @@ void Window::openWindow(const char* title, int w, int h)
     {
         glEnable(GL_TEXTURE_2D);
     }
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     freq = SDL_GetPerformanceFrequency();
     prevTime = SDL_GetPerformanceCounter();

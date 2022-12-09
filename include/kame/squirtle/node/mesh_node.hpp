@@ -18,6 +18,7 @@ struct Mesh {
 struct VBO {
     kame::ogl21::VertexBuffer* vboPositions = nullptr;
     kame::ogl21::VertexBuffer* vboTexCoords = nullptr;
+    kame::ogl21::VertexBuffer* vboNormals = nullptr;
     kame::ogl21::IndexBuffer* ibo = nullptr;
     kame::ogl21::VertexArrayObject vao;
     bool vaoIsCreated = false;
@@ -37,6 +38,7 @@ struct BufferedVBO {
             VBO& vbo = buffers.back();
             vbo.vboPositions = kame::ogl21::createVertexBuffer(mesh->positions.size() * 3 * sizeof(float), GL_DYNAMIC_DRAW);
             vbo.vboTexCoords = kame::ogl21::createVertexBuffer(mesh->texCoords.size() * 2 * sizeof(float), GL_DYNAMIC_DRAW);
+            vbo.vboNormals = kame::ogl21::createVertexBuffer(mesh->normals.size() * 3 * sizeof(float), GL_DYNAMIC_DRAW);
             vbo.ibo = kame::ogl21::createIndexBuffer(mesh->indices.size() * sizeof(unsigned int), GL_DYNAMIC_DRAW);
         }
     }
@@ -60,6 +62,7 @@ struct BufferedVBO {
         VBO& vbo = getVBO();
         vbo.vboPositions->setBuffer((const float*)&mesh->positions[0]);
         vbo.vboTexCoords->setBuffer((const float*)&mesh->texCoords[0]);
+        vbo.vboNormals->setBuffer((const float*)&mesh->normals[0]);
         vbo.ibo->setBuffer((const unsigned int*)&mesh->indices[0]);
     }
 };

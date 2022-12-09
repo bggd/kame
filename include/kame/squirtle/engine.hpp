@@ -4,6 +4,7 @@
 #include <kame/squirtle/node/node.hpp>
 #include <kame/squirtle/node/camera_node.hpp>
 #include <kame/squirtle/node/mesh_node.hpp>
+#include <kame/squirtle/node/light_node.hpp>
 
 #include <vector>
 #include <cstdint>
@@ -15,6 +16,8 @@ struct Engine {
 
     kame::squirtle::Node* root = nullptr;
     kame::squirtle::CameraNode* currentCamera = nullptr;
+
+    std::vector<kame::squirtle::LightNode> lights;
 
     void initSquirtle();
     void shutdownSqurtile();

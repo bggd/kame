@@ -135,6 +135,10 @@ struct Editor {
         {
             item = parent->add(Fl_Tree_Prefs(), "Mesh");
         }
+        else if (node->getType() == kSquirtleLightNode)
+        {
+            item = parent->add(Fl_Tree_Prefs(), "Light");
+        }
         for (kame::squirtle::Node* child : node->getChildren())
         {
             addTreeItemRecursive(item, child);
@@ -168,6 +172,15 @@ struct Editor {
         cam->farPlaneDistance = 100.0f;
         cam->setLocation(Vector3f(5.0f, 6.0f, 7.0f));
         engine.root->addChild(cam);
+
+        auto* light0 = new kame::squirtle::LightNode();
+        // light0->setLocation(Vector3f(0.0f, 0.0f, 3.0f));
+        //  light0->diffuse = Vector3f(0.5f, 0.1f, 0.1f);
+        cam->addChild(light0);
+        auto* light1 = new kame::squirtle::LightNode();
+        light1->setLocation(Vector3f(0.0f, 0.0f, -3.0f));
+        // light1->diffuse = Vector3f(0.1f, 0.1f, 0.5f);
+        engine.root->addChild(light1);
 
         mainWindow = new Fl_Window(256, 30, "Squirtle Editor");
         Fl_Menu_Bar* menuBar = new Fl_Menu_Bar(0, 0, 256, 30);

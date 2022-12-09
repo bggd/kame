@@ -144,6 +144,17 @@ Shader* createShader(const char* vert, const char* frag)
     glCompileShader(vs);
     GLint vsCompileStatus;
     glGetShaderiv(vs, GL_COMPILE_STATUS, &vsCompileStatus);
+    if (vsCompileStatus == GL_FALSE)
+    {
+        GLint logLength;
+        glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength)
+        {
+            std::string infoLog(logLength, ' ');
+            glGetShaderInfoLog(vs, logLength, NULL, &infoLog[0]);
+            SPDLOG_INFO("Vertex shader compilation failed: {0}", infoLog);
+        }
+    }
     assert(vsCompileStatus == GL_TRUE);
 
     GLint fs = glCreateShader(GL_FRAGMENT_SHADER);
@@ -151,6 +162,17 @@ Shader* createShader(const char* vert, const char* frag)
     glCompileShader(fs);
     GLint fsCompileStatus;
     glGetShaderiv(fs, GL_COMPILE_STATUS, &fsCompileStatus);
+    if (fsCompileStatus == GL_FALSE)
+    {
+        GLint logLength;
+        glGetShaderiv(fs, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength)
+        {
+            std::string infoLog(logLength, ' ');
+            glGetShaderInfoLog(fs, logLength, NULL, &infoLog[0]);
+            SPDLOG_INFO("Fragment shader compilation failed!\n{0}", infoLog);
+        }
+    }
     assert(fsCompileStatus == GL_TRUE);
 
     GLuint program = glCreateProgram();
@@ -186,6 +208,21 @@ GLuint Shader::getAttribLocation(const char* name)
 void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose)
 {
     glUniformMatrix4fv(glGetUniformLocation(id, name), 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
+}
+
+void Shader::setVector4f(const char* name, kame::math::Vector4f v)
+{
+    glUniform4fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
+}
+
+void Shader::setVector3f(const char* name, kame::math::Vector3f v)
+{
+    glUniform3fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
+}
+
+void Shader::setFloat(const char* name, float x)
+{
+    glUniform1fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&x);
 }
 
 VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
