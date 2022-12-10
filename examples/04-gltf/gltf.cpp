@@ -177,7 +177,7 @@ int main(int argc, char** argv)
         auto R = kame::math::Matrix4x4f::createRotationY(deg2rad(angle));
         auto S = kame::math::Matrix4x4f::createScale(0.5f);
         shader->setMatrix4x4f("uModel", S * R);
-        kame::ogl21::drawElements(vao, GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT);
+        vao.drawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT);
         win.swapWindow();
     }
 

@@ -82,9 +82,6 @@ void Window::openWindow(const char* title, int w, int h)
         glEnable(GL_TEXTURE_2D);
     }
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
     freq = SDL_GetPerformanceFrequency();
     prevTime = SDL_GetPerformanceCounter();
 }

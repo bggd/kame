@@ -100,6 +100,19 @@ void setDepthStencilState(DepthStencilState state)
     }
 }
 
+void setRasterizerState(RasterizerState state)
+{
+    if (state.useCullFace)
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(state.cullMode);
+    }
+    else
+    {
+        glDisable(GL_CULL_FACE);
+    }
+}
+
 void setShader(Shader* shader)
 {
     glUseProgram(shader->id);
@@ -109,6 +122,18 @@ void setTexture2D(GLuint slot, Texture2D* tex)
 {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, tex->id);
+}
+
+void setRenderTarget(FrameBuffer* fbo)
+{
+    if (fbo)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo->id);
+    }
+    else
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 }
 
 void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count)
@@ -132,6 +157,16 @@ void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count, GLen
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao.ibo_id);
     glDrawElements(mode, count, type, NULL);
+}
+
+void VertexArrayObject::drawArrays(GLenum mode, GLint first, GLsizei count)
+{
+    kame::ogl21::drawArrays(*this, mode, first, count);
+}
+
+void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type)
+{
+    kame::ogl21::drawElements(*this, mode, count, type);
 }
 
 Shader* createShader(const char* vert, const char* frag)
@@ -223,6 +258,11 @@ void Shader::setVector3f(const char* name, kame::math::Vector3f v)
 void Shader::setFloat(const char* name, float x)
 {
     glUniform1fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&x);
+}
+
+void Shader::setInt(const char* name, int x)
+{
+    glUniform1iv(glGetUniformLocation(id, name), 1, (const GLint*)&x);
 }
 
 VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
@@ -403,6 +443,7 @@ Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum f
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     t->id = tex;
     t->width = width;
@@ -420,6 +461,14 @@ void Texture2D::setTexParameteri(GLenum pname, GLint param)
 {
     glBindTexture(GL_TEXTURE_2D, id);
     glTexParameteri(GL_TEXTURE_2D, pname, param);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::setTexParameterfv(GLenum pname, const GLfloat* param)
+{
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexParameterfv(GL_TEXTURE_2D, pname, param);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 FrameBuffer* createFrameBuffer()
@@ -447,10 +496,17 @@ void deleteFrameBuffer(FrameBuffer* fbo)
     delete fbo;
 }
 
-void FrameBuffer::setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel = 0)
+void FrameBuffer::setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, id);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, tex->id, mipmapLevel);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::setDepthAttachment(Texture2D* tex, GLint mipmapLevel)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex->id, mipmapLevel);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -476,6 +532,13 @@ bool FrameBuffer::checkStatus()
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return status == GL_FRAMEBUFFER_COMPLETE;
+}
+
+void FrameBuffer::setDrawBuffer(GLenum mode)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    glDrawBuffer(mode);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 } // namespace kame::ogl21

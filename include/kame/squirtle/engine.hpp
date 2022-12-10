@@ -13,16 +13,19 @@ namespace kame::squirtle {
 
 struct Engine {
     kame::ogl21::Shader* shader = nullptr;
+    kame::ogl21::Shader* shaderShadow = nullptr;
 
     kame::squirtle::Node* root = nullptr;
     kame::squirtle::CameraNode* currentCamera = nullptr;
 
     std::vector<kame::squirtle::LightNode> lights;
+    kame::ogl21::FrameBuffer* depthFBO = nullptr;
+    kame::ogl21::Texture2D* depthTexture = nullptr;
 
     void initSquirtle();
     void shutdownSqurtile();
     void updateNodes(float dt);
-    void drawNodes();
+    void drawNodes(int viewportWidth, int viewportHeight);
 };
 
 } // namespace kame::squirtle

@@ -64,7 +64,7 @@ int main(int argc, char** argv)
         kame::ogl21::setViewport(0, 0, 640, 480);
         kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(0, 0, 0, 1));
         kame::ogl21::setShader(shader);
-        kame::ogl21::drawArrays(vao, GL_TRIANGLES, 0, 3);
+        vao.drawArrays(GL_TRIANGLES, 0, 3);
         win.swapWindow();
     }
 

@@ -170,16 +170,19 @@ struct Editor {
         cam->aspectRatio = 640.0f / 480.0f;
         cam->nearPlaneDistance = 0.1f;
         cam->farPlaneDistance = 100.0f;
-        cam->setLocation(Vector3f(5.0f, 6.0f, 7.0f));
+        cam->setLocation(Vector3f(3.0f, 4.0f, 5.0f));
         engine.root->addChild(cam);
 
         auto* light0 = new kame::squirtle::LightNode();
+        light0->lightType = kSquirtleDirectionalLight;
         // light0->setLocation(Vector3f(0.0f, 0.0f, 3.0f));
         //  light0->diffuse = Vector3f(0.5f, 0.1f, 0.1f);
         cam->addChild(light0);
         auto* light1 = new kame::squirtle::LightNode();
-        light1->setLocation(Vector3f(0.0f, 0.0f, -3.0f));
-        // light1->diffuse = Vector3f(0.1f, 0.1f, 0.5f);
+        light1->lightType = kSquirtleDirectionalLight;
+        light1->useShadow = true;
+        light1->setLocation(Vector3f(0.0f, 1.5f, -3.0f));
+        light1->diffuse = Vector3f::Zero();
         engine.root->addChild(light1);
 
         mainWindow = new Fl_Window(256, 30, "Squirtle Editor");
@@ -206,9 +209,7 @@ struct Editor {
             engine.updateNodes(state.deltaTime);
             CameraArcballNode* cam = (CameraArcballNode*)engine.currentCamera;
             cam->handleRotateArcball(state.isDownLMB, state.mouseX, state.mouseY, 640, 480);
-            kame::ogl21::setViewport(0, 0, 640, 480);
-            kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4f(0.5, 0.5, 0.5, 1));
-            engine.drawNodes();
+            engine.drawNodes(640, 480);
             win.swapWindow();
             Fl::check();
         }

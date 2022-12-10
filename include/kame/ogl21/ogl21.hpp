@@ -51,6 +51,9 @@ struct VertexArrayObject {
     };
     std::vector<VertexArrayObject::Attribute> attributes;
     GLuint ibo_id = 0;
+
+    void drawArrays(GLenum mode, GLint first, GLsizei count);
+    void drawElements(GLenum mode, GLsizei count, GLenum type);
 };
 
 struct VertexArrayObjectBuilder {
@@ -69,12 +72,14 @@ struct Shader {
     void setVector4f(const char* name, kame::math::Vector4f v);
     void setVector3f(const char* name, kame::math::Vector3f v);
     void setFloat(const char* name, float x);
+    void setInt(const char* name, int x);
 };
 
 struct Texture2D {
     GLuint id;
     int width, height;
     void setTexParameteri(GLenum pname, GLint param);
+    void setTexParameterfv(GLenum pname, const GLfloat* param);
 };
 
 struct FrameBuffer {
@@ -82,9 +87,11 @@ struct FrameBuffer {
     GLuint depthRBO;
     bool useDepthRBO;
 
-    void setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel);
+    void setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel = 0);
+    void setDepthAttachment(Texture2D* tex, GLint mipmapLevel = 0);
     void setDepthAttachmentFromRenderBuffer(int width, int height);
     bool checkStatus();
+    void setDrawBuffer(GLenum mode);
 };
 
 struct BlendState {
@@ -151,16 +158,37 @@ struct DepthStencilStateBuilder {
     }
 };
 
+struct RasterizerState {
+    bool useCullFace = false;
+    GLenum cullMode;
+};
+
+struct RasterizerStateBuilder {
+    RasterizerState state;
+
+    RasterizerStateBuilder& cullFace(GLenum mode)
+    {
+        state.cullMode = mode;
+        state.useCullFace = true;
+        return *this;
+    }
+
+    RasterizerState build()
+    {
+        return state;
+    }
+};
+
 const char* getGlslVersionString();
 
 void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 void setClearBuffer(GLbitfield mask, kame::math::Vector4f color);
 void setBlendState(BlendState state);
 void setDepthStencilState(DepthStencilState state);
+void setRasterizerState(RasterizerState state);
 void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
-void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count);
-void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count, GLenum type);
+void setRenderTarget(FrameBuffer* fbo);
 
 Shader* createShader(const char* vert, const char* frag);
 void deleteShader(Shader* shader);

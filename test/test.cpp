@@ -100,6 +100,18 @@ TEST(Matrix4x4, MVP)
     }
 }
 
+TEST(Matrix4x4, OrthoMatrix)
+{
+    Matrix4x4f Ortho = Matrix4x4f::createOrthographic_RH_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
+    glm::mat4 glmOrtho = glm::orthoRH_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
+
+    float* M = (float*)&Ortho;
+    for (int i = 0; i < 16; ++i)
+    {
+        EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmOrtho)[i]);
+    }
+}
+
 TEST(Matrix4x4, Transpose)
 {
     Matrix4x4f tp = Matrix4x4f::transpose(Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0)));
