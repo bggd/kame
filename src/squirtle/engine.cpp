@@ -39,8 +39,6 @@ void Engine::initSquirtle()
     fsShadow += shadowPixelGlslText;
     shaderShadow = kame::ogl21::createShader(vsShadow.c_str(), fsShadow.c_str());
 
-    depthFBO = kame::ogl21::createFrameBuffer();
-
     depthTexture = kame::ogl21::createTexture2D(GL_DEPTH_COMPONENT, 1024, 1024, GL_DEPTH_COMPONENT, GL_FLOAT);
     depthTexture->setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     depthTexture->setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -49,6 +47,7 @@ void Engine::initSquirtle()
     float rgba[] = {1.0f, 1.0f, 1.0f, 1.0f};
     depthTexture->setTexParameterfv(GL_TEXTURE_BORDER_COLOR, rgba);
 
+    depthFBO = kame::ogl21::createFrameBuffer();
     depthFBO->setDepthAttachment(depthTexture);
     assert(depthFBO->checkStatus());
     depthFBO->setDrawBuffer(GL_NONE);

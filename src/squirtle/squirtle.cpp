@@ -58,7 +58,8 @@ void loadMesh(kame::squirtle::MeshNode* meshNode, const kame::gltf::Gltf* gltf, 
                 auto& b = gltf->buffers[bv.buffer];
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
-                    auto v = ((kame::math::Vector2f*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    // TODO: support GL_UNSIGNED_BYTE and GL_UNSIGNED_SHORT
+                    kame::math::Vector2f v = ((kame::math::Vector2f*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
                     texcoords.push_back(v);
                 }
             }
