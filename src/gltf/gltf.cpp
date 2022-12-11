@@ -353,8 +353,9 @@ std::vector<uint8_t> decodeBase64(const std::string& str, integer start)
 
         if (decode[2] == 64 && decode[3] == 64)
         {
-            decode[1] = decode[1] & 0b11000000;
+            decode[1] = decode[1] & 0b11110000;
             bytes = decode[0] << 6 | decode[1];
+            bytes = bytes << 12;
             data.push_back(bytes >> 16);
         }
         else if (decode[3] == 64)
@@ -362,6 +363,7 @@ std::vector<uint8_t> decodeBase64(const std::string& str, integer start)
             decode[2] = decode[2] & 0b11111100;
             bytes = decode[0] << 6 | decode[1];
             bytes = bytes << 6 | decode[2];
+            bytes = bytes << 6;
             data.push_back(bytes >> 16);
             data.push_back(bytes >> 8);
         }
