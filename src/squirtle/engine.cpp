@@ -80,7 +80,7 @@ void updateNodeRecusrive(kame::squirtle::Engine* engine, kame::squirtle::Node* n
 void updateGlobalTransformRecursive(kame::squirtle::Node* node)
 {
     kame::math::Matrix4x4f local = node->getLocalTransform();
-    kame::math::Matrix4x4f global = kame::math::Matrix4x4f::Identity();
+    kame::math::Matrix4x4f global = kame::math::Matrix4x4f::identity();
     if (node->parent)
     {
         global = node->parent->getGlobalTransform();
@@ -151,6 +151,10 @@ void collectLightNodeRecursive(std::vector<kame::squirtle::LightNode>& lights, k
     }
 }
 
+void get(kame::math::Matrix4x4f ViewProj)
+{
+}
+
 void Engine::drawNodes(int viewportWidth, int viewportHeight)
 {
     kame::ogl21::BlendState blendState = kame::ogl21::BlendStateBuilder()
@@ -168,7 +172,7 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
 
     bool hasDirectionalLight = false;
     kame::squirtle::LightNode directionalLight;
-    kame::math::Matrix4x4f shadowMVP = kame::math::Matrix4x4f::Identity();
+    kame::math::Matrix4x4f shadowMVP = kame::math::Matrix4x4f::identity();
     for (auto& light : lights)
     {
         if (light.getLightType() == kSquirtleDirectionalLight && light.useShadow)
@@ -206,7 +210,7 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         kame::ogl21::setClearBuffer(GL_DEPTH_BUFFER_BIT, kame::math::Vector4f(0.5, 0.5, 0.5, 1));
     }
 
-    // color pass
+    // lighting pass
     kame::ogl21::setShader(shader);
 
     if (currentCamera)
@@ -214,7 +218,7 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         auto View = currentCamera->getViewMatrix();
         auto Proj = currentCamera->getPerspectiveMatrix();
 
-        shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::Identity());
+        shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uView", View);
         shader->setMatrix4x4f("uProjection", Proj);
         shader->setMatrix4x4f("uShadowMVP", shadowMVP);
@@ -222,18 +226,18 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
     }
     else
     {
-        shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::Identity());
-        shader->setMatrix4x4f("uView", kame::math::Matrix4x4f::Identity());
-        shader->setMatrix4x4f("uProjection", kame::math::Matrix4x4f::Identity());
+        shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::identity());
+        shader->setMatrix4x4f("uView", kame::math::Matrix4x4f::identity());
+        shader->setMatrix4x4f("uProjection", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uShadowMVP", shadowMVP);
-        shader->setVector3f("uEyePos", kame::math::Vector3f::Zero());
+        shader->setVector3f("uEyePos", kame::math::Vector3f::zero());
     }
 
     for (int i = 0; i < KAME_SQUIRTLE_MAX_LIGHTS; ++i)
     {
-        kame::math::Vector4f position = kame::math::Vector4f::Zero();
-        kame::math::Vector3f ambient = kame::math::Vector3f::Zero();
-        kame::math::Vector3f diffuse = kame::math::Vector3f::Zero();
+        kame::math::Vector4f position = kame::math::Vector4f::zero();
+        kame::math::Vector3f ambient = kame::math::Vector3f::zero();
+        kame::math::Vector3f diffuse = kame::math::Vector3f::zero();
         float constantAttenuation = 0.0f;
         float linearAttenuation = 0.0f;
         float quadraticAttenuation = 0.0f;

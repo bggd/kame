@@ -39,19 +39,19 @@ struct Matrix4x4f {
         this->m44 = m44;
     }
 
-    static Matrix4x4f Zero()
+    static Matrix4x4f zero()
     {
         return Matrix4x4f(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    static Matrix4x4f Identity()
+    static Matrix4x4f identity()
     {
         return Matrix4x4f(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    static Matrix4x4f Multiply(Matrix4x4f& a, Matrix4x4f& b)
+    static Matrix4x4f multiply(Matrix4x4f& a, Matrix4x4f& b)
     {
-        Matrix4x4f m = Matrix4x4f::Zero();
+        Matrix4x4f m = Matrix4x4f::zero();
         const float* A = (const float*)&a;
         const float* B = (const float*)&b;
         float* M = (float*)&m;
@@ -159,7 +159,7 @@ struct Matrix4x4f {
 
     static Matrix4x4f createScale(Vector3f v)
     {
-        Matrix4x4f m = Matrix4x4f::Zero();
+        Matrix4x4f m = Matrix4x4f::zero();
         m.m11 = v.x;
         m.m22 = v.y;
         m.m33 = v.z;
@@ -196,11 +196,13 @@ struct Matrix4x4f {
         ret.m44 = m.m44;
         return ret;
     }
+
+    static Matrix4x4f invert(const Matrix4x4f& m);
 };
 
 static Matrix4x4f operator*(Matrix4x4f& a, Matrix4x4f& b)
 {
-    Matrix4x4f m = Matrix4x4f::Zero();
+    Matrix4x4f m = Matrix4x4f::zero();
     const float* A = (const float*)&a;
     const float* B = (const float*)&b;
     float* M = (float*)&m;

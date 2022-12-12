@@ -18,12 +18,12 @@ struct Node {
     Node* parent = nullptr;
     std::list<Node*> children;
 
-    kame::math::Vector3f location = kame::math::Vector3f::Zero();
-    kame::math::Vector3f rotation = kame::math::Vector3f::Zero(); // euler rotation order is x,y,z
-    kame::math::Vector3f scale = kame::math::Vector3f::One();
+    kame::math::Vector3f location = kame::math::Vector3f::zero();
+    kame::math::Vector3f rotation = kame::math::Vector3f::zero(); // euler rotation order is x,y,z
+    kame::math::Vector3f scale = kame::math::Vector3f::one();
 
-    kame::math::Matrix4x4f localTransform = kame::math::Matrix4x4f::Identity();
-    kame::math::Matrix4x4f globalTransform = kame::math::Matrix4x4f::Identity();
+    kame::math::Matrix4x4f localTransform = kame::math::Matrix4x4f::identity();
+    kame::math::Matrix4x4f globalTransform = kame::math::Matrix4x4f::identity();
 
     virtual SquirtleNodeType getType() const
     {

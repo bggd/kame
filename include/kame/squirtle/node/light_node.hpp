@@ -15,8 +15,8 @@ struct LightNode : kame::squirtle::Node {
     SquirtleLightNodeType lightType = kSquirtlePointLight;
 
     bool useShadow = false;
-    kame::math::Vector3f direction = kame::math::Vector3f::Zero();
-    kame::math::Vector3f diffuse = kame::math::Vector3f::One();
+    kame::math::Vector3f direction = kame::math::Vector3f::zero();
+    kame::math::Vector3f diffuse = kame::math::Vector3f::one();
 
     float constantAttenuation = 1.0f;
     float linearAttenuation = 0.14f;

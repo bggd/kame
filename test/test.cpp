@@ -10,7 +10,7 @@ using namespace kame::math::helper;
 
 TEST(Matrix4x4, Identity)
 {
-    Matrix4x4f m = Matrix4x4f::Identity();
+    Matrix4x4f m = Matrix4x4f::identity();
     glm::mat4 glmMat(1.0f);
 
     float* M = (float*)&m;
@@ -125,6 +125,27 @@ TEST(Matrix4x4, Transpose)
     }
 }
 
+TEST(Matrix4x4, Inverse)
+{
+    Matrix4x4f invIdent = Matrix4x4f::invert(Matrix4x4f::identity());
+    glm::mat4 glmInvIdent = glm::inverse(glm::mat4(1.0f));
+
+    float* M = (float*)&invIdent;
+    for (int i = 0; i < 16; ++i)
+    {
+        EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmInvIdent)[i]);
+    }
+
+    Matrix4x4f inv = Matrix4x4f::invert(Matrix4x4f::createTranslation(Vector3f(3.0f, 4.0f, 5.0f)));
+    glm::mat4 glmInv = glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 4.0f, 5.0f)));
+
+    M = (float*)&inv;
+    for (int i = 0; i < 16; ++i)
+    {
+        EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmInv)[i]);
+    }
+}
+
 TEST(Vector3, Transform)
 {
     Matrix4x4f View = Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0));
@@ -135,7 +156,7 @@ TEST(Vector3, Transform)
     glm::mat4 glmProj = glm::perspectiveRH_NO(glm::radians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
     glm::mat4 glmMVP = glmProj * glmView;
 
-    Vector3f pos = Vector3f::Zero();
+    Vector3f pos = Vector3f::zero();
     pos = Vector3f::transform(pos, MVP);
 
     glm::vec4 glmPos(0.0f, 0.0f, 0.0f, 1.0f);

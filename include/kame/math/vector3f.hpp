@@ -20,12 +20,12 @@ struct Vector3f {
         return Vector3f(-x, -y, -z);
     }
 
-    static Vector3f Zero()
+    static Vector3f zero()
     {
         return {0.0f, 0.0f, 0.0f};
     }
 
-    static Vector3f One()
+    static Vector3f one()
     {
         return {1.0f, 1.0f, 1.0f};
     }
@@ -52,7 +52,7 @@ struct Vector3f {
 
     static Vector3f normalize(Vector3f v)
     {
-        Vector3f n = Vector3f::Zero();
+        Vector3f n = Vector3f::zero();
         float len = 1.0F / length(v);
         n.x = v.x * len;
         n.y = v.y * len;

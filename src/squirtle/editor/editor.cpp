@@ -22,7 +22,7 @@ float sign(float x)
 }
 
 struct CameraArcballNode : kame::squirtle::CameraNode {
-    Vector3f camTarget = Vector3f::Zero();
+    Vector3f camTarget = Vector3f::zero();
     Vector3f upVector = Vector3f(0.0f, 1.0f, 0.0f);
     int32_t lastMouseX = 0;
     int32_t lastMouseY = 0;
@@ -182,7 +182,7 @@ struct Editor {
         light1->lightType = kSquirtleDirectionalLight;
         light1->useShadow = true;
         light1->setLocation(Vector3f(0.0f, 1.5f, -3.0f));
-        light1->diffuse = Vector3f::Zero();
+        light1->diffuse = Vector3f::zero();
         engine.root->addChild(light1);
 
         mainWindow = new Fl_Window(256, 30, "Squirtle Editor");

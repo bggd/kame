@@ -14,7 +14,7 @@ struct Vector4f {
         return Vector4f(-x, -y, -z, -w);
     }
 
-    static Vector4f Zero()
+    static Vector4f zero()
     {
         return {0.0f, 0.0f, 0.0f, 0.0f};
     }

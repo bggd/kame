@@ -19,7 +19,7 @@ struct CameraNode : kame::squirtle::Node {
 
     virtual kame::math::Matrix4x4f getViewMatrix()
     {
-        return kame::math::Matrix4x4f::Identity();
+        return kame::math::Matrix4x4f::identity();
     }
 
     kame::math::Matrix4x4f getPerspectiveMatrix()
