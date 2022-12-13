@@ -19,8 +19,6 @@ struct Engine {
     kame::squirtle::CameraNode* currentCamera = nullptr;
 
     std::vector<kame::squirtle::LightNode> lights;
-    kame::ogl21::FrameBuffer* depthFBO = nullptr;
-    kame::ogl21::Texture2D* depthTexture = nullptr;
 
     void initSquirtle();
     void shutdownSqurtile();

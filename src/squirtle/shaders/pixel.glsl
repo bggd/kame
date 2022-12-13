@@ -9,10 +9,8 @@ out vec4 FragColor;
 in vec2 pUV;
 in vec3 pNormal;
 in vec3 pPos;
-in vec4 pShadowCoord;
 
 uniform sampler2D diffuseTexture;
-uniform sampler2D shadowTexture;
 
 struct LightNode {
     vec4 position;
@@ -63,11 +61,6 @@ vec3 phong(vec3 surfaceNormal, vec3 surfacePosition)
         vec3 ambient = attenuation * light.ambient;
         diffuse *= attenuation;
         specular *= attenuation;
-
-        float bias = 0.005;
-        float shadowFactor = 1.0;
-        if (texture(shadowTexture, pShadowCoord.xy).z < pShadowCoord.z - bias) { shadowFactor = 0.5; }
-        diffuse *= shadowFactor;
 
         result += (ambient + diffuse + specular);
     }

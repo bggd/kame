@@ -18,6 +18,8 @@ struct Vector4f {
     {
         return {0.0f, 0.0f, 0.0f, 0.0f};
     }
+
+    static Vector4f transform(Vector4f v, const kame::math::Matrix4x4f& m);
 };
 
 static Vector4f operator+(Vector4f a, Vector4f b)

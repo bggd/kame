@@ -20,6 +20,8 @@ static const char* shadowPixelGlslText =
 ;
 // clang-format on
 
+#define KAME_SQUIRTLE_SHADOW_SIZE 2048
+
 void Engine::initSquirtle()
 {
     std::string vs = kame::ogl21::getGlslVersionString();
@@ -31,7 +33,6 @@ void Engine::initSquirtle()
 
     kame::ogl21::setShader(shader);
     shader->setInt("diffuseTexture", 0);
-    shader->setInt("shadowTexture", 1);
 
     std::string vsShadow = kame::ogl21::getGlslVersionString();
     vsShadow += shadowVertexGlslText;
@@ -39,27 +40,12 @@ void Engine::initSquirtle()
     fsShadow += shadowPixelGlslText;
     shaderShadow = kame::ogl21::createShader(vsShadow.c_str(), fsShadow.c_str());
 
-    depthTexture = kame::ogl21::createTexture2D(GL_DEPTH_COMPONENT, 1024, 1024, GL_DEPTH_COMPONENT, GL_FLOAT);
-    depthTexture->setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    depthTexture->setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    depthTexture->setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    depthTexture->setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float rgba[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    depthTexture->setTexParameterfv(GL_TEXTURE_BORDER_COLOR, rgba);
-
-    depthFBO = kame::ogl21::createFrameBuffer();
-    depthFBO->setDepthAttachment(depthTexture);
-    assert(depthFBO->checkStatus());
-    depthFBO->setDrawBuffer(GL_NONE);
-
     root = new kame::squirtle::Node();
     assert(root);
 }
 
 void Engine::shutdownSqurtile()
 {
-    kame::ogl21::deleteTexture2D(depthTexture);
-    kame::ogl21::deleteFrameBuffer(depthFBO);
     kame::ogl21::deleteShader(shaderShadow);
     kame::ogl21::deleteShader(shader);
 }
@@ -151,10 +137,6 @@ void collectLightNodeRecursive(std::vector<kame::squirtle::LightNode>& lights, k
     }
 }
 
-void get(kame::math::Matrix4x4f ViewProj)
-{
-}
-
 void Engine::drawNodes(int viewportWidth, int viewportHeight)
 {
     kame::ogl21::BlendState blendState = kame::ogl21::BlendStateBuilder()
@@ -170,46 +152,6 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
     lights.clear();
     collectLightNodeRecursive(lights, root);
 
-    bool hasDirectionalLight = false;
-    kame::squirtle::LightNode directionalLight;
-    kame::math::Matrix4x4f shadowMVP = kame::math::Matrix4x4f::identity();
-    for (auto& light : lights)
-    {
-        if (light.getLightType() == kSquirtleDirectionalLight && light.useShadow)
-        {
-            hasDirectionalLight = true;
-            directionalLight = light;
-        }
-    }
-
-    if (hasDirectionalLight)
-    {
-        // shadow pass
-        kame::ogl21::RasterizerState rasterState = kame::ogl21::RasterizerStateBuilder().cullFace(GL_FRONT).build();
-        kame::ogl21::setRasterizerState(rasterState);
-        kame::ogl21::setRenderTarget(depthFBO);
-        kame::ogl21::setViewport(0, 0, 1024, 1024);
-        kame::ogl21::setClearBuffer(GL_DEPTH_BUFFER_BIT, kame::math::Vector4f(0.5, 0.5, 0.5, 1));
-        kame::ogl21::setShader(shaderShadow);
-        auto View = kame::math::Matrix4x4f::createLookAt_RH(directionalLight.getGlobalLocation(), directionalLight.direction - directionalLight.getGlobalLocation(), kame::math::Vector3f(0.0f, 1.0f, 0.0f));
-        auto Proj = kame::math::Matrix4x4f::createOrthographic_RH_NO(-2.0f, 2.0f, -2.0f, 2.0f, directionalLight.nearPlane, directionalLight.farPlane);
-        shadowMVP = View * Proj;
-        shaderShadow->setMatrix4x4f("uMVP", shadowMVP);
-
-        // [-1, 1] -> [0, 1]
-        shadowMVP = shadowMVP * kame::math::Matrix4x4f(0.5f, 0.0f, 0.0f, 0.0f,
-                                                       0.0f, 0.5f, 0.0f, 0.0f,
-                                                       0.0f, 0.0f, 0.5f, 0.0f,
-                                                       0.5f, 0.5f, 0.5f, 1.0f);
-
-        drawNodeRecursive(this, root, true);
-    }
-    else
-    {
-        kame::ogl21::setRenderTarget(depthFBO);
-        kame::ogl21::setClearBuffer(GL_DEPTH_BUFFER_BIT, kame::math::Vector4f(0.5, 0.5, 0.5, 1));
-    }
-
     // lighting pass
     kame::ogl21::setShader(shader);
 
@@ -221,7 +163,6 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uView", View);
         shader->setMatrix4x4f("uProjection", Proj);
-        shader->setMatrix4x4f("uShadowMVP", shadowMVP);
         shader->setVector3f("uEyePos", currentCamera->getGlobalLocation());
     }
     else
@@ -229,7 +170,6 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uView", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uProjection", kame::math::Matrix4x4f::identity());
-        shader->setMatrix4x4f("uShadowMVP", shadowMVP);
         shader->setVector3f("uEyePos", kame::math::Vector3f::zero());
     }
 
@@ -276,13 +216,10 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         shader->setFloat(fmt::format("uLights[{0}].quadraticAttenuation", i).c_str(), quadraticAttenuation);
     }
 
-    kame::ogl21::setRenderTarget(nullptr);
-
     kame::ogl21::setViewport(0, 0, viewportWidth, viewportHeight);
     kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, kame::math::Vector4f(0.5, 0.5, 0.5, 1));
     kame::ogl21::RasterizerState rasterState = kame::ogl21::RasterizerStateBuilder().cullFace(GL_BACK).build();
     kame::ogl21::setRasterizerState(rasterState);
-    kame::ogl21::setTexture2D(1, depthTexture);
 
     drawNodeRecursive(this, root, false);
 }

@@ -16,6 +16,7 @@ add_library(kame
     STATIC
         src/kame.cpp
         src/math/vector3f.cpp
+        src/math/vector4f.cpp
         src/math/matrix4x4f.cpp
         src/sdl2/sdl2.cpp
 	src/ogl21/glad.cpp

@@ -169,7 +169,7 @@ struct Editor {
         cam->fov = 45.0f;
         cam->aspectRatio = 640.0f / 480.0f;
         cam->nearPlaneDistance = 0.1f;
-        cam->farPlaneDistance = 100.0f;
+        cam->farPlaneDistance = 10.0f;
         cam->setLocation(Vector3f(3.0f, 4.0f, 5.0f));
         engine.root->addChild(cam);
 
@@ -180,7 +180,7 @@ struct Editor {
         cam->addChild(light0);
         auto* light1 = new kame::squirtle::LightNode();
         light1->lightType = kSquirtleDirectionalLight;
-        light1->useShadow = true;
+        // light1->useShadow = true;
         light1->setLocation(Vector3f(0.0f, 1.5f, -3.0f));
         light1->diffuse = Vector3f::zero();
         engine.root->addChild(light1);
