@@ -66,6 +66,27 @@ struct CameraArcballNode : kame::squirtle::CameraNode {
     }
 };
 
+struct RotateLight : kame::squirtle::Node {
+    RotateLight()
+    {
+        auto light0 = new kame::squirtle::LightNode();
+        light0->setLocation(kame::math::Vector3f(1.5f, 1.0f, 0.0f));
+        light0->diffuse = kame::math::Vector3f(1.0f, 0.0f, 0.0f);
+        this->addChild(light0);
+
+        auto light1 = new kame::squirtle::LightNode();
+        light1->setLocation(kame::math::Vector3f(-1.5f, 1.0f, 0.0f));
+        light1->diffuse = kame::math::Vector3f(0.0f, 0.0f, 1.0f);
+        this->addChild(light1);
+    }
+    void onUpdate(float dt) override
+    {
+        auto r = this->getRotation();
+        r.y += 100.0f * dt;
+        this->setRotation(r);
+    }
+};
+
 struct Editor {
     kame::sdl2::Window win;
     kame::squirtle::Engine engine;
@@ -175,14 +196,10 @@ struct Editor {
 
         auto* light0 = new kame::squirtle::LightNode();
         light0->lightType = kSquirtleDirectionalLight;
-        // light0->setLocation(Vector3f(0.0f, 0.0f, 3.0f));
-        //  light0->diffuse = Vector3f(0.5f, 0.1f, 0.1f);
+        light0->diffuse = Vector3f(0.5f, 0.5f, 0.5f);
         cam->addChild(light0);
-        auto* light1 = new kame::squirtle::LightNode();
-        light1->lightType = kSquirtleDirectionalLight;
-        light1->setLocation(Vector3f(0.0f, 1.5f, -3.0f));
-        light1->diffuse = Vector3f::zero();
-        // engine.root->addChild(light1);
+
+        engine.root->addChild(new RotateLight());
 
         mainWindow = new Fl_Window(256, 30, "Squirtle Editor");
         Fl_Menu_Bar* menuBar = new Fl_Menu_Bar(0, 0, 256, 30);

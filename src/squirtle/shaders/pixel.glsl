@@ -55,10 +55,10 @@ vec3 phong(vec3 surfaceNormal, vec3 surfacePosition)
         {
             vec3 viewDirection = normalize(uEyePos - surfacePosition);
             vec3 reflectDirection = reflect(-viewDirection, N);
-            vec3 specular = pow(max(dot(viewDirection, reflectDirection), 0.0), specularShininess) * light.diffuse;
+            specular = pow(max(dot(viewDirection, reflectDirection), 0.0), specularShininess) * light.diffuse;
         }
 
-        vec3 ambient = attenuation * light.ambient;
+        vec3 ambient = light.ambient;
         diffuse *= attenuation;
         specular *= attenuation;
 
