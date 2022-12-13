@@ -157,12 +157,20 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
 
     if (currentCamera)
     {
+        auto Model = kame::math::Matrix4x4f::identity();
         auto View = currentCamera->getViewMatrix();
         auto Proj = currentCamera->getPerspectiveMatrix();
 
-        shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::identity());
+        shader->setMatrix4x4f("uModel", Model);
         shader->setMatrix4x4f("uView", View);
         shader->setMatrix4x4f("uProjection", Proj);
+        Model.m14 = 0.0f;
+        Model.m24 = 0.0f;
+        Model.m34 = 0.0f;
+        Model.m41 = 0.0f;
+        Model.m42 = 0.0f;
+        Model.m43 = 0.0f;
+        shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(Model)));
         shader->setVector3f("uEyePos", currentCamera->getGlobalLocation());
     }
     else
@@ -170,6 +178,7 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uView", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uProjection", kame::math::Matrix4x4f::identity());
+        shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::identity());
         shader->setVector3f("uEyePos", kame::math::Vector3f::zero());
     }
 

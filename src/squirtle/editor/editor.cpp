@@ -180,10 +180,9 @@ struct Editor {
         cam->addChild(light0);
         auto* light1 = new kame::squirtle::LightNode();
         light1->lightType = kSquirtleDirectionalLight;
-        // light1->useShadow = true;
         light1->setLocation(Vector3f(0.0f, 1.5f, -3.0f));
         light1->diffuse = Vector3f::zero();
-        engine.root->addChild(light1);
+        // engine.root->addChild(light1);
 
         mainWindow = new Fl_Window(256, 30, "Squirtle Editor");
         Fl_Menu_Bar* menuBar = new Fl_Menu_Bar(0, 0, 256, 30);

@@ -37,13 +37,13 @@ vec3 phong(vec3 surfaceNormal, vec3 surfacePosition)
 
         vec3 lightDirection;
         float attenuation = 1.0;
-        if (light.position.w > 0.5)
+        if (light.position.w > 0.5) // point light
         {
             lightDirection = normalize(light.position.xyz - surfacePosition);
             float distanceToLight = length(light.position.xyz - surfacePosition);
             attenuation = 1.0 / (light.linearAttenuation * distanceToLight + ((distanceToLight * distanceToLight) * light.quadraticAttenuation) + light.constantAttenuation);
         }
-        else
+        else // directional light
         {
             lightDirection = normalize(-light.position.xyz);
         }
