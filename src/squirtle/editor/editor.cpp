@@ -88,7 +88,7 @@ struct RotateLight : kame::squirtle::Node {
 };
 
 struct Editor {
-    kame::sdl2::Window win;
+    kame::sdl::Window win;
     kame::squirtle::Engine engine;
     Fl_Window* mainWindow = nullptr;
     Fl_Window* outliner = nullptr;

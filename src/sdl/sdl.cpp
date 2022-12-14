@@ -4,7 +4,7 @@ void printSDL_GL_GetAttribute();
 void debugGLMessageCallback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
 void spdlogSDL2(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
-namespace kame::sdl2 {
+namespace kame::sdl {
 
 void Window::openWindow(const char* title, int w, int h)
 {

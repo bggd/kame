@@ -18,7 +18,7 @@ add_library(kame
         src/math/vector3f.cpp
         src/math/vector4f.cpp
         src/math/matrix4x4f.cpp
-        src/sdl2/sdl2.cpp
+        src/sdl/sdl.cpp
 	src/ogl21/glad.cpp
 	src/ogl21/ogl21.cpp
 	src/gltf/gltf.cpp

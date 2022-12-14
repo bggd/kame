@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 
-namespace kame::sdl2 {
+namespace kame::sdl {
 
 struct State {
     bool isCloseRequest = false;
@@ -36,4 +36,4 @@ struct Window {
     const State& getState();
 };
 
-} // namespace kame::sdl2
+} // namespace kame::sdl
