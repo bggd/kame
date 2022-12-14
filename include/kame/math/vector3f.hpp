@@ -91,4 +91,9 @@ static Vector3f operator/(Vector3f a, Vector3f b)
     return Vector3f(a.x / b.x, a.y / b.y, a.z / b.z);
 }
 
+static Vector3f operator*(Vector3f a, float scalar)
+{
+    return Vector3f(a.x * scalar, a.y * scalar, a.z * scalar);
+}
+
 } // namespace kame::math

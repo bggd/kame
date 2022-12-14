@@ -166,3 +166,28 @@ TEST(Vector3, Transform)
     EXPECT_FLOAT_EQ(pos.y, glmPos.y);
     EXPECT_FLOAT_EQ(pos.z, glmPos.z);
 }
+
+TEST(Quaternion, AddSub)
+{
+    Quaternion q0 = Quaternion(1.0f, 2.0f, 3.0f, 1.0f);
+    Quaternion q1 = Quaternion(4.0f, 5.0f, 6.0f, 1.0f);
+
+    glm::quat glmQ0 = glm::quat(1.0f, 2.0f, 3.0f, 1.0f);
+    glm::quat glmQ1 = glm::quat(4.0f, 5.0f, 6.0f, 1.0f);
+
+    Quaternion q2 = q0 + q1;
+    glm::quat glmQ2 = glmQ0 + glmQ1;
+
+    EXPECT_FLOAT_EQ(q2.x, glmQ2.w);
+    EXPECT_FLOAT_EQ(q2.y, glmQ2.x);
+    EXPECT_FLOAT_EQ(q2.z, glmQ2.y);
+    EXPECT_FLOAT_EQ(q2.w, glmQ2.z);
+
+    q2 = q0 - q1;
+    glmQ2 = glmQ0 - glmQ1;
+
+    EXPECT_FLOAT_EQ(q2.x, glmQ2.w);
+    EXPECT_FLOAT_EQ(q2.y, glmQ2.x);
+    EXPECT_FLOAT_EQ(q2.z, glmQ2.y);
+    EXPECT_FLOAT_EQ(q2.w, glmQ2.z);
+}
