@@ -21,7 +21,6 @@ struct VBO {
     kame::ogl21::VertexBuffer* vboNormals = nullptr;
     kame::ogl21::IndexBuffer* ibo = nullptr;
     kame::ogl21::VertexArrayObject vao;
-    kame::ogl21::VertexArrayObject vaoShadow;
     bool vaoIsCreated = false;
 };
 

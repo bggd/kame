@@ -101,14 +101,9 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
                           .bindAttribute(engine->shader->getAttribLocation("vNormal"), vbo.vboNormals, 3, 3 * sizeof(float), 0)
                           .bindIndexBuffer(vbo.ibo)
                           .build();
-            vbo.vaoShadow = kame::ogl21::VertexArrayObjectBuilder()
-                                .bindAttribute(engine->shaderShadow->getAttribLocation("vPos"), vbo.vboPositions, 3, 3 * sizeof(float), 0)
-                                .bindIndexBuffer(vbo.ibo)
-                                .build();
         }
         if (isShadowPass)
         {
-            vbo.vaoShadow.drawElements(GL_TRIANGLES, meshNode->mesh->indices.size(), GL_UNSIGNED_INT);
         }
         else
         {
@@ -139,16 +134,6 @@ void collectLightNodeRecursive(std::vector<kame::squirtle::LightNode>& lights, k
 
 void Engine::drawNodes(int viewportWidth, int viewportHeight)
 {
-    kame::ogl21::BlendState blendState = kame::ogl21::BlendStateBuilder()
-                                             .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
-                                             .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-                                             .build();
-    kame::ogl21::DepthStencilState depthState = kame::ogl21::DepthStencilStateBuilder()
-                                                    .depthFunc(GL_LESS)
-                                                    .build();
-    kame::ogl21::setBlendState(blendState);
-    kame::ogl21::setDepthStencilState(depthState);
-
     lights.clear();
     collectLightNodeRecursive(lights, root);
 
@@ -229,6 +214,15 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
     kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, kame::math::Vector4f(0.5, 0.5, 0.5, 1));
     kame::ogl21::RasterizerState rasterState = kame::ogl21::RasterizerStateBuilder().cullFace(GL_BACK).build();
     kame::ogl21::setRasterizerState(rasterState);
+    kame::ogl21::BlendState blendState = kame::ogl21::BlendStateBuilder()
+                                             .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
+                                             .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+                                             .build();
+    kame::ogl21::DepthStencilState depthState = kame::ogl21::DepthStencilStateBuilder()
+                                                    .depthFunc(GL_LESS)
+                                                    .build();
+    kame::ogl21::setBlendState(blendState);
+    kame::ogl21::setDepthStencilState(depthState);
 
     drawNodeRecursive(this, root, false);
 }
