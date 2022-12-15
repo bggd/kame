@@ -114,8 +114,15 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
         }
         else
         {
-            engine->shader->setMatrix4x4f("uModel", node->getGlobalTransform());
-            engine->shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(node->getGlobalTransform())));
+            auto Model = node->getGlobalTransform();
+            engine->shader->setMatrix4x4f("uModel", Model);
+            Model.m14 = 0.0f;
+            Model.m24 = 0.0f;
+            Model.m34 = 0.0f;
+            Model.m41 = 0.0f;
+            Model.m42 = 0.0f;
+            Model.m43 = 0.0f;
+            engine->shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(Model)));
             kame::ogl21::setTexture2D(0, meshNode->diffuse);
             vbo.vao.drawElements(GL_TRIANGLES, meshNode->mesh->indices.size(), GL_UNSIGNED_INT);
             meshNode->bufferedVBO.swap();
