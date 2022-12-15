@@ -116,11 +116,8 @@ struct Editor {
         char* filePath = fl_file_chooser("Import GLTF 2.0?", "*.gltf", nullptr, 0);
         if (filePath)
         {
-            kame::squirtle::Node* node = new kame::squirtle::Node();
-            assert(node);
-
             kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(filePath);
-            kame::squirtle::loadMeshNodeFromGLTF(node, gltf);
+            kame::squirtle::GltfNode* node = kame::squirtle::helper::loadGltfNode(gltf);
             kame::gltf::deleteGLTF(gltf);
 
             std::filesystem::path path(filePath);
@@ -128,13 +125,12 @@ struct Editor {
             kame::ogl21::Texture2D* diffuse = kame::ogl21::loadTexture2D(path.string().c_str());
             setTexture(node, diffuse);
 
-            for (kame::squirtle::Node* child : node->getChildren())
+            if (node->player.hasAnimation())
             {
-                engine.root->addChild(child);
+                node->player.playLoop();
             }
 
-            node->children.clear();
-            delete node;
+            engine.root->addChild(node);
 
             addTreeItem();
             outliner->redraw();
@@ -159,6 +155,10 @@ struct Editor {
         else if (node->getType() == kSquirtleLightNode)
         {
             item = parent->add(Fl_Tree_Prefs(), "Light");
+        }
+        else if (node->getType() == kSquirtleGltfNode)
+        {
+            item = parent->add(Fl_Tree_Prefs(), "GLTF");
         }
         for (kame::squirtle::Node* child : node->getChildren())
         {
@@ -222,7 +222,7 @@ struct Editor {
             auto state = win.getState();
             if (state.isCloseRequest)
                 break;
-            engine.updateNodes(state.deltaTime);
+            engine.updateNodes(state.deltaTime > 1.0f ? 1.0 / 60.0f : state.deltaTime);
             CameraArcballNode* cam = (CameraArcballNode*)engine.currentCamera;
             cam->handleRotateArcball(state.isDownLMB, state.mouseX, state.mouseY, 640, 480);
             engine.drawNodes(640, 480);

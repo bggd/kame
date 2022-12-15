@@ -246,6 +246,45 @@ void loadMeshes(Gltf* gltf, json& j)
     }
 }
 
+void loadAnimations(Gltf* gltf, json& j)
+{
+    if (j.contains("animations"))
+    {
+        for (auto& e : j["animations"])
+        {
+            Animation anim;
+            if (e.contains("name"))
+            {
+                anim.name = e["name"].get<std::string>();
+            }
+            for (auto& c : e["channels"])
+            {
+                Animation::Channel animChan;
+                animChan.sampler = c["sampler"].get<integer>();
+                if (c["target"].contains("node"))
+                {
+                    animChan.target.node = c["target"]["node"].get<integer>();
+                    animChan.target.hasNode = true;
+                }
+                animChan.target.path = c["target"]["path"].get<std::string>();
+                anim.channels.push_back(animChan);
+            }
+            for (auto& s : e["samplers"])
+            {
+                Animation::Sampler animSampler;
+                animSampler.input = s["input"].get<integer>();
+                if (s.contains("interpolation"))
+                {
+                    animSampler.interpolation = s["interpolation"].get<std::string>();
+                }
+                animSampler.output = s["output"].get<integer>();
+                anim.samplers.push_back(animSampler);
+            }
+            gltf->animations.push_back(anim);
+        }
+    }
+}
+
 Gltf* loadGLTF(const char* path)
 {
     Gltf* gltf = new Gltf();
@@ -266,6 +305,7 @@ Gltf* loadGLTF(const char* path)
     loadBufferViews(gltf, j);
     loadAccessors(gltf, j);
     loadMeshes(gltf, j);
+    loadAnimations(gltf, j);
 
     return gltf;
 }
@@ -289,6 +329,7 @@ Gltf* loadGLTFFromMemory(const char* jsonString)
     loadBufferViews(gltf, j);
     loadAccessors(gltf, j);
     loadMeshes(gltf, j);
+    loadAnimations(gltf, j);
 
     return gltf;
 }

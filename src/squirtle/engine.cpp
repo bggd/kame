@@ -56,7 +56,14 @@ void updateNodeRecusrive(kame::squirtle::Engine* engine, kame::squirtle::Node* n
     {
         engine->currentCamera = (kame::squirtle::CameraNode*)node;
     }
+
     node->onUpdate(dt);
+
+    if (node->getType() == kSquirtleGltfNode)
+    {
+        ((kame::squirtle::GltfNode*)node)->player.update(dt);
+    }
+
     for (kame::squirtle::Node* child : node->getChildren())
     {
         updateNodeRecusrive(engine, child, dt);
@@ -107,6 +114,8 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
         }
         else
         {
+            engine->shader->setMatrix4x4f("uModel", node->getGlobalTransform());
+            engine->shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(node->getGlobalTransform())));
             kame::ogl21::setTexture2D(0, meshNode->diffuse);
             vbo.vao.drawElements(GL_TRIANGLES, meshNode->mesh->indices.size(), GL_UNSIGNED_INT);
             meshNode->bufferedVBO.swap();

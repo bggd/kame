@@ -2,6 +2,7 @@
 
 #include "vector3f.hpp"
 #include "vector4f.hpp"
+#include "quaternion.hpp"
 
 #include <cmath>
 
@@ -170,6 +171,17 @@ struct Matrix4x4f {
     static Matrix4x4f createScale(float scales)
     {
         return createScale(Vector3f(scales));
+    }
+
+    static Matrix4x4f CreateFromQuaternion(Quaternion q)
+    {
+        Vector3f r = Vector3f::transform(Vector3f(1.0f, 0.0f, 0.0f), q);
+        Vector3f u = Vector3f::transform(Vector3f(0.0f, 1.0f, 0.0f), q);
+        Vector3f f = Vector3f::transform(Vector3f(0.0f, 0.0f, 1.0f), q);
+        return {r.x, r.y, r.z, 0.0f,
+                u.x, u.y, u.z, 0.0f,
+                f.x, f.y, f.z, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f};
     }
 
     static Matrix4x4f transpose(const Matrix4x4f& m)

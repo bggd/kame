@@ -191,3 +191,23 @@ TEST(Quaternion, AddSub)
     EXPECT_FLOAT_EQ(q2.z, glmQ2.y);
     EXPECT_FLOAT_EQ(q2.w, glmQ2.z);
 }
+
+#include <kame/gltf/gltf.hpp>
+
+TEST(Gltf, base64)
+{
+    std::vector<uint8_t> d = kame::gltf::decodeBase64("TWFu", 0);
+    EXPECT_EQ('M', d[0]);
+    EXPECT_EQ('a', d[1]);
+    EXPECT_EQ('n', d[2]);
+    EXPECT_EQ(3, d.size());
+
+    d = kame::gltf::decodeBase64("TWE=", 0);
+    EXPECT_EQ('M', d[0]);
+    EXPECT_EQ('a', d[1]);
+    EXPECT_EQ(2, d.size());
+
+    d = kame::gltf::decodeBase64("TQ==", 0);
+    EXPECT_EQ('M', d[0]);
+    EXPECT_EQ(1, d.size());
+}

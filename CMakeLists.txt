@@ -18,12 +18,13 @@ add_library(kame
         src/math/vector3f.cpp
         src/math/vector4f.cpp
         src/math/matrix4x4f.cpp
+        src/math/quaternion.cpp
         src/sdl/sdl.cpp
 	src/ogl21/glad.cpp
 	src/ogl21/ogl21.cpp
 	src/gltf/gltf.cpp
         src/squirtle/engine.cpp
-        src/squirtle/squirtle.cpp
+        src/squirtle/node/helper.cpp
 	pystring/pystring.cpp
 )
 
@@ -81,7 +82,7 @@ target_include_directories(squirtleEditor
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 target_link_directories(squirtleEditor PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/lib)
-target_link_libraries(squirtleEditor PRIVATE kame gdiplus Ws2_32 comctl32 fltk$<$<CONFIG:Debug>:d>)
+target_link_libraries(squirtleEditor PRIVATE kame gdiplus Ws2_32 comctl32 fltk)
 
 
 enable_testing()

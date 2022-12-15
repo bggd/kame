@@ -2,7 +2,8 @@
 
 namespace kame::math {
 struct Matrix4x4f;
-}
+struct Quaternion;
+} // namespace kame::math
 
 #include <cmath>
 
@@ -17,7 +18,7 @@ struct Vector3f {
 
     Vector3f operator-()
     {
-        return Vector3f(-x, -y, -z);
+        return {-x, -y, -z};
     }
 
     static Vector3f zero()
@@ -69,6 +70,9 @@ struct Vector3f {
     }
 
     static Vector3f transform(Vector3f v, const kame::math::Matrix4x4f& m);
+    static Vector3f transform(Vector3f v, Quaternion q);
+
+    static Vector3f lerp(Vector3f a, Vector3f b, float amount);
 };
 
 static Vector3f operator+(Vector3f a, Vector3f b)

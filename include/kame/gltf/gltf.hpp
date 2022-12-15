@@ -84,6 +84,31 @@ struct Scene {
     std::vector<integer> nodes;
 };
 
+struct Animation {
+
+    struct Channel {
+
+        struct Target {
+            integer node;
+            bool hasNode = false;
+            std::string path;
+        };
+
+        integer sampler;
+        Animation::Channel::Target target;
+    };
+
+    struct Sampler {
+        integer input;
+        std::string interpolation = "LINEAR";
+        integer output;
+    };
+
+    std::string name;
+    std::vector<Animation::Channel> channels;
+    std::vector<Animation::Sampler> samplers;
+};
+
 struct Gltf {
     integer scene = 0;
     bool hasScene = false;
@@ -93,10 +118,13 @@ struct Gltf {
     std::vector<BufferView> bufferViews;
     std::vector<Accessor> accessors;
     std::vector<Mesh> meshes;
+    std::vector<Animation> animations;
 };
 
 Gltf* loadGLTF(const char* path);
 Gltf* loadGLTFFromMemory(const char* jsonString);
 void deleteGLTF(Gltf* gltf);
+
+std::vector<uint8_t> decodeBase64(const std::string& str, integer start);
 
 } // namespace kame::gltf
