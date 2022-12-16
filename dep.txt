@@ -11,9 +11,9 @@ git clone --depth 1 --branch v1.11.0 https://github.com/gabime/spdlog.git
 
 git clone --depth 1 --branch v3.11.2 https://github.com/nlohmann/json.git
 
-- pystring (commit hash: 089194ddaf62a9cd536caf0e9ed7f0054979efa5 )
+- pystring
 
-git clone https://github.com/imageworks/pystring.git
+git clone --depth 1 --branch v1.1.4 https://github.com/imageworks/pystring.git
 
 - googletest
 

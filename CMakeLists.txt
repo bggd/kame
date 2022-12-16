@@ -9,8 +9,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 
-add_subdirectory(SDL)
-add_subdirectory(spdlog)
+add_subdirectory(thirdparty/SDL)
+add_subdirectory(thirdparty/spdlog)
 
 add_library(kame
     STATIC
@@ -25,7 +25,7 @@ add_library(kame
 	src/gltf/gltf.cpp
         src/squirtle/engine.cpp
         src/squirtle/node/helper.cpp
-	pystring/pystring.cpp
+        thirdparty/pystring/pystring.cpp
 )
 
 target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog)
@@ -33,8 +33,8 @@ target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog)
 target_include_directories(kame
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/SDL/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/spdlog/include>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
@@ -63,7 +63,7 @@ add_executable(squirtleEditor
 include(ExternalProject)
 ExternalProject_Add(
     FLTK14
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/fltk
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/fltk
     INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
@@ -87,7 +87,7 @@ target_link_libraries(squirtleEditor PRIVATE kame gdiplus Ws2_32 comctl32 fltk)
 
 enable_testing()
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-add_subdirectory(googletest)
+add_subdirectory(thirdparty/googletest)
 
 add_executable(unit_test test/test.cpp)
 target_link_libraries(unit_test PRIVATE kame GTest::gtest_main)

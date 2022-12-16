@@ -7,7 +7,7 @@
 
 #include "stb_image.h"
 
-#include "../pystring/pystring.h"
+#include "../thirdparty/pystring/pystring.h"
 
 #include <cassert>
 #include <cstdio>
