@@ -1,6 +1,6 @@
 #include <all.hpp>
 
-#include "../../json/single_include/nlohmann/json.hpp"
+#include "../../thirdparty/json/single_include/nlohmann/json.hpp"
 using json = nlohmann::json;
 
 namespace kame::gltf {
