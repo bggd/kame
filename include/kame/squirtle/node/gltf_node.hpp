@@ -182,6 +182,11 @@ struct GltfNode : kame::squirtle::Node {
     {
         return kSquirtleGltfNode;
     }
+
+    virtual void onUpdate(float dt) override
+    {
+        player.update(dt);
+    }
 };
 
 } // namespace kame::squirtle

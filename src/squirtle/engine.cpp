@@ -59,11 +59,6 @@ void updateNodeRecusrive(kame::squirtle::Engine* engine, kame::squirtle::Node* n
 
     node->onUpdate(dt);
 
-    if (node->getType() == kSquirtleGltfNode)
-    {
-        ((kame::squirtle::GltfNode*)node)->player.update(dt);
-    }
-
     for (kame::squirtle::Node* child : node->getChildren())
     {
         updateNodeRecusrive(engine, child, dt);
