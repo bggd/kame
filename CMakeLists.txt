@@ -64,10 +64,10 @@ include(ExternalProject)
 ExternalProject_Add(
     FLTK14
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/fltk
-    INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}
+    INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/fltk_install
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CONFIGURATION_TYPES}
+        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
         -DFLTK_BUILD_TEST:BOOL=OFF
         -DFLTK_BUILD_FLUID:BOOL=OFF
         -DOPTION_USE_SYSTEM_LIBJPEG:BOOL=OFF
@@ -79,9 +79,9 @@ ExternalProject_Add(
 add_dependencies(squirtleEditor FLTK14)
 
 target_include_directories(squirtleEditor
-    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fltk_install/include
 )
-target_link_directories(squirtleEditor PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+target_link_directories(squirtleEditor PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fltk_install/lib)
 target_link_libraries(squirtleEditor PRIVATE kame gdiplus Ws2_32 comctl32 fltk$<$<CONFIG:Debug>:d>)
 
 
