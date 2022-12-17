@@ -39,6 +39,7 @@
 *.user
 tags
 .vs
+build
 CMakeSettings.json
 thirdparty/SDL/
 thirdparty/spdlog/
