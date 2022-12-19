@@ -120,6 +120,7 @@ void setShader(Shader* shader)
 
 void setTexture2D(GLuint slot, Texture2D* tex)
 {
+    assert(tex);
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, tex->id);
 }
