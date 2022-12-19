@@ -272,7 +272,7 @@ void loadGltf(kame::squirtle::Node* root, const kame::gltf::Gltf* gltf, kame::sq
     }
 }
 
-kame::squirtle::GltfNode* kame::squirtle::helper::loadGltfNode(const kame::gltf::Gltf* gltf)
+kame::squirtle::GltfNode* kame::squirtle::helper::createGltfNode(const kame::gltf::Gltf* gltf)
 {
     kame::squirtle::GltfNode* node = new kame::squirtle::GltfNode();
     assert(node);

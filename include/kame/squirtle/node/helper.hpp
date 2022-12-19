@@ -6,6 +6,6 @@
 
 namespace kame::squirtle::helper {
 
-kame::squirtle::GltfNode* loadGltfNode(const kame::gltf::Gltf* gltf);
+kame::squirtle::GltfNode* createGltfNode(const kame::gltf::Gltf* gltf);
 
 } // namespace kame::squirtle::helper

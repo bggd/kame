@@ -117,7 +117,7 @@ struct Editor {
         if (filePath)
         {
             kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(filePath);
-            kame::squirtle::GltfNode* node = kame::squirtle::helper::loadGltfNode(gltf);
+            kame::squirtle::GltfNode* node = kame::squirtle::helper::createGltfNode(gltf);
             kame::gltf::deleteGLTF(gltf);
 
             std::filesystem::path path(filePath);
