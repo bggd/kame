@@ -163,7 +163,6 @@ int main(int argc, char** argv)
 
     auto* light = new kame::squirtle::LightNode();
     light->lightType = kSquirtleDirectionalLight;
-    // light->diffuse = kame::math::Vector3f(0.5f, 0.5f, 0.5f);
     cam->addChild(light);
 
     engine.root->addChild(cam);
