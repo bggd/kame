@@ -12,6 +12,8 @@ struct CameraNode : kame::squirtle::Node {
     float nearPlaneDistance;
     float farPlaneDistance;
 
+    kame::math::Matrix4x4f viewMatrix = kame::math::Matrix4x4f::identity();
+
     SquirtleNodeType getType() const override
     {
         return kSquirtleCameraNode;
@@ -19,10 +21,10 @@ struct CameraNode : kame::squirtle::Node {
 
     virtual kame::math::Matrix4x4f getViewMatrix()
     {
-        return kame::math::Matrix4x4f::identity();
+        return viewMatrix;
     }
 
-    kame::math::Matrix4x4f getPerspectiveMatrix()
+    virtual kame::math::Matrix4x4f getProjectionMatrix()
     {
         float y_fov = kame::math::helper::toRadians(fov);
         return kame::math::Matrix4x4f::createPerspectiveFieldOfView_RH_NO(y_fov, aspectRatio, nearPlaneDistance, farPlaneDistance);

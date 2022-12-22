@@ -291,7 +291,8 @@ Gltf* loadGLTF(const char* path)
     assert(gltf);
 
     std::fstream f(path);
-    json j = json::parse(f);
+    json j = json::parse(f, nullptr, false);
+    assert(!j.is_discarded());
 
     if (j.contains("scene"))
     {
@@ -310,12 +311,13 @@ Gltf* loadGLTF(const char* path)
     return gltf;
 }
 
-Gltf* loadGLTFFromMemory(const char* jsonString)
+Gltf* loadGLTFFromMemory(const unsigned char* src, unsigned int len)
 {
     Gltf* gltf = new Gltf();
     assert(gltf);
 
-    json j = json::parse(jsonString);
+    json j = json::parse(src, src + len, nullptr, false);
+    assert(!j.is_discarded());
 
     if (j.contains("scene"))
     {

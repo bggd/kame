@@ -92,11 +92,11 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
     if (node->getType() == kSquirtleMeshNode)
     {
         kame::squirtle::MeshNode* meshNode = (kame::squirtle::MeshNode*)node;
-        meshNode->bufferedVBO.updateVBO(meshNode->mesh);
 
         kame::squirtle::VBO& vbo = meshNode->bufferedVBO.getVBO();
         if (!vbo.vaoIsCreated)
         {
+            meshNode->bufferedVBO.updateVBO(meshNode->mesh);
             vbo.vao = kame::ogl21::VertexArrayObjectBuilder()
                           .bindAttribute(engine->shader->getAttribLocation("vPos"), vbo.vboPositions, 3, 3 * sizeof(float), 0)
                           .bindAttribute(engine->shader->getAttribLocation("vUV"), vbo.vboTexCoords, 2, 2 * sizeof(float), 0)
@@ -155,7 +155,7 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
     {
         auto Model = kame::math::Matrix4x4f::identity();
         auto View = currentCamera->getViewMatrix();
-        auto Proj = currentCamera->getPerspectiveMatrix();
+        auto Proj = currentCamera->getProjectionMatrix();
 
         shader->setMatrix4x4f("uModel", Model);
         shader->setMatrix4x4f("uView", View);

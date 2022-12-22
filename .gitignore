@@ -55,3 +55,5 @@ out/
 !include/kame/assimp
 !src/assimp
 p5/
+!examples/data/*.gltf
+!examples/data/*.png

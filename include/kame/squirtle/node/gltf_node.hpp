@@ -113,12 +113,12 @@ struct AnimationPlayer {
 
         if (isLoop)
         {
-            float duration = clip->endTime - clip->startTime;
+            double duration = clip->endTime - clip->startTime;
             if (duration <= 0)
             {
                 currentTime = 0.0f;
             }
-            currentTime = fmodf(currentTime - clip->startTime, clip->endTime - clip->startTime);
+            currentTime = fmod(currentTime - clip->startTime, clip->endTime - clip->startTime);
             if (currentTime < 0.0f)
             {
                 currentTime += clip->endTime - clip->startTime;

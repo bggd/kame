@@ -26,7 +26,7 @@ struct VBO {
 
 struct BufferedVBO {
     uint8_t current = 0;
-    uint8_t numBuffering = 2;
+    uint8_t numBuffering = 1;
 
     std::vector<VBO> buffers;
 

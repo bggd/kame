@@ -39,22 +39,8 @@ target_include_directories(kame
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 
-add_executable(exampleKameHelloWorld
-    examples/00-helloworld/helloworld.cpp)
-target_link_libraries(exampleKameHelloWorld kame)
 
-add_executable(exampleKameTriangle
-    examples/01-triangle/triangle.cpp)
-target_link_libraries(exampleKameTriangle kame)
-
-add_executable(exampleKameImage
-    examples/02-image/image.cpp)
-target_link_libraries(exampleKameImage kame)
-
-add_executable(exampleKameGltf
-    examples/04-gltf/gltf.cpp)
-target_link_libraries(exampleKameGltf kame)
-
+add_subdirectory(examples)
 
 add_executable(squirtleEditor
     src/squirtle/editor/editor.cpp

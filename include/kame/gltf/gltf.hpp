@@ -122,7 +122,7 @@ struct Gltf {
 };
 
 Gltf* loadGLTF(const char* path);
-Gltf* loadGLTFFromMemory(const char* jsonString);
+Gltf* loadGLTFFromMemory(const unsigned char* src, unsigned int len);
 void deleteGLTF(Gltf* gltf);
 
 std::vector<uint8_t> decodeBase64(const std::string& str, integer start);
