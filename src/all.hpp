@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include <array>
 #include <string>
 #include <vector>
 #include <stack>

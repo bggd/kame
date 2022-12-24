@@ -22,7 +22,8 @@ add_library(kame
         src/sdl/sdl.cpp
 	src/ogl21/glad.cpp
 	src/ogl21/ogl21.cpp
-	src/gltf/gltf.cpp
+        src/gltf/gltf.cpp
+        src/squirtle/node/gltf_node.cpp
         src/squirtle/engine.cpp
         src/squirtle/node/helper.cpp
         thirdparty/pystring/pystring.cpp

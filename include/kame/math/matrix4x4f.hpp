@@ -212,6 +212,20 @@ struct Matrix4x4f {
     static Matrix4x4f invert(const Matrix4x4f& m);
 };
 
+static Matrix4x4f operator+(Matrix4x4f& a, Matrix4x4f& b)
+{
+    Matrix4x4f m = Matrix4x4f::zero();
+    const float* A = (const float*)&a;
+    const float* B = (const float*)&b;
+    float* M = (float*)&m;
+
+    for (int i = 0; i < 16; ++i)
+    {
+        M[i] = A[i] + B[i];
+    }
+    return m;
+}
+
 static Matrix4x4f operator*(Matrix4x4f& a, Matrix4x4f& b)
 {
     Matrix4x4f m = Matrix4x4f::zero();
@@ -228,6 +242,19 @@ static Matrix4x4f operator*(Matrix4x4f& a, Matrix4x4f& b)
                 M[4 * i + j] += A[4 * i + k] * B[4 * k + j];
             }
         }
+    }
+    return m;
+}
+
+static Matrix4x4f operator*(Matrix4x4f& a, float scaleFactor)
+{
+    Matrix4x4f m = Matrix4x4f::zero();
+    const float* A = (const float*)&a;
+    float* M = (float*)&m;
+
+    for (int i = 0; i < 16; ++i)
+    {
+        M[i] = A[i] * scaleFactor;
     }
     return m;
 }

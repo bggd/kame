@@ -48,6 +48,11 @@ void loadNodes(Gltf* gltf, json& j)
                     node.children.push_back(n.get<integer>());
                 }
             }
+            if (e.contains("skin"))
+            {
+                node.skin = e["skin"].get<integer>();
+                node.hasSkin = true;
+            }
             if (e.contains("mesh"))
             {
                 node.mesh = e["mesh"].get<integer>();
@@ -285,6 +290,36 @@ void loadAnimations(Gltf* gltf, json& j)
     }
 }
 
+void loadSkins(Gltf* gltf, json& j)
+{
+    if (j.contains("skins"))
+    {
+        for (auto& e : j["skins"])
+        {
+            Skin skin;
+            if (e.contains("name"))
+            {
+                skin.name = e["name"].get<std::string>();
+            }
+            if (e.contains("inverseBindMatrices"))
+            {
+                skin.inverseBindMatrices = e["inverseBindMatrices"].get<integer>();
+                skin.hasInverseBindMatrices = true;
+            }
+            if (e.contains("skeleton"))
+            {
+                skin.skeleton = e["skeleton"].get<integer>();
+                skin.hasSkeleton = true;
+            }
+            for (auto& i : e["joints"])
+            {
+                skin.joints.push_back(i.get<integer>());
+            }
+            gltf->skins.push_back(skin);
+        }
+    }
+}
+
 Gltf* loadGLTF(const char* path)
 {
     Gltf* gltf = new Gltf();
@@ -307,6 +342,7 @@ Gltf* loadGLTF(const char* path)
     loadAccessors(gltf, j);
     loadMeshes(gltf, j);
     loadAnimations(gltf, j);
+    loadSkins(gltf, j);
 
     return gltf;
 }
@@ -332,6 +368,7 @@ Gltf* loadGLTFFromMemory(const unsigned char* src, unsigned int len)
     loadAccessors(gltf, j);
     loadMeshes(gltf, j);
     loadAnimations(gltf, j);
+    loadSkins(gltf, j);
 
     return gltf;
 }

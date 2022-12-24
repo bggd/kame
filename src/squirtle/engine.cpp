@@ -104,6 +104,45 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
                           .bindIndexBuffer(vbo.ibo)
                           .build();
         }
+
+        if (meshNode->gltf)
+        {
+            // update skinMatrix
+            auto invertMtx = kame::math::Matrix4x4f::invert(meshNode->getGlobalTransform());
+            Skin& skin = (*meshNode->gltf->skins)[meshNode->skinIdx];
+            uint32_t idx = 0;
+            for (auto& i : skin.joints)
+            {
+                kame::squirtle::Node* joint = meshNode->gltf->nodes[i];
+                skin.skinMatrices[idx] = skin.inverseBindMatrices[idx] * joint->getGlobalTransform() * invertMtx;
+                ++idx;
+            }
+
+            // update skinned mesh
+            static Mesh dstMesh;
+            dstMesh.positions.clear();
+            dstMesh.positions.resize(meshNode->mesh->positions.size());
+            dstMesh.normals.clear();
+            dstMesh.normals.resize(meshNode->mesh->normals.size());
+            for (auto i : meshNode->mesh->indices)
+            {
+                auto vPos = meshNode->mesh->positions[i];
+                auto vNormal = meshNode->mesh->normals[i];
+                auto vJoints = meshNode->mesh->joints[i];
+                auto vWeights = meshNode->mesh->weights[i];
+
+                kame::math::Matrix4x4f skinMtx = skin.skinMatrices[vJoints[0]] * vWeights.x;
+                skinMtx = skinMtx + skin.skinMatrices[vJoints[1]] * vWeights.y;
+                skinMtx = skinMtx + skin.skinMatrices[vJoints[2]] * vWeights.z;
+                skinMtx = skinMtx + skin.skinMatrices[vJoints[3]] * vWeights.w;
+
+                dstMesh.positions[i] = kame::math::Vector3f::transform(vPos, skinMtx);
+                dstMesh.normals[i] = kame::math::Vector3f::transform(vNormal, skinMtx);
+            }
+            vbo.vboPositions->setBuffer((const float*)&dstMesh.positions[0]);
+            vbo.vboNormals->setBuffer((const float*)&dstMesh.normals[0]);
+        }
+
         if (isShadowPass)
         {
         }

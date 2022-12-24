@@ -63,8 +63,8 @@ struct Mesh {
 struct Node {
     std::string name;
     std::vector<integer> children;
+    integer skin;
     integer mesh;
-    bool hasMesh = false;
     float matrix[16] = {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
@@ -73,6 +73,8 @@ struct Node {
     float translation[3] = {0.0f, 0.0f, 0.0f};
     float rotation[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     float scale[3] = {1.0f, 1.0f, 1.0f};
+    bool hasSkin = false;
+    bool hasMesh = false;
     bool hasMatrix = false;
     bool hasTranslation = false;
     bool hasRotation = false;
@@ -109,6 +111,15 @@ struct Animation {
     std::vector<Animation::Sampler> samplers;
 };
 
+struct Skin {
+    std::string name;
+    integer inverseBindMatrices;
+    integer skeleton;
+    std::vector<integer> joints;
+    bool hasInverseBindMatrices = false;
+    bool hasSkeleton = false;
+};
+
 struct Gltf {
     integer scene = 0;
     bool hasScene = false;
@@ -119,6 +130,7 @@ struct Gltf {
     std::vector<Accessor> accessors;
     std::vector<Mesh> meshes;
     std::vector<Animation> animations;
+    std::vector<Skin> skins;
 };
 
 Gltf* loadGLTF(const char* path);

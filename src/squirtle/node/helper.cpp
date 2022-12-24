@@ -5,6 +5,8 @@ void loadMesh(kame::squirtle::MeshNode* meshNode, const kame::gltf::Gltf* gltf, 
     std::vector<kame::math::Vector3f> positions;
     std::vector<kame::math::Vector2f> texcoords;
     std::vector<kame::math::Vector3f> normals;
+    std::vector<std::array<uint16_t, 4>> joints;
+    std::vector<kame::math::Vector4f> weights;
     std::vector<uint32_t> indices;
 
     auto& m = gltf->meshes[gltfNode.mesh];
@@ -73,18 +75,57 @@ void loadMesh(kame::squirtle::MeshNode* meshNode, const kame::gltf::Gltf* gltf, 
                     normals.push_back(v);
                 }
             }
+            else if (item.first == "JOINTS_0")
+            {
+                auto& acc = gltf->accessors[item.second];
+                auto& bv = gltf->bufferViews[acc.bufferView];
+                auto& b = gltf->buffers[bv.buffer];
+                assert(acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
+                for (unsigned int i = 0; i < acc.count; ++i)
+                {
+                    if (acc.componentType == GL_UNSIGNED_BYTE)
+                    {
+                        auto e = ((std::array<uint8_t, 4>*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        std::array<uint16_t, 4> j;
+                        j[0] = e[0];
+                        j[1] = e[1];
+                        j[2] = e[2];
+                        j[3] = e[3];
+                        joints.push_back(j);
+                    }
+                    else if (acc.componentType == GL_UNSIGNED_SHORT)
+                    {
+                        auto e = ((std::array<uint16_t, 4>*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        joints.push_back(e);
+                    }
+                }
+            }
+            else if (item.first == "WEIGHTS_0")
+            {
+                auto& acc = gltf->accessors[item.second];
+                auto& bv = gltf->bufferViews[acc.bufferView];
+                auto& b = gltf->buffers[bv.buffer];
+                assert(acc.componentType == GL_FLOAT);
+                for (unsigned int i = 0; i < acc.count; ++i)
+                {
+                    auto v = ((kame::math::Vector4f*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    weights.push_back(v);
+                }
+            }
         }
     }
 
     meshNode->mesh->positions = std::move(positions);
     meshNode->mesh->texCoords = std::move(texcoords);
     meshNode->mesh->normals = std::move(normals);
+    meshNode->mesh->joints = std::move(joints);
+    meshNode->mesh->weights = std::move(weights);
     meshNode->mesh->indices = std::move(indices);
 
     meshNode->bufferedVBO.init(meshNode->mesh);
 }
 
-void loadNode(kame::squirtle::Node* parent, const kame::gltf::Gltf* gltf, kame::gltf::integer gltfNodeID, std::vector<kame::squirtle::Node*>& squirtleNodes)
+void loadNode(kame::squirtle::GltfNode* root, kame::squirtle::Node* parent, const kame::gltf::Gltf* gltf, kame::gltf::integer gltfNodeID, std::vector<kame::squirtle::Node*>& squirtleNodes)
 {
     auto& gltfNode = gltf->nodes[gltfNodeID];
 
@@ -98,6 +139,12 @@ void loadNode(kame::squirtle::Node* parent, const kame::gltf::Gltf* gltf, kame::
         assert(meshNode->mesh);
 
         loadMesh(meshNode, gltf, gltfNode);
+
+        if (gltfNode.hasSkin)
+        {
+            meshNode->skinIdx = gltfNode.skin;
+            meshNode->gltf = root;
+        }
 
         self = meshNode;
     }
@@ -131,7 +178,7 @@ void loadNode(kame::squirtle::Node* parent, const kame::gltf::Gltf* gltf, kame::
 
     for (auto childID : gltfNode.children)
     {
-        loadNode(self, gltf, childID, squirtleNodes);
+        loadNode(root, self, gltf, childID, squirtleNodes);
     }
 }
 
@@ -241,7 +288,39 @@ kame::squirtle::AnimationClip loadAnimation(std::vector<kame::squirtle::Node*>& 
     return clip;
 }
 
-void loadGltf(kame::squirtle::Node* root, const kame::gltf::Gltf* gltf, kame::squirtle::Animation* squirtleAnimation)
+void loadSkin(kame::squirtle::GltfNode* root, const std::vector<kame::squirtle::Node*>& squirtleNodes, const kame::gltf::Skin& gltfSkin, const kame::gltf::Gltf* gltf)
+{
+    kame::squirtle::Skin skin;
+
+    if (gltfSkin.hasInverseBindMatrices)
+    {
+        auto& acc = gltf->accessors[gltfSkin.inverseBindMatrices];
+        auto& bv = gltf->bufferViews[acc.bufferView];
+        auto& b = gltf->buffers[bv.buffer];
+        for (unsigned int i = 0; i < acc.count; ++i)
+        {
+            auto v = ((kame::math::Matrix4x4f*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+            skin.inverseBindMatrices.push_back(v);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < gltfSkin.joints.size(); ++i)
+        {
+            skin.inverseBindMatrices.push_back(kame::math::Matrix4x4f::identity());
+        }
+    }
+
+    for (auto i : gltfSkin.joints)
+    {
+        skin.joints.push_back(i);
+        skin.skinMatrices.push_back(kame::math::Matrix4x4f::identity());
+    }
+
+    root->skins->push_back(skin);
+}
+
+void loadGltf(kame::squirtle::GltfNode* root, const kame::gltf::Gltf* gltf, kame::squirtle::Animation* squirtleAnimation)
 {
     std::vector<kame::squirtle::Node*> squirtleNodes(gltf->nodes.size(), nullptr);
 
@@ -254,14 +333,14 @@ void loadGltf(kame::squirtle::Node* root, const kame::gltf::Gltf* gltf, kame::sq
 
         for (auto gltfNodeID : gltfScene.nodes)
         {
-            loadNode(scene, gltf, gltfNodeID, squirtleNodes);
+            loadNode(root, scene, gltf, gltfNodeID, squirtleNodes);
         }
     }
 
-    squirtleAnimation->nodes = std::move(squirtleNodes);
+    root->nodes = std::move(squirtleNodes);
     for (auto& gltfAnimation : gltf->animations)
     {
-        squirtleAnimation->clips.emplace_back(loadAnimation(squirtleNodes, gltfAnimation, gltf));
+        squirtleAnimation->clips.emplace_back(loadAnimation(root->nodes, gltfAnimation, gltf));
     }
     for (auto& clip : squirtleAnimation->clips)
     {
@@ -270,6 +349,15 @@ void loadGltf(kame::squirtle::Node* root, const kame::gltf::Gltf* gltf, kame::sq
             squirtleAnimation->clipMap[clip.name] = &clip;
         }
     }
+
+    if (!gltf->skins.empty())
+    {
+        root->skins = new std::vector<kame::squirtle::Skin>();
+    }
+    for (auto& skin : gltf->skins)
+    {
+        loadSkin(root, root->nodes, skin, gltf);
+    }
 }
 
 kame::squirtle::GltfNode* kame::squirtle::helper::createGltfNode(const kame::gltf::Gltf* gltf)
@@ -277,12 +365,12 @@ kame::squirtle::GltfNode* kame::squirtle::helper::createGltfNode(const kame::glt
     kame::squirtle::GltfNode* node = new kame::squirtle::GltfNode();
     assert(node);
 
-    node->animation = new kame::squirtle::Animation();
-    assert(node->animation);
+    node->player.animation = new kame::squirtle::Animation();
+    assert(node->player.animation);
 
-    loadGltf(node, gltf, node->animation);
+    loadGltf(node, gltf, node->player.animation);
 
-    node->player.animation = node->animation;
+    node->player.gltf = node;
 
     return node;
 }

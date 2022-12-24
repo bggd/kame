@@ -1,8 +1,11 @@
 #pragma once
 
 #include "node.hpp"
+#include "gltf_node.hpp"
+
 #include <kame/math/math.hpp>
 #include <kame/ogl21/ogl21.hpp>
+#include <array>
 #include <vector>
 #include <cstdint>
 
@@ -12,6 +15,8 @@ struct Mesh {
     std::vector<kame::math::Vector3f> positions;
     std::vector<kame::math::Vector2f> texCoords;
     std::vector<kame::math::Vector3f> normals;
+    std::vector<std::array<uint16_t, 4>> joints;
+    std::vector<kame::math::Vector4f> weights;
     std::vector<uint32_t> indices;
 };
 
@@ -72,6 +77,8 @@ struct MeshNode : kame::squirtle::Node {
     Mesh* mesh = nullptr;
     kame::ogl21::Texture2D* diffuse = nullptr;
     BufferedVBO bufferedVBO;
+    uint32_t skinIdx = 0;
+    GltfNode* gltf = nullptr;
 
     SquirtleNodeType getType() const override
     {

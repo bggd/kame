@@ -9,6 +9,12 @@
 
 namespace kame::squirtle {
 
+struct Skin {
+    std::vector<kame::math::Matrix4x4f> inverseBindMatrices;
+    std::vector<uint64_t> joints;
+    std::vector<kame::math::Matrix4x4f> skinMatrices;
+};
+
 struct AnimationClip {
     struct Channel {
         enum Type {
@@ -54,8 +60,11 @@ struct Animation {
     std::map<std::string, AnimationClip*> clipMap;
 };
 
+struct Gltf;
+
 struct AnimationPlayer {
     Animation* animation = nullptr;
+    struct GltfNode* gltf = nullptr;
     double currentTime = 0.0;
     bool isLoop = false;
     AnimationClip* clip = nullptr;
@@ -67,7 +76,7 @@ struct AnimationPlayer {
 
     void play(std::string name)
     {
-        assert(animation);
+        assert(hasAnimation());
         clip = animation->clipMap[name];
         assert(clip);
         currentTime = 0.0;
@@ -76,7 +85,7 @@ struct AnimationPlayer {
 
     void play()
     {
-        assert(animation);
+        assert(hasAnimation());
 
         clip = &animation->clips.front();
         assert(clip);
@@ -86,7 +95,7 @@ struct AnimationPlayer {
 
     void playLoop(std::string name)
     {
-        assert(animation);
+        assert(hasAnimation());
         clip = animation->clipMap[name];
         assert(clip);
         currentTime = 0.0;
@@ -95,87 +104,20 @@ struct AnimationPlayer {
 
     void playLoop()
     {
-        assert(animation);
+        assert(hasAnimation());
         clip = &animation->clips.front();
         assert(clip);
         currentTime = 0.0;
         isLoop = true;
     }
 
-    void update(float dt)
-    {
-        if (!clip)
-        {
-            return;
-        }
-
-        currentTime += dt;
-
-        if (isLoop)
-        {
-            double duration = clip->endTime - clip->startTime;
-            if (duration <= 0)
-            {
-                currentTime = 0.0f;
-            }
-            currentTime = fmod(currentTime - clip->startTime, clip->endTime - clip->startTime);
-            if (currentTime < 0.0f)
-            {
-                currentTime += clip->endTime - clip->startTime;
-            }
-            currentTime += clip->startTime;
-        }
-        else
-        {
-            if (currentTime < clip->startTime)
-            {
-                currentTime = clip->startTime;
-            }
-            if (currentTime > clip->endTime)
-            {
-                currentTime = clip->endTime;
-            }
-        }
-
-        for (auto& chan : clip->channels)
-        {
-            auto& spl = clip->samplers[chan.sampler];
-            int prevKey = 0;
-            for (int i = 0; i < spl.input.size() - 1; ++i)
-            {
-                prevKey = i;
-                if (currentTime < spl.input[i + 1])
-                {
-                    break;
-                }
-            }
-            double prevTime = spl.input[prevKey];
-            double nextTime = spl.input[prevKey + 1];
-            double interpolationValue = (currentTime - prevTime) / (nextTime - prevTime);
-
-            if (chan.targetType == AnimationClip::Channel::Type::kTranslation)
-            {
-                kame::math::Vector3f prevTranslation = spl.outputVec3[prevKey];
-                kame::math::Vector3f nextTranslation = spl.outputVec3[prevKey + 1];
-                kame::math::Vector3f translation = kame::math::Vector3f::lerp(prevTranslation, nextTranslation, interpolationValue);
-                animation->nodes[chan.targetNodeID]->setLocation(translation);
-            }
-            else if (chan.targetType == AnimationClip::Channel::Type::kRotation)
-            {
-                kame::math::Quaternion prevRotation = spl.outputVec4[prevKey];
-                kame::math::Quaternion nextRotation = spl.outputVec4[prevKey + 1];
-                kame::math::Quaternion rotation = kame::math::Quaternion::slerp(prevRotation, nextRotation, interpolationValue);
-                auto* node = animation->nodes[chan.targetNodeID];
-                node->rotationMode = kSquirtleRotationModeQuaternion;
-                node->setQuatRotation(rotation);
-            }
-        }
-    }
+    void update(float dt);
 };
 
 struct GltfNode : kame::squirtle::Node {
 
-    Animation* animation;
+    std::vector<kame::squirtle::Node*> nodes;
+    std::vector<Skin>* skins = nullptr;
     AnimationPlayer player;
 
     SquirtleNodeType getType() const override
