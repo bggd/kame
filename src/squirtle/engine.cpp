@@ -137,7 +137,7 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
                 skinMtx = skinMtx + skin.skinMatrices[vJoints[3]] * vWeights.w;
 
                 dstMesh.positions[i] = kame::math::Vector3f::transform(vPos, skinMtx);
-                dstMesh.normals[i] = kame::math::Vector3f::transform(vNormal, skinMtx);
+                dstMesh.normals[i] = kame::math::Vector3f::transform(vNormal, kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(skinMtx)));
             }
             vbo.vboPositions->setBuffer((const float*)&dstMesh.positions[0]);
             vbo.vboNormals->setBuffer((const float*)&dstMesh.normals[0]);
