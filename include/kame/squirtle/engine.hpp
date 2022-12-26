@@ -17,6 +17,7 @@ struct Engine {
 
     kame::squirtle::Node* root = nullptr;
     kame::squirtle::CameraNode* currentCamera = nullptr;
+    kame::math::Matrix4x4f currentViewMtx = kame::math::Matrix4x4f::identity();
 
     std::vector<kame::squirtle::LightNode> lights;
 

@@ -156,7 +156,7 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
             Model.m41 = 0.0f;
             Model.m42 = 0.0f;
             Model.m43 = 0.0f;
-            engine->shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(Model)));
+            engine->shader->setMatrix4x4f("uInvModelView", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(Model * engine->currentViewMtx)));
             kame::ogl21::setTexture2D(0, meshNode->diffuse);
             vbo.vao.drawElements(GL_TRIANGLES, meshNode->mesh->indices.size(), GL_UNSIGNED_INT);
             meshNode->bufferedVBO.swap();
@@ -195,6 +195,7 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         auto Model = kame::math::Matrix4x4f::identity();
         auto View = currentCamera->getViewMatrix();
         auto Proj = currentCamera->getProjectionMatrix();
+        currentViewMtx = View;
 
         shader->setMatrix4x4f("uModel", Model);
         shader->setMatrix4x4f("uView", View);
@@ -205,16 +206,15 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         Model.m41 = 0.0f;
         Model.m42 = 0.0f;
         Model.m43 = 0.0f;
-        shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(Model)));
-        shader->setVector3f("uEyePos", currentCamera->getGlobalLocation());
+        shader->setMatrix4x4f("uInvModelView", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(Model * View)));
     }
     else
     {
+        currentViewMtx = kame::math::Matrix4x4f::identity();
         shader->setMatrix4x4f("uModel", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uView", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uProjection", kame::math::Matrix4x4f::identity());
         shader->setMatrix4x4f("uInvModel", kame::math::Matrix4x4f::identity());
-        shader->setVector3f("uEyePos", kame::math::Vector3f::zero());
     }
 
     for (int i = 0; i < KAME_SQUIRTLE_MAX_LIGHTS; ++i)
@@ -229,9 +229,10 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         if (i < lights.size())
         {
             auto light = lights[i];
-            kame::math::Vector3f lightPos = light.getGlobalLocation();
+
             if (light.getLightType() == kSquirtlePointLight)
             {
+                kame::math::Vector3f lightPos = kame::math::Vector3f::transform(light.getGlobalLocation(), currentViewMtx);
                 position.x = lightPos.x;
                 position.y = lightPos.y;
                 position.z = lightPos.z;
@@ -242,10 +243,10 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
             }
             else
             {
-                kame::math::Vector3f lightDir = light.direction;
-                position.x = lightDir.x - lightPos.x;
-                position.y = lightDir.y - lightPos.y;
-                position.z = lightDir.z - lightPos.z;
+                kame::math::Vector3f direction = kame::math::Vector3f::transform(light.direction, currentViewMtx);
+                position.x = direction.x;
+                position.y = direction.y;
+                position.z = direction.z;
                 position.w = 0.0f;
             }
             diffuse = light.diffuse;

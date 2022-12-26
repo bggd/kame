@@ -66,6 +66,14 @@ struct CameraArcballNode : kame::squirtle::CameraNode {
     }
 };
 
+struct DirectionalLight : kame::squirtle::LightNode {
+
+    virtual void onUpdate(float dt) override
+    {
+        direction = -kame::math::Vector3f::normalize(getGlobalLocation());
+    }
+};
+
 struct RotateLight : kame::squirtle::Node {
     RotateLight()
     {
@@ -194,7 +202,7 @@ struct Editor {
         cam->setLocation(Vector3f(3.0f, 4.0f, 5.0f));
         engine.root->addChild(cam);
 
-        auto* light0 = new kame::squirtle::LightNode();
+        auto* light0 = new DirectionalLight();
         light0->lightType = kSquirtleDirectionalLight;
         light0->diffuse = Vector3f(0.5f, 0.5f, 0.5f);
         cam->addChild(light0);

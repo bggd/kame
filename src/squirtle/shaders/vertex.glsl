@@ -14,12 +14,12 @@ out vec3 pPos;
 uniform mat4 uModel;
 uniform mat4 uView;
 uniform mat4 uProjection;
-uniform mat4 uInvModel;
+uniform mat4 uInvModelView;
 
 void main() {
     gl_Position = uProjection * uView * uModel * vec4(vPos, 1.0);
     pUV = vUV;
-    pNormal = mat3(uInvModel) * vNormal;
-    pPos = (uModel * vec4(vPos, 1.0)).xyz;
+    pNormal = normalize(mat3(uInvModelView) * vNormal);
+    pPos = (uView * uModel * vec4(vPos, 1.0)).xyz;
 }
 )"
