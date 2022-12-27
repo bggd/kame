@@ -57,7 +57,7 @@ vec3 phong(vec3 surfaceNormal, vec3 surfacePosition)
         diffuse *= attenuation;
         specular *= attenuation;
 
-        result += light.ambient + diffuse + specular ;
+        result += light.ambient + diffuse + specular;
     }
 
     return result;

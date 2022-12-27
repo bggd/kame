@@ -115,15 +115,12 @@ kame::squirtle::Node* clone(kame::squirtle::Node* node)
     if (node->getType() == kSquirtleGltfNode)
     {
         newNode = new kame::squirtle::GltfNode();
-        *newNode = *(kame::squirtle::GltfNode*)node;
+        *(kame::squirtle::GltfNode*)newNode = *(kame::squirtle::GltfNode*)node;
     }
     else if (node->getType() == kSquirtleMeshNode)
     {
         newNode = new kame::squirtle::MeshNode();
-        *newNode = *(kame::squirtle::MeshNode*)node;
-        ((kame::squirtle::MeshNode*)newNode)->mesh = ((kame::squirtle::MeshNode*)node)->mesh;
-        ((kame::squirtle::MeshNode*)newNode)->diffuse = ((kame::squirtle::MeshNode*)node)->diffuse;
-        ((kame::squirtle::MeshNode*)newNode)->bufferedVBO.init(((kame::squirtle::MeshNode*)newNode)->mesh);
+        *(kame::squirtle::MeshNode*)newNode = *(kame::squirtle::MeshNode*)node;
     }
     else if (node->getType() == kSquirtleNode)
     {

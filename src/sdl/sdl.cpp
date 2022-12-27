@@ -169,7 +169,7 @@ const State& Window::getState()
 {
     return state;
 }
-} // namespace kame::sdl2
+} // namespace kame::sdl
 
 void printSDL_GL_GetAttribute()
 {
