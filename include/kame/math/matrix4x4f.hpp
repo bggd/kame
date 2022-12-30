@@ -129,8 +129,8 @@ struct Matrix4x4f {
         float x = axisUnit.x;
         float y = axisUnit.y;
         float z = axisUnit.z;
-        float c = std::cosf(angleRadian);
-        float s = std::sinf(angleRadian);
+        float c = ::cosf(angleRadian);
+        float s = ::sinf(angleRadian);
         float t = 1.0F - c;
 
         // clang-format off
@@ -212,7 +212,7 @@ struct Matrix4x4f {
     static Matrix4x4f invert(const Matrix4x4f& m);
 };
 
-static Matrix4x4f operator+(Matrix4x4f& a, Matrix4x4f& b)
+static Matrix4x4f operator+(const Matrix4x4f& a, const Matrix4x4f& b)
 {
     Matrix4x4f m = Matrix4x4f::zero();
     const float* A = (const float*)&a;
@@ -226,7 +226,7 @@ static Matrix4x4f operator+(Matrix4x4f& a, Matrix4x4f& b)
     return m;
 }
 
-static Matrix4x4f operator*(Matrix4x4f& a, Matrix4x4f& b)
+static Matrix4x4f operator*(const Matrix4x4f& a, const Matrix4x4f& b)
 {
     Matrix4x4f m = Matrix4x4f::zero();
     const float* A = (const float*)&a;
@@ -246,7 +246,7 @@ static Matrix4x4f operator*(Matrix4x4f& a, Matrix4x4f& b)
     return m;
 }
 
-static Matrix4x4f operator*(Matrix4x4f& a, float scaleFactor)
+static Matrix4x4f operator*(const Matrix4x4f& a, float scaleFactor)
 {
     Matrix4x4f m = Matrix4x4f::zero();
     const float* A = (const float*)&a;

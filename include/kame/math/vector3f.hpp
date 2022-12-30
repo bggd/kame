@@ -48,7 +48,7 @@ struct Vector3f {
 
     static float length(Vector3f v)
     {
-        return std::sqrtf(lengthSquared(v));
+        return ::sqrtf(lengthSquared(v));
     }
 
     static Vector3f normalize(Vector3f v)

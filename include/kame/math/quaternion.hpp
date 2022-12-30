@@ -46,7 +46,7 @@ struct Quaternion {
 
     static float length(Quaternion q)
     {
-        return std::sqrtf(lengthSquared(q));
+        return sqrtf(lengthSquared(q));
     }
 
     static Quaternion normalize(Quaternion q)

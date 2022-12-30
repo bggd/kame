@@ -4,6 +4,7 @@ project(kame LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
@@ -29,7 +30,7 @@ add_library(kame
         thirdparty/pystring/pystring.cpp
 )
 
-target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog)
+target_link_libraries(kame PUBLIC SDL2::SDL2 spdlog::spdlog)
 
 target_include_directories(kame
     PUBLIC
@@ -65,10 +66,12 @@ ExternalProject_Add(
 )
 add_dependencies(squirtleEditor FLTK14)
 
+
 target_include_directories(squirtleEditor
     PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fltk_install/include
 )
 target_link_directories(squirtleEditor PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fltk_install/lib)
+
 target_link_libraries(squirtleEditor PRIVATE kame gdiplus Ws2_32 comctl32 fltk$<$<CONFIG:Debug>:d>)
 
 
