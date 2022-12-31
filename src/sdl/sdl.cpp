@@ -22,7 +22,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, std::get<0>(ver));
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, std::get<1>(ver));
 
-        if (isOGL21DebugMode)
+        if (isOGLDebugMode)
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
         }
@@ -54,7 +54,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
     {
         SDL_GL_ResetAttributes();
 
-        if (isOGL21DebugMode)
+        if (isOGLDebugMode)
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
         }
@@ -91,7 +91,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         assert(GLAD_GL_ARB_framebuffer_object || GLAD_GL_EXT_framebuffer_object);
     }
 
-    if (isOGL21DebugMode)
+    if (isOGLDebugMode)
     {
         int flags;
         glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -139,7 +139,7 @@ void WindowOGL::swapWindow()
 
 void WindowOGL::setOgl21DebugMode(bool debug)
 {
-    isOGL21DebugMode = debug;
+    isOGLDebugMode = debug;
 }
 
 void WindowOGL::setVsync(bool vsync)

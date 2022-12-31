@@ -20,7 +20,7 @@ struct State {
 struct WindowOGL {
     SDL_Window* window = nullptr;
     SDL_GLContext glc = nullptr;
-    bool isOGL21DebugMode = false;
+    bool isOGLDebugMode = false;
     bool isVsync = false;
     double fpsCap = -1.0;
     uint64_t freq = 0;
