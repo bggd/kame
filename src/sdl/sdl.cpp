@@ -89,12 +89,6 @@ void WindowOGL::openWindow(const char* title, int w, int h)
     if (GLAD_VERSION_MAJOR(version) < 3)
     {
         assert(GLAD_GL_ARB_framebuffer_object || GLAD_GL_EXT_framebuffer_object);
-        if (!GLAD_GL_ARB_framebuffer_object && GLAD_GL_EXT_framebuffer_object)
-        {
-            glGenFramebuffers = glGenFramebuffersEXT;
-            glBindFramebuffer = glBindFramebufferEXT;
-            glFramebufferTexture2D = glFramebufferTexture2DEXT;
-        }
     }
 
     if (isOGL21DebugMode)
