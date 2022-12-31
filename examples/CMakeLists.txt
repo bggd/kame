@@ -17,3 +17,5 @@ target_link_libraries(exampleKameGltf kame)
 add_executable(exampleKameBunnymark
     05-bunnymark/bunnymark.cpp)
 target_link_libraries(exampleKameBunnymark kame)
+
+set_target_properties(exampleKameHelloWorld exampleKameTriangle exampleKameImage exampleKameGltf exampleKameBunnymark PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
