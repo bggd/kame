@@ -77,13 +77,13 @@ void WindowOGL::openWindow(const char* title, int w, int h)
     SPDLOG_INFO("OpenGL Version: {0}", (const char*)glGetString(GL_VERSION));
     SPDLOG_INFO("OpenGL Renderer: {0}", (const char*)glGetString(GL_RENDERER));
     SPDLOG_INFO("GLSL Version: {0}", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-    kame::ogl21::Context::getInstance().versionMajor = GLAD_VERSION_MAJOR(version);
-    kame::ogl21::Context::getInstance().versionMinor = GLAD_VERSION_MINOR(version);
+    kame::ogl::Context::getInstance().versionMajor = GLAD_VERSION_MAJOR(version);
+    kame::ogl::Context::getInstance().versionMinor = GLAD_VERSION_MINOR(version);
     int profile = 0;
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
-    kame::ogl21::Context::getInstance().isCoreProfile = (profile == SDL_GL_CONTEXT_PROFILE_CORE);
-    kame::ogl21::Context::getInstance().isAvaliable = true;
-    SPDLOG_INFO("OpenGL Context: {0}", kame::ogl21::Context::getInstance().isCoreProfile ? "Core" : "Compatibility");
+    kame::ogl::Context::getInstance().isCoreProfile = (profile == SDL_GL_CONTEXT_PROFILE_CORE);
+    kame::ogl::Context::getInstance().isAvaliable = true;
+    SPDLOG_INFO("OpenGL Context: {0}", kame::ogl::Context::getInstance().isCoreProfile ? "Core" : "Compatibility");
 
     assert(GLAD_GL_VERSION_2_1);
     if (GLAD_VERSION_MAJOR(version) < 3)
@@ -132,7 +132,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 
 void WindowOGL::closeWindow()
 {
-    kame::ogl21::Context::getInstance().isAvaliable = false;
+    kame::ogl::Context::getInstance().isAvaliable = false;
     SDL_GL_DeleteContext(glc);
     SDL_DestroyWindow(window);
     SDL_Quit();

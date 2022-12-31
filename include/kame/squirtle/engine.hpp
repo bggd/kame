@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kame/ogl21/ogl21.hpp>
+#include <kame/ogl/ogl.hpp>
 #include <kame/squirtle/node/node.hpp>
 #include <kame/squirtle/node/camera_node.hpp>
 #include <kame/squirtle/node/mesh_node.hpp>
@@ -12,8 +12,8 @@
 namespace kame::squirtle {
 
 struct Engine {
-    kame::ogl21::Shader* shader = nullptr;
-    kame::ogl21::Shader* shaderShadow = nullptr;
+    kame::ogl::Shader* shader = nullptr;
+    kame::ogl::Shader* shaderShadow = nullptr;
 
     kame::squirtle::Node* root = nullptr;
     kame::squirtle::CameraNode* currentCamera = nullptr;

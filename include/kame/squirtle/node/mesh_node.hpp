@@ -4,7 +4,7 @@
 #include "gltf_node.hpp"
 
 #include <kame/math/math.hpp>
-#include <kame/ogl21/ogl21.hpp>
+#include <kame/ogl/ogl.hpp>
 #include <array>
 #include <vector>
 #include <cstdint>
@@ -21,11 +21,11 @@ struct Mesh {
 };
 
 struct VBO {
-    kame::ogl21::VertexBuffer* vboPositions = nullptr;
-    kame::ogl21::VertexBuffer* vboTexCoords = nullptr;
-    kame::ogl21::VertexBuffer* vboNormals = nullptr;
-    kame::ogl21::IndexBuffer* ibo = nullptr;
-    kame::ogl21::VertexArrayObject vao;
+    kame::ogl::VertexBuffer* vboPositions = nullptr;
+    kame::ogl::VertexBuffer* vboTexCoords = nullptr;
+    kame::ogl::VertexBuffer* vboNormals = nullptr;
+    kame::ogl::IndexBuffer* ibo = nullptr;
+    kame::ogl::VertexArrayObject vao;
     bool vaoIsCreated = false;
 };
 
@@ -41,10 +41,10 @@ struct BufferedVBO {
         {
             buffers.emplace_back();
             VBO& vbo = buffers.back();
-            vbo.vboPositions = kame::ogl21::createVertexBuffer(mesh->positions.size() * 3 * sizeof(float), GL_DYNAMIC_DRAW);
-            vbo.vboTexCoords = kame::ogl21::createVertexBuffer(mesh->texCoords.size() * 2 * sizeof(float), GL_DYNAMIC_DRAW);
-            vbo.vboNormals = kame::ogl21::createVertexBuffer(mesh->normals.size() * 3 * sizeof(float), GL_DYNAMIC_DRAW);
-            vbo.ibo = kame::ogl21::createIndexBuffer(mesh->indices.size() * sizeof(unsigned int), GL_DYNAMIC_DRAW);
+            vbo.vboPositions = kame::ogl::createVertexBuffer(mesh->positions.size() * 3 * sizeof(float), GL_DYNAMIC_DRAW);
+            vbo.vboTexCoords = kame::ogl::createVertexBuffer(mesh->texCoords.size() * 2 * sizeof(float), GL_DYNAMIC_DRAW);
+            vbo.vboNormals = kame::ogl::createVertexBuffer(mesh->normals.size() * 3 * sizeof(float), GL_DYNAMIC_DRAW);
+            vbo.ibo = kame::ogl::createIndexBuffer(mesh->indices.size() * sizeof(unsigned int), GL_DYNAMIC_DRAW);
         }
     }
 
@@ -75,7 +75,7 @@ struct BufferedVBO {
 struct MeshNode : kame::squirtle::Node {
 
     Mesh* mesh = nullptr;
-    kame::ogl21::Texture2D* diffuse = nullptr;
+    kame::ogl::Texture2D* diffuse = nullptr;
     BufferedVBO bufferedVBO;
     uint32_t skinIdx = 0;
     GltfNode* gltf = nullptr;

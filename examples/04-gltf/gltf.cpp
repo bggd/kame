@@ -62,11 +62,11 @@ int main(int argc, char** argv)
     win.openWindow();
     win.setVsync(true);
 
-    std::string vs = kame::ogl21::getGlslVersionString();
+    std::string vs = kame::ogl::getGlslVersionString();
     vs += vert;
-    std::string fs = kame::ogl21::getGlslVersionString();
+    std::string fs = kame::ogl::getGlslVersionString();
     fs += frag;
-    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str());
+    auto* shader = kame::ogl::createShader(vs.c_str(), fs.c_str());
 
     auto* gltf = kame::gltf::loadGLTFFromMemory(examples_data_torus_gltf, examples_data_torus_gltf_len);
 
@@ -132,22 +132,22 @@ int main(int argc, char** argv)
     }
     kame::gltf::deleteGLTF(gltf);
 
-    auto* vboPositions = kame::ogl21::createVertexBuffer(positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
+    auto* vboPositions = kame::ogl::createVertexBuffer(positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
     vboPositions->setBuffer((const float*)&positions[0]);
 
-    auto* vboTexcoords = kame::ogl21::createVertexBuffer(texcoords.size() * 2 * sizeof(float), GL_STATIC_DRAW);
+    auto* vboTexcoords = kame::ogl::createVertexBuffer(texcoords.size() * 2 * sizeof(float), GL_STATIC_DRAW);
     vboTexcoords->setBuffer((const float*)&texcoords[0]);
 
-    auto* iboIndices = kame::ogl21::createIndexBuffer(indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
+    auto* iboIndices = kame::ogl::createIndexBuffer(indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
     iboIndices->setBuffer((const unsigned int*)&indices[0]);
 
-    auto vao = kame::ogl21::VertexArrayObjectBuilder()
+    auto vao = kame::ogl::VertexArrayObjectBuilder()
                    .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
                    .bindAttribute(shader->getAttribLocation("vUV"), vboTexcoords, 2, 2 * sizeof(float), 0)
                    .bindIndexBuffer(iboIndices)
                    .build();
 
-    auto* tex = kame::ogl21::loadTexture2DFromMemory(Image_0_png, Image_0_png_len);
+    auto* tex = kame::ogl::loadTexture2DFromMemory(Image_0_png, Image_0_png_len);
 
     float angle = 0.0f;
 
@@ -157,19 +157,19 @@ int main(int argc, char** argv)
         auto state = win.getState();
         if (state.isCloseRequest)
             break;
-        kame::ogl21::setViewport(0, 0, 640, 480);
-        kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4f(0, 0, 0, 1));
-        kame::ogl21::setShader(shader);
-        kame::ogl21::BlendState blendState = kame::ogl21::BlendStateBuilder()
+        kame::ogl::setViewport(0, 0, 640, 480);
+        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4f(0, 0, 0, 1));
+        kame::ogl::setShader(shader);
+        kame::ogl::BlendState blendState = kame::ogl::BlendStateBuilder()
                                                  .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
                                                  .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
                                                  .build();
-        kame::ogl21::DepthStencilState depthState = kame::ogl21::DepthStencilStateBuilder()
+        kame::ogl::DepthStencilState depthState = kame::ogl::DepthStencilStateBuilder()
                                                         .depthFunc(GL_LESS)
                                                         .build();
-        kame::ogl21::setBlendState(blendState);
-        kame::ogl21::setDepthStencilState(depthState);
-        kame::ogl21::setTexture2D(0, tex);
+        kame::ogl::setBlendState(blendState);
+        kame::ogl::setDepthStencilState(depthState);
+        kame::ogl::setTexture2D(0, tex);
         angle += 1.0f;
         if (angle > 360.0f)
         {
@@ -182,11 +182,11 @@ int main(int argc, char** argv)
         win.swapWindow();
     }
 
-    kame::ogl21::deleteTexture2D(tex);
-    kame::ogl21::deleteIndexBuffer(iboIndices);
-    kame::ogl21::deleteVertexBuffer(vboTexcoords);
-    kame::ogl21::deleteVertexBuffer(vboPositions);
-    kame::ogl21::deleteShader(shader);
+    kame::ogl::deleteTexture2D(tex);
+    kame::ogl::deleteIndexBuffer(iboIndices);
+    kame::ogl::deleteVertexBuffer(vboTexcoords);
+    kame::ogl::deleteVertexBuffer(vboPositions);
+    kame::ogl::deleteShader(shader);
 
     win.closeWindow();
     kame::kameShutdown();

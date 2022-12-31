@@ -47,11 +47,11 @@ int main(int argc, char** argv)
     win.openWindow();
     win.setVsync(true);
 
-    std::string vs = kame::ogl21::getGlslVersionString();
+    std::string vs = kame::ogl::getGlslVersionString();
     vs += vert;
-    std::string fs = kame::ogl21::getGlslVersionString();
+    std::string fs = kame::ogl::getGlslVersionString();
     fs += frag;
-    auto* shader = kame::ogl21::createShader(vs.c_str(), fs.c_str());
+    auto* shader = kame::ogl::createShader(vs.c_str(), fs.c_str());
 
     const float vtx[] = {
         0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
@@ -61,10 +61,10 @@ int main(int argc, char** argv)
         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f, 1.0f};
 
-    auto* vbo = kame::ogl21::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
+    auto* vbo = kame::ogl::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
     vbo->setBuffer(vtx);
 
-    auto vao = kame::ogl21::VertexArrayObjectBuilder()
+    auto vao = kame::ogl::VertexArrayObjectBuilder()
                    .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 5 * sizeof(float), 0)
                    .bindAttribute(shader->getAttribLocation("aTexCoord"), vbo, 2, 5 * sizeof(float), 3 * sizeof(float))
                    .build();
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
         0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82};
     unsigned int img_len = 108;
 
-    auto* tex = kame::ogl21::loadTexture2DFromMemory(img, img_len);
+    auto* tex = kame::ogl::loadTexture2DFromMemory(img, img_len);
     tex->setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     tex->setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -91,17 +91,17 @@ int main(int argc, char** argv)
         auto state = win.getState();
         if (state.isCloseRequest)
             break;
-        kame::ogl21::setViewport(0, 0, 640, 480);
-        kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(0, 0, 0, 1));
-        kame::ogl21::setShader(shader);
-        kame::ogl21::setTexture2D(0, tex);
+        kame::ogl::setViewport(0, 0, 640, 480);
+        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(0, 0, 0, 1));
+        kame::ogl::setShader(shader);
+        kame::ogl::setTexture2D(0, tex);
         vao.drawArrays(GL_TRIANGLES, 0, 6);
         win.swapWindow();
     }
 
-    kame::ogl21::deleteTexture2D(tex);
-    kame::ogl21::deleteVertexBuffer(vbo);
-    kame::ogl21::deleteShader(shader);
+    kame::ogl::deleteTexture2D(tex);
+    kame::ogl::deleteVertexBuffer(vbo);
+    kame::ogl::deleteShader(shader);
 
     win.closeWindow();
     kame::kameShutdown();

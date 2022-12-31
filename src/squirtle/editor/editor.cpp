@@ -107,7 +107,7 @@ struct Editor {
         ((Editor*)data)->OnImportGltf();
     }
 
-    void setTexture(kame::squirtle::Node* node, kame::ogl21::Texture2D* diffuse)
+    void setTexture(kame::squirtle::Node* node, kame::ogl::Texture2D* diffuse)
     {
         if (node->getType() == kSquirtleMeshNode)
         {
@@ -130,7 +130,7 @@ struct Editor {
 
             std::filesystem::path path(filePath);
             path.replace_filename(path.stem().string() + "-diffuse.png");
-            kame::ogl21::Texture2D* diffuse = kame::ogl21::loadTexture2D(path.string().c_str());
+            kame::ogl::Texture2D* diffuse = kame::ogl::loadTexture2D(path.string().c_str());
             setTexture(node, diffuse);
 
             if (node->player.hasAnimation())

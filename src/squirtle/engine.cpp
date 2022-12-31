@@ -24,21 +24,21 @@ static const char* shadowPixelGlslText =
 
 void Engine::initSquirtle()
 {
-    std::string vs = kame::ogl21::getGlslVersionString();
+    std::string vs = kame::ogl::getGlslVersionString();
     vs += vertexGlslText;
-    std::string fs = kame::ogl21::getGlslVersionString();
+    std::string fs = kame::ogl::getGlslVersionString();
     fs += fmt::format("#define MAX_LIGHTS {0}\n", KAME_SQUIRTLE_MAX_LIGHTS);
     fs += pixelGlslText;
-    shader = kame::ogl21::createShader(vs.c_str(), fs.c_str());
+    shader = kame::ogl::createShader(vs.c_str(), fs.c_str());
 
-    kame::ogl21::setShader(shader);
+    kame::ogl::setShader(shader);
     shader->setInt("diffuseTexture", 0);
 
-    std::string vsShadow = kame::ogl21::getGlslVersionString();
+    std::string vsShadow = kame::ogl::getGlslVersionString();
     vsShadow += shadowVertexGlslText;
-    std::string fsShadow = kame::ogl21::getGlslVersionString();
+    std::string fsShadow = kame::ogl::getGlslVersionString();
     fsShadow += shadowPixelGlslText;
-    shaderShadow = kame::ogl21::createShader(vsShadow.c_str(), fsShadow.c_str());
+    shaderShadow = kame::ogl::createShader(vsShadow.c_str(), fsShadow.c_str());
 
     root = new kame::squirtle::Node();
     assert(root);
@@ -46,8 +46,8 @@ void Engine::initSquirtle()
 
 void Engine::shutdownSqurtile()
 {
-    kame::ogl21::deleteShader(shaderShadow);
-    kame::ogl21::deleteShader(shader);
+    kame::ogl::deleteShader(shaderShadow);
+    kame::ogl::deleteShader(shader);
 }
 
 void updateNodeRecusrive(kame::squirtle::Engine* engine, kame::squirtle::Node* node, float dt)
@@ -97,7 +97,7 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
         if (!vbo.vaoIsCreated)
         {
             meshNode->bufferedVBO.updateVBO(meshNode->mesh);
-            vbo.vao = kame::ogl21::VertexArrayObjectBuilder()
+            vbo.vao = kame::ogl::VertexArrayObjectBuilder()
                           .bindAttribute(engine->shader->getAttribLocation("vPos"), vbo.vboPositions, 3, 3 * sizeof(float), 0)
                           .bindAttribute(engine->shader->getAttribLocation("vUV"), vbo.vboTexCoords, 2, 2 * sizeof(float), 0)
                           .bindAttribute(engine->shader->getAttribLocation("vNormal"), vbo.vboNormals, 3, 3 * sizeof(float), 0)
@@ -157,7 +157,7 @@ void drawNodeRecursive(Engine* engine, kame::squirtle::Node* node, bool isShadow
             Model.m42 = 0.0f;
             Model.m43 = 0.0f;
             engine->shader->setMatrix4x4f("uInvModelView", kame::math::Matrix4x4f::transpose(kame::math::Matrix4x4f::invert(Model * engine->currentViewMtx)));
-            kame::ogl21::setTexture2D(0, meshNode->diffuse);
+            kame::ogl::setTexture2D(0, meshNode->diffuse);
             vbo.vao.drawElements(GL_TRIANGLES, meshNode->mesh->indices.size(), GL_UNSIGNED_INT);
             meshNode->bufferedVBO.swap();
         }
@@ -188,7 +188,7 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
     collectLightNodeRecursive(lights, root);
 
     // lighting pass
-    kame::ogl21::setShader(shader);
+    kame::ogl::setShader(shader);
 
     if (currentCamera)
     {
@@ -261,19 +261,19 @@ void Engine::drawNodes(int viewportWidth, int viewportHeight)
         shader->setFloat(fmt::format("uLights[{0}].quadraticAttenuation", i).c_str(), quadraticAttenuation);
     }
 
-    kame::ogl21::setViewport(0, 0, viewportWidth, viewportHeight);
-    kame::ogl21::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, kame::math::Vector4f(0.5, 0.5, 0.5, 1));
-    kame::ogl21::RasterizerState rasterState = kame::ogl21::RasterizerStateBuilder().cullFace(GL_BACK).build();
-    kame::ogl21::setRasterizerState(rasterState);
-    kame::ogl21::BlendState blendState = kame::ogl21::BlendStateBuilder()
+    kame::ogl::setViewport(0, 0, viewportWidth, viewportHeight);
+    kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, kame::math::Vector4f(0.5, 0.5, 0.5, 1));
+    kame::ogl::RasterizerState rasterState = kame::ogl::RasterizerStateBuilder().cullFace(GL_BACK).build();
+    kame::ogl::setRasterizerState(rasterState);
+    kame::ogl::BlendState blendState = kame::ogl::BlendStateBuilder()
                                              .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
                                              .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
                                              .build();
-    kame::ogl21::DepthStencilState depthState = kame::ogl21::DepthStencilStateBuilder()
+    kame::ogl::DepthStencilState depthState = kame::ogl::DepthStencilStateBuilder()
                                                     .depthFunc(GL_LESS)
                                                     .build();
-    kame::ogl21::setBlendState(blendState);
-    kame::ogl21::setDepthStencilState(depthState);
+    kame::ogl::setBlendState(blendState);
+    kame::ogl::setDepthStencilState(depthState);
 
     drawNodeRecursive(this, root, false);
 }

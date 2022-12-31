@@ -90,7 +90,7 @@ struct Bunny : kame::squirtle::Node {
     }
 };
 
-void setTexture(kame::squirtle::Node* node, kame::ogl21::Texture2D* diffuse)
+void setTexture(kame::squirtle::Node* node, kame::ogl::Texture2D* diffuse)
 {
     if (node->getType() == kSquirtleMeshNode)
     {
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
     kame::squirtle::GltfNode* node = kame::squirtle::helper::createGltfNode(gltf);
     kame::gltf::deleteGLTF(gltf);
 
-    auto* tex = kame::ogl21::loadTexture2DFromMemory(examples_data_bunny_diffuse_png, examples_data_bunny_diffuse_png_len);
+    auto* tex = kame::ogl::loadTexture2DFromMemory(examples_data_bunny_diffuse_png, examples_data_bunny_diffuse_png_len);
     setTexture(node, tex);
 
     for (;;)
@@ -188,7 +188,7 @@ int main(int argc, char** argv)
         win.swapWindow();
     }
 
-    kame::ogl21::deleteTexture2D(tex);
+    kame::ogl::deleteTexture2D(tex);
 
     engine.shutdownSqurtile();
     win.closeWindow();

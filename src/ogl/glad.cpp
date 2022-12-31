@@ -1,2 +1,2 @@
 #define GLAD_GL_IMPLEMENTATION
-#include <kame/ogl21/glad.hpp>
+#include <kame/ogl/glad.hpp>

@@ -1,6 +1,6 @@
 #include <all.hpp>
 
-namespace kame::ogl21 {
+namespace kame::ogl {
 
 Context& Context::getInstance()
 {
@@ -161,12 +161,12 @@ void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count, GLen
 
 void VertexArrayObject::drawArrays(GLenum mode, GLint first, GLsizei count)
 {
-    kame::ogl21::drawArrays(*this, mode, first, count);
+    kame::ogl::drawArrays(*this, mode, first, count);
 }
 
 void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type)
 {
-    kame::ogl21::drawElements(*this, mode, count, type);
+    kame::ogl::drawElements(*this, mode, count, type);
 }
 
 Shader* createShader(const char* vert, const char* frag)

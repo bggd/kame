@@ -7,13 +7,17 @@
 #include <vector>
 #include <cassert>
 
-namespace kame::ogl21 {
+namespace kame::ogl {
 
 struct Context {
+    struct Capability {
+    };
+
     int versionMajor = 0;
     int versionMinor = 0;
     bool isCoreProfile = false;
     bool isAvaliable = false;
+    Capability capability;
 
 private:
     Context() {}
