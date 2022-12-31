@@ -10,8 +10,10 @@
 namespace kame::ogl21 {
 
 struct Context {
-    int versionMajor, versionMinor;
-    bool isAvaliable;
+    int versionMajor = 0;
+    int versionMinor = 0;
+    bool isCoreProfile = false;
+    bool isAvaliable = false;
 
 private:
     Context() {}

@@ -5,7 +5,6 @@ namespace kame::ogl21 {
 Context& Context::getInstance()
 {
     static Context ctx;
-    ctx.isAvaliable = false;
     return ctx;
 }
 

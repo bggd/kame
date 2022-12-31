@@ -6,28 +6,69 @@ void spdlogSDL2(void* userdata, int category, SDL_LogPriority priority, const ch
 
 namespace kame::sdl {
 
-void Window::openWindow(const char* title, int w, int h)
+void WindowOGL::openWindow(const char* title, int w, int h)
 {
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
     SDL_LogSetOutputFunction(spdlogSDL2, NULL);
 
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    if (isOGL21DebugMode)
+    std::tuple<int, int> glVersions[] = {{4, 6}, {4, 5}, {4, 4}, {4, 3}, {4, 2}, {4, 1}, {4, 0}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
+    for (std::tuple<int, int> ver : glVersions)
     {
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+        SDL_GL_ResetAttributes();
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, std::get<0>(ver));
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, std::get<1>(ver));
+
+        if (isOGL21DebugMode)
+        {
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+        }
+
+        window = SDL_CreateWindow(title,
+                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                  w, h,
+                                  SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+        if (!window)
+        {
+            continue;
+        }
+
+        glc = SDL_GL_CreateContext(window);
+        if (!glc)
+        {
+            SDL_DestroyWindow(window);
+            continue;
+        }
+
+        if (glc)
+        {
+            break;
+        }
     }
 
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    // create legacy context
+    if (!glc)
+    {
+        SDL_GL_ResetAttributes();
 
-    window = SDL_CreateWindow(title,
-                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              w, h,
-                              SDL_WINDOW_OPENGL);
-    assert(window);
+        if (isOGL21DebugMode)
+        {
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+        }
 
-    glc = SDL_GL_CreateContext(window);
-    assert(glc);
+        window = SDL_CreateWindow(title,
+                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                  w, h,
+                                  SDL_WINDOW_OPENGL);
+        assert(window);
+        glc = SDL_GL_CreateContext(window);
+        assert(glc);
+    }
+
+    SDL_ShowWindow(window);
     SDL_GL_MakeCurrent(window, glc);
     printSDL_GL_GetAttribute();
 
@@ -38,8 +79,11 @@ void Window::openWindow(const char* title, int w, int h)
     SPDLOG_INFO("GLSL Version: {0}", (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
     kame::ogl21::Context::getInstance().versionMajor = GLAD_VERSION_MAJOR(version);
     kame::ogl21::Context::getInstance().versionMinor = GLAD_VERSION_MINOR(version);
-
+    int profile = 0;
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &profile);
+    kame::ogl21::Context::getInstance().isCoreProfile = (profile == SDL_GL_CONTEXT_PROFILE_CORE);
     kame::ogl21::Context::getInstance().isAvaliable = true;
+    SPDLOG_INFO("OpenGL Context: {0}", kame::ogl21::Context::getInstance().isCoreProfile ? "Core" : "Compatibility");
 
     assert(GLAD_GL_VERSION_2_1);
     if (GLAD_VERSION_MAJOR(version) < 3)
@@ -86,7 +130,7 @@ void Window::openWindow(const char* title, int w, int h)
     prevTime = SDL_GetPerformanceCounter();
 }
 
-void Window::closeWindow()
+void WindowOGL::closeWindow()
 {
     kame::ogl21::Context::getInstance().isAvaliable = false;
     SDL_GL_DeleteContext(glc);
@@ -94,17 +138,17 @@ void Window::closeWindow()
     SDL_Quit();
 }
 
-void Window::swapWindow()
+void WindowOGL::swapWindow()
 {
     SDL_GL_SwapWindow(window);
 }
 
-void Window::setOgl21DebugMode(bool debug)
+void WindowOGL::setOgl21DebugMode(bool debug)
 {
     isOGL21DebugMode = debug;
 }
 
-void Window::setVsync(bool vsync)
+void WindowOGL::setVsync(bool vsync)
 {
     isVsync = vsync;
     if (vsync)
@@ -120,12 +164,12 @@ void Window::setVsync(bool vsync)
     }
 }
 
-void Window::setFpsCap(double cap)
+void WindowOGL::setFpsCap(double cap)
 {
     fpsCap = cap;
 }
 
-void Window::update()
+void WindowOGL::update()
 {
     uint64_t nowTime = SDL_GetPerformanceCounter();
     double deltaTime = double(nowTime - prevTime) / freq;
@@ -165,7 +209,7 @@ void Window::update()
     state.isDownX2 = buttonState & SDL_BUTTON_X2;
 }
 
-const State& Window::getState()
+const State& WindowOGL::getState()
 {
     return state;
 }

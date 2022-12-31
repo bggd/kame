@@ -142,7 +142,7 @@ int main(int argc, char** argv)
 {
     kame::kameInit();
 
-    kame::sdl::Window win;
+    kame::sdl::WindowOGL win;
     win.setOgl21DebugMode(true);
     win.setFpsCap(1.0 / 60.0);
     win.openWindow("bunnymark", SCREEN_WIDTH, SCREEN_HEIGHT);

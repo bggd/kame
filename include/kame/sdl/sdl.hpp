@@ -17,7 +17,7 @@ struct State {
     bool isDownX2 = false;
 };
 
-struct Window {
+struct WindowOGL {
     SDL_Window* window = nullptr;
     SDL_GLContext glc = nullptr;
     bool isOGL21DebugMode = false;
