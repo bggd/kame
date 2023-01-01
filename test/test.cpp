@@ -1,7 +1,7 @@
 #include <kame/math/math.hpp>
 
-#include "../thirdparty/glm/glm/glm.hpp"
-#include "../thirdparty/glm/glm/ext.hpp"
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
 
 #include <gtest/gtest.h>
 

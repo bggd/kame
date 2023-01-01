@@ -8,7 +8,9 @@ namespace kame::sdl {
 
 void WindowOGL::openWindow(const char* title, int w, int h)
 {
+#if !defined(NDEBUG)
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
+#endif
     SDL_LogSetOutputFunction(spdlogSDL2, NULL);
 
     SDL_Init(SDL_INIT_EVERYTHING);

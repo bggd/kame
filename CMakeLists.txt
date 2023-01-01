@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.11)
 
 project(kame LANGUAGES C CXX)
 
@@ -6,8 +6,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 
-add_subdirectory(thirdparty/SDL)
-add_subdirectory(thirdparty/spdlog)
+add_subdirectory(thirdparty)
 
 add_library(kame
     STATIC
@@ -23,17 +22,14 @@ add_library(kame
         src/squirtle/node/gltf_node.cpp
         src/squirtle/engine.cpp
         src/squirtle/node/helper.cpp
-        thirdparty/pystring/pystring.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
-target_link_libraries(kame PUBLIC SDL2::SDL2 spdlog::spdlog)
+target_link_libraries(kame PUBLIC SDL2::SDL2 spdlog::spdlog nlohmann_json::nlohmann_json pystring)
 
 target_include_directories(kame
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/spdlog/include>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
@@ -81,10 +77,9 @@ endif()
 option(KAME_BUILD_TESTS "Build kame tests" ON)
 if(KAME_BUILD_TESTS)
     enable_testing()
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    add_subdirectory(thirdparty/googletest)
 
     add_executable(unit_test test/test.cpp)
+    target_include_directories(unit_test PRIVATE $<BUILD_INTERFACE:${glm_SOURCE_DIR}>)
     set_target_properties(unit_test PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
     target_link_libraries(unit_test PRIVATE kame GTest::gtest_main)
     include(GoogleTest)
