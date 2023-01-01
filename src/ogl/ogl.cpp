@@ -159,6 +159,18 @@ void drawElements(const VertexArrayObject& vao, GLenum mode, GLsizei count, GLen
     glDrawElements(mode, count, type, NULL);
 }
 
+void drawElementsInstanced(const VertexArrayObject& vao, GLenum mode, GLsizei count, GLenum type, GLsizei primCount)
+{
+    for (const auto& i : vao.attributes)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, i.vbo_id);
+        glEnableVertexAttribArray(i.location);
+        glVertexAttribPointer(i.location, i.componentSize, i.type, i.normalized, i.stride, (const void*)i.offset);
+    }
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao.ibo_id);
+    glDrawElementsInstanced(mode, count, type, NULL, primCount);
+}
+
 void VertexArrayObject::drawArrays(GLenum mode, GLint first, GLsizei count)
 {
     kame::ogl::drawArrays(*this, mode, first, count);
@@ -167,6 +179,11 @@ void VertexArrayObject::drawArrays(GLenum mode, GLint first, GLsizei count)
 void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type)
 {
     kame::ogl::drawElements(*this, mode, count, type);
+}
+
+void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type, GLsizei primCount)
+{
+    kame::ogl::drawElementsInstanced(*this, mode, count, type, primCount);
 }
 
 Shader* createShader(const char* vert, const char* frag)
@@ -541,4 +558,4 @@ void FrameBuffer::setDrawBuffer(GLenum mode)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-} // namespace kame::ogl21
+} // namespace kame::ogl

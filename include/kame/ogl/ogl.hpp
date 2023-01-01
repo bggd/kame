@@ -11,6 +11,8 @@ namespace kame::ogl {
 
 struct Context {
     struct Capability {
+        bool arb_texture_float = false;
+        bool arb_draw_instanced = false;
     };
 
     int versionMajor = 0;
@@ -60,6 +62,7 @@ struct VertexArrayObject {
 
     void drawArrays(GLenum mode, GLint first, GLsizei count);
     void drawElements(GLenum mode, GLsizei count, GLenum type);
+    void drawElements(GLenum mode, GLsizei count, GLenum type, GLsizei primCount);
 };
 
 struct VertexArrayObjectBuilder {
@@ -213,4 +216,4 @@ void deleteTexture2D(Texture2D* tex);
 FrameBuffer* createFrameBuffer();
 void deleteFrameBuffer(FrameBuffer* fbo);
 
-} // namespace kame::ogl21
+} // namespace kame::ogl

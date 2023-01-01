@@ -15,6 +15,7 @@ struct State {
     bool isDownRMB = false;
     bool isDownX1 = false;
     bool isDownX2 = false;
+    bool isDownScancode[SDL_NUM_SCANCODES] = {false};
 };
 
 struct WindowOGL {
@@ -30,7 +31,7 @@ struct WindowOGL {
     void openWindow(const char* title = "kame", int w = 640, int h = 480);
     void closeWindow();
     void swapWindow();
-    void setOgl21DebugMode(bool debug);
+    void setOglDebugMode(bool debug);
     void setVsync(bool vsync);
     void setFpsCap(double cap);
     void update();

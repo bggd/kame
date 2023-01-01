@@ -120,6 +120,15 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         glEnable(GL_TEXTURE_2D);
     }
 
+    if (GLAD_GL_ARB_texture_float)
+    {
+        kame::ogl::Context::getInstance().capability.arb_texture_float = true;
+    }
+    if (GLAD_GL_ARB_draw_instanced)
+    {
+        kame::ogl::Context::getInstance().capability.arb_draw_instanced = true;
+    }
+
     freq = SDL_GetPerformanceFrequency();
     prevTime = SDL_GetPerformanceCounter();
 }
@@ -137,7 +146,7 @@ void WindowOGL::swapWindow()
     SDL_GL_SwapWindow(window);
 }
 
-void WindowOGL::setOgl21DebugMode(bool debug)
+void WindowOGL::setOglDebugMode(bool debug)
 {
     isOGLDebugMode = debug;
 }
@@ -201,6 +210,18 @@ void WindowOGL::update()
     state.isDownRMB = buttonState & SDL_BUTTON_RIGHT;
     state.isDownX1 = buttonState & SDL_BUTTON_X1;
     state.isDownX2 = buttonState & SDL_BUTTON_X2;
+
+    int numKeys;
+    auto* scancodeState = SDL_GetKeyboardState(&numKeys);
+    assert(numKeys <= SDL_NUM_SCANCODES);
+    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+    {
+        state.isDownScancode[i] = false;
+    }
+    for (int i = 0; i < numKeys; ++i)
+    {
+        state.isDownScancode[i] = scancodeState[i] == 1;
+    }
 }
 
 const State& WindowOGL::getState()

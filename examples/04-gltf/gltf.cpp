@@ -57,7 +57,7 @@ int main(int argc, char** argv)
     kame::kameInit();
 
     kame::sdl::WindowOGL win;
-    win.setOgl21DebugMode(true);
+    win.setOglDebugMode(true);
     win.setFpsCap(1.0 / 60.0);
     win.openWindow();
     win.setVsync(true);
