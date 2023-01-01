@@ -386,12 +386,13 @@ void IndexBuffer::setBuffer(const unsigned int* vertices)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-Texture2D* loadTexture2D(const char* path)
+Texture2D* loadTexture2D(const char* path, bool flipY)
 {
     Texture2D* t = new Texture2D();
     assert(t);
 
     int x, y, c;
+    stbi_set_flip_vertically_on_load(flipY);
     unsigned char* data = stbi_load(path, &x, &y, &c, 0);
     SPDLOG_INFO("loadTexture2D: {0}(width:{1}, height:{2}, channel:{3})", path, x, y, c);
     assert(data);
@@ -407,28 +408,33 @@ Texture2D* loadTexture2D(const char* path)
     if (c == 3)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        t->format = GL_RGB;
     }
     else if (c == 4)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        t->format = GL_RGBA;
     }
     stbi_image_free(data);
 
     t->id = tex;
     t->width = x;
     t->height = y;
+    t->numChannel = c;
     return t;
 }
 
-Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len)
+Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY)
 {
     Texture2D* t = new Texture2D();
     assert(t);
 
     int x, y, c;
-    unsigned char* data = stbi_load_from_memory(src, len, &x, &y, &c, 4);
+    stbi_set_flip_vertically_on_load(flipY);
+    unsigned char* data = stbi_load_from_memory(src, len, &x, &y, &c, 0);
     SPDLOG_INFO("loadTexture2DFromMemory: (width:{0}, height:{1}, channel:{2})", x, y, c);
     assert(data);
+    assert(c > 2 && c < 5);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -437,13 +443,22 @@ Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
+    if (c == 3)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        t->format = GL_RGB;
+    }
+    else if (c == 4)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        t->format = GL_RGBA;
+    }
     stbi_image_free(data);
 
     t->id = tex;
     t->width = x;
     t->height = y;
+    t->numChannel = c;
     return t;
 }
 
@@ -465,6 +480,19 @@ Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum f
     t->id = tex;
     t->width = width;
     t->height = height;
+    t->format = format;
+    switch (format)
+    {
+        case GL_RGB:
+            t->numChannel = 3;
+            break;
+        case GL_RGBA:
+            t->numChannel = 4;
+        default:
+            t->numChannel = 0; // unknown
+            break;
+    }
+
     return t;
 }
 

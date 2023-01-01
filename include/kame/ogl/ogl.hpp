@@ -87,6 +87,8 @@ struct Shader {
 struct Texture2D {
     GLuint id;
     int width, height;
+    GLenum format;
+    int numChannel;
     void setTexParameteri(GLenum pname, GLint param);
     void setTexParameterfv(GLenum pname, const GLfloat* param);
 };
@@ -208,8 +210,8 @@ void deleteVertexBuffer(VertexBuffer* vbo);
 IndexBuffer* createIndexBuffer(GLsizeiptr numBytes, GLenum usage);
 void deleteIndexBuffer(IndexBuffer* ibo);
 
-Texture2D* loadTexture2D(const char* path);
-Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len);
+Texture2D* loadTexture2D(const char* path, bool flipY = false);
+Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY = false);
 Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum format, GLenum type);
 void deleteTexture2D(Texture2D* tex);
 
