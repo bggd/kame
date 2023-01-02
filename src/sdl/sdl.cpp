@@ -145,6 +145,17 @@ void WindowOGL::closeWindow()
 
 void WindowOGL::swapWindow()
 {
+    if (isVsync)
+    {
+        if (SDL_GL_SetSwapInterval(-1) < 0)
+        {
+            SDL_GL_SetSwapInterval(1);
+        }
+    }
+    else
+    {
+        SDL_GL_SetSwapInterval(0);
+    }
     SDL_GL_SwapWindow(window);
 }
 
@@ -156,17 +167,6 @@ void WindowOGL::setOglDebugMode(bool debug)
 void WindowOGL::setVsync(bool vsync)
 {
     isVsync = vsync;
-    if (vsync)
-    {
-        if (SDL_GL_SetSwapInterval(-1) < 0)
-        {
-            SDL_GL_SetSwapInterval(1);
-        }
-    }
-    else
-    {
-        SDL_GL_SetSwapInterval(0);
-    }
 }
 
 void WindowOGL::setFpsCap(double cap)
