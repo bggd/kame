@@ -6,6 +6,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 
+option(KAME_BUILD_TESTS "Build kame tests" OFF)
+
 add_subdirectory(thirdparty)
 
 add_library(kame
@@ -20,7 +22,7 @@ add_library(kame
         src/ogl/ogl.cpp
         src/gltf/gltf.cpp
 )
-set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 
 target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog nlohmann_json::nlohmann_json pystring)
 
@@ -37,13 +39,12 @@ if(KAME_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-option(KAME_BUILD_TESTS "Build kame tests" ON)
 if(KAME_BUILD_TESTS)
     enable_testing()
 
     add_executable(unit_test test/test.cpp)
     target_include_directories(unit_test PRIVATE $<BUILD_INTERFACE:${glm_SOURCE_DIR}>)
-    set_target_properties(unit_test PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+    set_target_properties(unit_test PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
     target_link_libraries(unit_test PRIVATE kame GTest::gtest_main)
     include(GoogleTest)
     gtest_discover_tests(unit_test)

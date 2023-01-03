@@ -44,7 +44,6 @@ CMakeSettings.json
 thirdparty/SDL/
 thirdparty/spdlog/
 thirdparty/json/
-thirdparty/pystring
 thirdparty/fltk/
 thirdparty/glm/
 thirdparty/googletest/
