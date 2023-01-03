@@ -19,9 +19,6 @@ add_library(kame
         src/ogl/glad.cpp
         src/ogl/ogl.cpp
         src/gltf/gltf.cpp
-        src/squirtle/node/gltf_node.cpp
-        src/squirtle/engine.cpp
-        src/squirtle/node/helper.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
@@ -38,40 +35,6 @@ target_include_directories(kame
 option(KAME_BUILD_EXAMPLES "Build kame examples" ON)
 if(KAME_BUILD_EXAMPLES)
     add_subdirectory(examples)
-endif()
-
-option(KAME_BUILD_SQUIRTLE_EDITOR "Build kame::Squirtle Editor" OFF)
-if(KAME_BUILD_SQUIRTLE_EDITOR)
-    add_executable(squirtleEditor
-        src/squirtle/editor/editor.cpp
-    )
-    set_target_properties(squirtleEditor PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
-
-    include(ExternalProject)
-    ExternalProject_Add(
-        FLTK14
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/fltk
-        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/fltk_install
-        CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-            -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-            -DFLTK_BUILD_TEST:BOOL=OFF
-            -DFLTK_BUILD_FLUID:BOOL=OFF
-            -DOPTION_USE_SYSTEM_LIBJPEG:BOOL=OFF
-            -DOPTION_USE_SYSTEM_LIBPNG:BOOL=OFF
-            -DOPTION_USE_SYSTEM_ZLIB:BOOL=OFF
-            -DOPTION_BUILD_HTML_DOCUMENTATION:BOOL=OFF
-            -DOPTION_BUILD_PDF_DOCUMENTATION:BOOL=OFF
-    )
-    add_dependencies(squirtleEditor FLTK14)
-
-
-    target_include_directories(squirtleEditor
-        PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fltk_install/include
-    )
-    target_link_directories(squirtleEditor PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/fltk_install/lib)
-
-    target_link_libraries(squirtleEditor PRIVATE kame gdiplus Ws2_32 comctl32 fltk$<$<CONFIG:Debug>:d>)
 endif()
 
 option(KAME_BUILD_TESTS "Build kame tests" ON)
