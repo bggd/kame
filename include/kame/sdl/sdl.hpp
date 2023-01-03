@@ -1,7 +1,8 @@
 #pragma once
 
-#define SDL_MAIN_HANDLED
 #include <SDL.h>
+
+#include <cstdint>
 
 namespace kame::sdl {
 
@@ -16,6 +17,8 @@ struct State {
     bool isDownX1 = false;
     bool isDownX2 = false;
     bool isDownScancode[SDL_NUM_SCANCODES] = {false};
+    int32_t drawableSizeX = 0;
+    int32_t drawableSizeY = 0;
 };
 
 struct WindowOGL {

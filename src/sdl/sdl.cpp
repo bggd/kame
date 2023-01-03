@@ -224,6 +224,8 @@ void WindowOGL::update()
     {
         state.isDownScancode[i] = scancodeState[i] == 1;
     }
+
+    SDL_GL_GetDrawableSize(window, &state.drawableSizeX, &state.drawableSizeY);
 }
 
 const State& WindowOGL::getState()

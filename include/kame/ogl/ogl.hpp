@@ -76,11 +76,13 @@ struct VertexArrayObjectBuilder {
 struct Shader {
     GLint id;
 
-    GLuint getAttribLocation(const char* name);
+    GLint getAttribLocation(const char* name);
+    GLint getUniformLocation(const char* name);
     void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose = false);
     void setVector4f(const char* name, kame::math::Vector4f v);
     void setVector3f(const char* name, kame::math::Vector3f v);
     void setFloat(const char* name, float x);
+    void setFloat(GLint location, float x);
     void setInt(const char* name, int x);
 };
 

@@ -234,6 +234,17 @@ Shader* createShader(const char* vert, const char* frag)
 
     GLint programLinkStatus;
     glGetProgramiv(program, GL_LINK_STATUS, &programLinkStatus);
+    if (programLinkStatus == GL_FALSE)
+    {
+        GLint logLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength)
+        {
+            std::string infoLog(logLength, ' ');
+            glGetProgramInfoLog(program, logLength, NULL, &infoLog[0]);
+            SPDLOG_INFO("Shader link failed!\n{0}", infoLog);
+        }
+    }
     assert(programLinkStatus == GL_TRUE);
 
     glDetachShader(program, vs);
@@ -251,10 +262,16 @@ void deleteShader(Shader* shader)
     delete shader;
 }
 
-GLuint Shader::getAttribLocation(const char* name)
+GLint Shader::getAttribLocation(const char* name)
 {
     GLint loc = glGetAttribLocation(id, name);
-    return (GLuint)loc;
+    return loc;
+}
+
+GLint Shader::getUniformLocation(const char* name)
+{
+    GLint loc = glGetUniformLocation(id, name);
+    return loc;
 }
 
 void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose)
@@ -275,6 +292,11 @@ void Shader::setVector3f(const char* name, kame::math::Vector3f v)
 void Shader::setFloat(const char* name, float x)
 {
     glUniform1fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&x);
+}
+
+void Shader::setFloat(GLint location, float x)
+{
+    glUniform1fv(location, 1, (const GLfloat*)&x);
 }
 
 void Shader::setInt(const char* name, int x)
