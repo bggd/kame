@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <utility>
 
 namespace kame::gltf {
 
@@ -49,7 +49,7 @@ struct Accessor {
 struct Mesh {
 
     struct Primitive {
-        std::unordered_map<std::string, integer> attributes;
+        std::vector<std::pair<std::string, integer>> attributes;
         integer indices;
         integer mode = 4;
         bool hasIndices;

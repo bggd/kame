@@ -22,7 +22,3 @@ git clone --depth 1 --branch release-1.12.1 https://github.com/google/googletest
 - glm
 
 git clone --depth 1 --branch 0.9.9.8 https://github.com/g-truc/glm.git
-
-- FLTK 1.4 (commit hash: 72415b534de36888e1a393847ec38544cdbbc3f7)
-
-git clone https://github.com/fltk/fltk.git

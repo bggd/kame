@@ -279,6 +279,11 @@ void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bo
     glUniformMatrix4fv(glGetUniformLocation(id, name), 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
 }
 
+void Shader::setMatrix4x4f(GLint location, const kame::math::Matrix4x4f& m, bool transpose)
+{
+    glUniformMatrix4fv(location, 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
+}
+
 void Shader::setVector4f(const char* name, kame::math::Vector4f v)
 {
     glUniform4fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);

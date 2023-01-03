@@ -190,7 +190,7 @@ void loadAccessors(Gltf* gltf, json& j)
             }
             if (e.contains("normalized"))
             {
-                accessor.normalized = e["normalized"].get<integer>();
+                accessor.normalized = e["normalized"].get<bool>();
                 accessor.hasNormalized = true;
             }
             if (e.contains("max"))
@@ -242,7 +242,7 @@ void loadMeshes(Gltf* gltf, json& j)
                 }
                 for (auto& [key, val] : p["attributes"].items())
                 {
-                    primitive.attributes[key] = val.get<integer>();
+                    primitive.attributes.push_back(std::make_pair(key, val));
                 }
                 mesh.primitives.push_back(primitive);
             }
