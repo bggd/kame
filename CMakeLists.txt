@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.11)
 
 project(kame LANGUAGES C CXX)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
-
 option(KAME_BUILD_TESTS "Build kame tests" OFF)
 
 add_subdirectory(thirdparty)
@@ -34,7 +30,7 @@ target_include_directories(kame
 )
 
 
-option(KAME_BUILD_EXAMPLES "Build kame examples" ON)
+option(KAME_BUILD_EXAMPLES "Build kame examples" OFF)
 if(KAME_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()

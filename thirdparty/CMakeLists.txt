@@ -2,7 +2,7 @@ include(FetchContent)
 
 set(SDL_STATIC OFF CACHE INTERNAL "")
 FetchContent_Declare(SDL
-    URL https://github.com/libsdl-org/SDL/releases/download/release-2.26.1/SDL2-2.26.1.tar.gz
+    URL https://github.com/libsdl-org/SDL/releases/download/release-2.26.2/SDL2-2.26.2.tar.gz
 )
 FetchContent_MakeAvailable(SDL)
 
