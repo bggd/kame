@@ -1,8 +1,8 @@
 #pragma once
 
-#include "vector3f.hpp"
-#include "vector4f.hpp"
-#include "quaternionf.hpp"
+#include "vector3.hpp"
+#include "vector4.hpp"
+#include "quaternion.hpp"
 
 #include <cmath>
 
@@ -76,9 +76,9 @@ struct Matrix4x4 {
         Vector3 s = Vector3::normalize(Vector3::cross(f, cameraUp));
         Vector3 u = Vector3::cross(s, f);
         Matrix4x4 m(s.x, u.x, -f.x, 0.0f,
-                     s.y, u.y, -f.y, 0.0f,
-                     s.z, u.z, -f.z, 0.0f,
-                     -Vector3::dot(s, cameraPosition), -Vector3::dot(u, cameraPosition), Vector3::dot(f, cameraPosition), 1.0f);
+                    s.y, u.y, -f.y, 0.0f,
+                    s.z, u.z, -f.z, 0.0f,
+                    -Vector3::dot(s, cameraPosition), -Vector3::dot(u, cameraPosition), Vector3::dot(f, cameraPosition), 1.0f);
         return m;
     }
 
@@ -103,9 +103,9 @@ struct Matrix4x4 {
         float a = 1.0f / tanf(fovYRadian / 2.0f);
 
         Matrix4x4 m(a / aspectRatio, 0.0f, 0.0f, 0.0f,
-                     0.0f, a, 0.0f, 0.0f,
-                     0.0f, 0.0f, -((farPlaneDistance + nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), -1.0f,
-                     0.0f, 0.0f, -((2.0f * farPlaneDistance * nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), 0.0f);
+                    0.0f, a, 0.0f, 0.0f,
+                    0.0f, 0.0f, -((farPlaneDistance + nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), -1.0f,
+                    0.0f, 0.0f, -((2.0f * farPlaneDistance * nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), 0.0f);
         return m;
     }
 

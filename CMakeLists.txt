@@ -9,10 +9,10 @@ add_subdirectory(thirdparty)
 add_library(kame
     STATIC
         src/kame.cpp
-        src/math/vector3f.cpp
-        src/math/vector4f.cpp
-        src/math/matrix4x4f.cpp
-        src/math/quaternionf.cpp
+        src/math/vector3.cpp
+        src/math/vector4.cpp
+        src/math/matrix4x4.cpp
+        src/math/quaternion.cpp
         src/sdl/sdl.cpp
         src/ogl/glad.cpp
         src/ogl/ogl.cpp

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "vector3f.hpp"
-#include "vector4f.hpp"
+#include "vector3.hpp"
+#include "vector4.hpp"
 
 namespace kame::math {
 
