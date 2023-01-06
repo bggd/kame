@@ -12,7 +12,7 @@ add_library(kame
         src/math/vector3f.cpp
         src/math/vector4f.cpp
         src/math/matrix4x4f.cpp
-        src/math/quaternion.cpp
+        src/math/quaternionf.cpp
         src/sdl/sdl.cpp
         src/ogl/glad.cpp
         src/ogl/ogl.cpp
