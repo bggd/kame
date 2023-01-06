@@ -173,7 +173,7 @@ struct Matrix4x4f {
         return createScale(Vector3f(scales));
     }
 
-    static Matrix4x4f CreateFromQuaternion(Quaternion q)
+    static Matrix4x4f CreateFromQuaternion(Quaternionf q)
     {
         Vector3f r = Vector3f::transform(Vector3f(1.0f, 0.0f, 0.0f), q);
         Vector3f u = Vector3f::transform(Vector3f(0.0f, 1.0f, 0.0f), q);

@@ -2,7 +2,7 @@
 
 namespace kame::math {
 struct Matrix4x4f;
-struct Quaternion;
+struct Quaternionf;
 } // namespace kame::math
 
 #include <cmath>
@@ -70,7 +70,7 @@ struct Vector3f {
     }
 
     static Vector3f transform(Vector3f v, const kame::math::Matrix4x4f& m);
-    static Vector3f transform(Vector3f v, Quaternion q);
+    static Vector3f transform(Vector3f v, Quaternionf q);
 
     static Vector3f lerp(Vector3f a, Vector3f b, float amount);
 };

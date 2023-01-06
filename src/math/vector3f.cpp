@@ -8,7 +8,7 @@ kame::math::Vector3f kame::math::Vector3f::transform(kame::math::Vector3f v, con
     return {x, y, z};
 }
 
-kame::math::Vector3f kame::math::Vector3f::transform(kame::math::Vector3f v, kame::math::Quaternion q)
+kame::math::Vector3f kame::math::Vector3f::transform(kame::math::Vector3f v, kame::math::Quaternionf q)
 {
     kame::math::Vector3f qv(q.x, q.y, q.z);
 

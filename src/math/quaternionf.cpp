@@ -1,8 +1,8 @@
 #include <all.hpp>
 
-kame::math::Quaternion kame::math::Quaternion::slerp(kame::math::Quaternion a, kame::math::Quaternion b, float amount)
+kame::math::Quaternionf kame::math::Quaternionf::slerp(kame::math::Quaternionf a, kame::math::Quaternionf b, float amount)
 {
-    float dotProduct = kame::math::Quaternion::dot(a, b);
+    float dotProduct = kame::math::Quaternionf::dot(a, b);
 
     if (dotProduct < 0.0f)
     {
@@ -12,7 +12,7 @@ kame::math::Quaternion kame::math::Quaternion::slerp(kame::math::Quaternion a, k
 
     if (dotProduct > 0.995f)
     {
-        return kame::math::Quaternion::normalize(a + ((b - a) * amount));
+        return kame::math::Quaternionf::normalize(a + ((b - a) * amount));
     }
 
     float theta0 = acosf(dotProduct);
