@@ -5,30 +5,30 @@
 
 namespace kame::math {
 
-struct Quaternionf {
+struct Quaternion {
     float x, y, z, w;
 
-    Quaternionf() {}
-    Quaternionf(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
-    Quaternionf(Vector3f v, float W) : x(v.x), y(v.y), z(v.z), w(W) {}
-    Quaternionf(Vector4f v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
+    Quaternion() {}
+    Quaternion(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
+    Quaternion(Vector3 v, float W) : x(v.x), y(v.y), z(v.z), w(W) {}
+    Quaternion(Vector4 v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
 
-    Quaternionf operator-()
+    Quaternion operator-()
     {
         return {-x, -y, -z, -w};
     }
 
-    static Quaternionf zero()
+    static Quaternion zero()
     {
         return {0.0f, 0.0f, 0.0f, 0.0f};
     }
 
-    static Quaternionf identity()
+    static Quaternion identity()
     {
         return {0.0f, 0.0f, 0.0f, 1.0f};
     }
 
-    static float dot(Quaternionf a, Quaternionf b)
+    static float dot(Quaternion a, Quaternion b)
     {
         float dot = 0.0f;
         dot += a.x * b.x;
@@ -39,19 +39,19 @@ struct Quaternionf {
         return dot;
     }
 
-    static float lengthSquared(Quaternionf q)
+    static float lengthSquared(Quaternion q)
     {
         return dot(q, q);
     }
 
-    static float length(Quaternionf q)
+    static float length(Quaternion q)
     {
         return sqrtf(lengthSquared(q));
     }
 
-    static Quaternionf normalize(Quaternionf q)
+    static Quaternion normalize(Quaternion q)
     {
-        Quaternionf n = Quaternionf::zero();
+        Quaternion n = Quaternion::zero();
         float len = 1.0F / length(q);
         n.x = q.x * len;
         n.y = q.y * len;
@@ -60,23 +60,23 @@ struct Quaternionf {
         return n;
     }
 
-    static Quaternionf slerp(Quaternionf a, Quaternionf b, float amount);
+    static Quaternion slerp(Quaternion a, Quaternion b, float amount);
 };
 
-static Quaternionf operator+(Quaternionf a, Quaternionf b)
+static Quaternion operator+(Quaternion a, Quaternion b)
 {
-    return Quaternionf(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+    return Quaternion(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
-static Quaternionf operator-(Quaternionf a, Quaternionf b)
+static Quaternion operator-(Quaternion a, Quaternion b)
 {
-    return Quaternionf(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+    return Quaternion(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 }
 
-static Quaternionf operator*(Quaternionf a, Quaternionf b)
+static Quaternion operator*(Quaternion a, Quaternion b)
 {
     // clang-format off
-    return Quaternionf(
+    return Quaternion(
         ( b.x * a.w) + (b.y * a.z) - (b.z * a.y) + (b.w * a.x),
         (-b.x * a.z) + (b.y * a.w) + (b.z * a.x) + (b.w * a.y),
         ( b.x * a.y) - (b.y * a.x) + (b.z * a.w) + (b.w * a.z),
@@ -84,9 +84,9 @@ static Quaternionf operator*(Quaternionf a, Quaternionf b)
     // clang-format on
 }
 
-static Quaternionf operator*(Quaternionf a, float scalar)
+static Quaternion operator*(Quaternion a, float scalar)
 {
-    return Quaternionf(a.x * scalar, a.y * scalar, a.z * scalar, a.w * scalar);
+    return Quaternion(a.x * scalar, a.y * scalar, a.z * scalar, a.w * scalar);
 }
 
 } // namespace kame::math

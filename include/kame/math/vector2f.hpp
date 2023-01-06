@@ -2,37 +2,37 @@
 
 namespace kame::math {
 
-struct Vector2f {
+struct Vector2 {
     float x, y;
 
-    Vector2f() {}
-    Vector2f(float valueForAll) : x(valueForAll), y(valueForAll) {}
-    Vector2f(float X, float Y) : x(X), y(Y) {}
+    Vector2() {}
+    Vector2(float valueForAll) : x(valueForAll), y(valueForAll) {}
+    Vector2(float X, float Y) : x(X), y(Y) {}
 
-    Vector2f operator-()
+    Vector2 operator-()
     {
-        return Vector2f(-x, -y);
+        return Vector2(-x, -y);
     }
 };
 
-static Vector2f operator+(Vector2f a, Vector2f b)
+static Vector2 operator+(Vector2 a, Vector2 b)
 {
-    return Vector2f(a.x + b.x, a.y + b.y);
+    return Vector2(a.x + b.x, a.y + b.y);
 }
 
-static Vector2f operator-(Vector2f a, Vector2f b)
+static Vector2 operator-(Vector2 a, Vector2 b)
 {
-    return Vector2f(a.x - b.x, a.y - b.y);
+    return Vector2(a.x - b.x, a.y - b.y);
 }
 
-static Vector2f operator*(Vector2f a, Vector2f b)
+static Vector2 operator*(Vector2 a, Vector2 b)
 {
-    return Vector2f(a.x * b.x, a.y * b.y);
+    return Vector2(a.x * b.x, a.y * b.y);
 }
 
-static Vector2f operator/(Vector2f a, Vector2f b)
+static Vector2 operator/(Vector2 a, Vector2 b)
 {
-    return Vector2f(a.x / b.x, a.y / b.y);
+    return Vector2(a.x / b.x, a.y / b.y);
 }
 
 } // namespace kame::math

@@ -10,7 +10,7 @@ using namespace kame::math::helper;
 
 TEST(Matrix4x4, Identity)
 {
-    Matrix4x4f m = Matrix4x4f::identity();
+    Matrix4x4 m = Matrix4x4::identity();
     glm::mat4 glmMat(1.0f);
 
     float* M = (float*)&m;
@@ -22,7 +22,7 @@ TEST(Matrix4x4, Identity)
 
 TEST(Matrix4x4, TRS)
 {
-    Matrix4x4f T = Matrix4x4f::createTranslation(Vector3f(3.0f, 4.0f, 5.0f));
+    Matrix4x4 T = Matrix4x4::createTranslation(Vector3(3.0f, 4.0f, 5.0f));
     glm::mat4 glmT = glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 4.0f, 5.0f));
 
     float* M = (float*)&T;
@@ -31,7 +31,7 @@ TEST(Matrix4x4, TRS)
         EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmT)[i]);
     }
 
-    Matrix4x4f R = Matrix4x4f::createRotationX(toRadians(90.0f));
+    Matrix4x4 R = Matrix4x4::createRotationX(toRadians(90.0f));
     glm::mat4 glmR = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0));
 
     M = (float*)&R;
@@ -40,7 +40,7 @@ TEST(Matrix4x4, TRS)
         EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmR)[i]);
     }
 
-    Matrix4x4f S = Matrix4x4f::createScale(0.5f);
+    Matrix4x4 S = Matrix4x4::createScale(0.5f);
     glm::mat4 glmS = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
 
     M = (float*)&S;
@@ -49,7 +49,7 @@ TEST(Matrix4x4, TRS)
         EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmS)[i]);
     }
 
-    Matrix4x4f TRS = S * R * T;
+    Matrix4x4 TRS = S * R * T;
     glm::mat4 glmTRS = glmT * glmR * glmS;
 
     M = (float*)&TRS;
@@ -61,7 +61,7 @@ TEST(Matrix4x4, TRS)
 
 TEST(Matrix4x4, ViewMatrix)
 {
-    Matrix4x4f View = Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0));
+    Matrix4x4 View = Matrix4x4::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
     glm::mat4 glmView = glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     float* M = (float*)&View;
@@ -73,7 +73,7 @@ TEST(Matrix4x4, ViewMatrix)
 
 TEST(Matrix4x4, ProjectionMatrix)
 {
-    Matrix4x4f Proj = Matrix4x4f::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
+    Matrix4x4 Proj = Matrix4x4::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
     glm::mat4 glmProj = glm::perspectiveRH_NO(glm::radians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
 
     float* M = (float*)&Proj;
@@ -85,9 +85,9 @@ TEST(Matrix4x4, ProjectionMatrix)
 
 TEST(Matrix4x4, MVP)
 {
-    Matrix4x4f View = Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0));
-    Matrix4x4f Proj = Matrix4x4f::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
-    Matrix4x4f MVP = View * Proj;
+    Matrix4x4 View = Matrix4x4::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
+    Matrix4x4 Proj = Matrix4x4::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
+    Matrix4x4 MVP = View * Proj;
 
     glm::mat4 glmView = glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 glmProj = glm::perspectiveRH_NO(glm::radians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
@@ -102,7 +102,7 @@ TEST(Matrix4x4, MVP)
 
 TEST(Matrix4x4, OrthoMatrix)
 {
-    Matrix4x4f Ortho = Matrix4x4f::createOrthographic_RH_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
+    Matrix4x4 Ortho = Matrix4x4::createOrthographic_RH_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
     glm::mat4 glmOrtho = glm::orthoRH_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
 
     float* M = (float*)&Ortho;
@@ -114,7 +114,7 @@ TEST(Matrix4x4, OrthoMatrix)
 
 TEST(Matrix4x4, Transpose)
 {
-    Matrix4x4f tp = Matrix4x4f::transpose(Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0)));
+    Matrix4x4 tp = Matrix4x4::transpose(Matrix4x4::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0)));
 
     glm::mat4 glmTp = glm::transpose(glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 
@@ -127,7 +127,7 @@ TEST(Matrix4x4, Transpose)
 
 TEST(Matrix4x4, Inverse)
 {
-    Matrix4x4f invIdent = Matrix4x4f::invert(Matrix4x4f::identity());
+    Matrix4x4 invIdent = Matrix4x4::invert(Matrix4x4::identity());
     glm::mat4 glmInvIdent = glm::inverse(glm::mat4(1.0f));
 
     float* M = (float*)&invIdent;
@@ -136,7 +136,7 @@ TEST(Matrix4x4, Inverse)
         EXPECT_FLOAT_EQ(M[i], glm::value_ptr(glmInvIdent)[i]);
     }
 
-    Matrix4x4f inv = Matrix4x4f::invert(Matrix4x4f::createTranslation(Vector3f(3.0f, 4.0f, 5.0f)));
+    Matrix4x4 inv = Matrix4x4::invert(Matrix4x4::createTranslation(Vector3(3.0f, 4.0f, 5.0f)));
     glm::mat4 glmInv = glm::inverse(glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 4.0f, 5.0f)));
 
     M = (float*)&inv;
@@ -148,16 +148,16 @@ TEST(Matrix4x4, Inverse)
 
 TEST(Vector3, Transform)
 {
-    Matrix4x4f View = Matrix4x4f::createLookAt_RH(Vector3f(3.0f, 4.0f, 5.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0));
-    Matrix4x4f Proj = Matrix4x4f::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
-    Matrix4x4f MVP = View * Proj;
+    Matrix4x4 View = Matrix4x4::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
+    Matrix4x4 Proj = Matrix4x4::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
+    Matrix4x4 MVP = View * Proj;
 
     glm::mat4 glmView = glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 glmProj = glm::perspectiveRH_NO(glm::radians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
     glm::mat4 glmMVP = glmProj * glmView;
 
-    Vector3f pos = Vector3f::zero();
-    pos = Vector3f::transform(pos, MVP);
+    Vector3 pos = Vector3::zero();
+    pos = Vector3::transform(pos, MVP);
 
     glm::vec4 glmPos(0.0f, 0.0f, 0.0f, 1.0f);
     glmPos = glmMVP * glmPos;
@@ -169,13 +169,13 @@ TEST(Vector3, Transform)
 
 TEST(Quaternion, AddSub)
 {
-    Quaternionf q0 = Quaternionf(1.0f, 2.0f, 3.0f, 1.0f);
-    Quaternionf q1 = Quaternionf(4.0f, 5.0f, 6.0f, 1.0f);
+    Quaternion q0 = Quaternion(1.0f, 2.0f, 3.0f, 1.0f);
+    Quaternion q1 = Quaternion(4.0f, 5.0f, 6.0f, 1.0f);
 
     glm::quat glmQ0 = glm::quat(1.0f, 2.0f, 3.0f, 1.0f);
     glm::quat glmQ1 = glm::quat(4.0f, 5.0f, 6.0f, 1.0f);
 
-    Quaternionf q2 = q0 + q1;
+    Quaternion q2 = q0 + q1;
     glm::quat glmQ2 = glmQ0 + glmQ1;
 
     EXPECT_FLOAT_EQ(q2.x, glmQ2.w);
@@ -246,6 +246,57 @@ r = { g = { b = { a = 'rgba' } } }
 return 1, 2, 3
 )");
     EXPECT_EQ(lua.getStackSize(), 3);
+
+    lua.shutdownLua();
+}
+
+TEST(Lua, Vector3)
+{
+    kame::lua::Lua lua;
+    lua.initLua();
+
+    lua.openKameMath();
+    lua.openLibs();
+
+    lua.doString(R"(
+local Vector3 = require 'kame.math.Vector3'
+local v = Vector3.new(1, 2, 3)
+v.z = 100.0
+return v.x, v.y, v.z
+)");
+    EXPECT_EQ(lua.getStackSize(), 3);
+    float z = lua.toNumber();
+    float y = lua.toNumber();
+    float x = lua.toNumber();
+    EXPECT_EQ(lua.getStackSize(), 0);
+    EXPECT_FLOAT_EQ(x, 1.0f);
+    EXPECT_FLOAT_EQ(y, 2.0f);
+    EXPECT_FLOAT_EQ(z, 100.0f);
+
+    lua.doString(R"(
+local Vector3 = require 'kame.math.Vector3'
+local v = Vector3.new(1, 2, 3)
+v.z = 100.0
+v = -v
+return v.x, v.y, v.z
+)");
+    z = lua.toNumber();
+    y = lua.toNumber();
+    x = lua.toNumber();
+    EXPECT_FLOAT_EQ(x, -1.0f);
+    EXPECT_FLOAT_EQ(y, -2.0f);
+    EXPECT_FLOAT_EQ(z, -100.0f);
+
+    lua.doString(R"(
+local Vector3 = require 'kame.math.Vector3'
+local v = Vector3.new(-1.0, 0.0, 1.0)
+return v
+)");
+
+    kame::math::Vector3 v = lua.toVector3();
+    EXPECT_FLOAT_EQ(v.x, -1.0);
+    EXPECT_FLOAT_EQ(v.y, 0.0);
+    EXPECT_FLOAT_EQ(v.z, 1.0);
 
     lua.shutdownLua();
 }

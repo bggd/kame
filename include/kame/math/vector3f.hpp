@@ -1,37 +1,37 @@
 #pragma once
 
 namespace kame::math {
-struct Matrix4x4f;
-struct Quaternionf;
+struct Matrix4x4;
+struct Quaternion;
 } // namespace kame::math
 
 #include <cmath>
 
 namespace kame::math {
 
-struct Vector3f {
+struct Vector3 {
     float x, y, z;
 
-    Vector3f() {}
-    Vector3f(float valueForAll) : x(valueForAll), y(valueForAll), z(valueForAll) {}
-    Vector3f(float X, float Y, float Z) : x(X), y(Y), z(Z) {}
+    Vector3() {}
+    Vector3(float valueForAll) : x(valueForAll), y(valueForAll), z(valueForAll) {}
+    Vector3(float X, float Y, float Z) : x(X), y(Y), z(Z) {}
 
-    Vector3f operator-()
+    Vector3 operator-()
     {
         return {-x, -y, -z};
     }
 
-    static Vector3f zero()
+    static Vector3 zero()
     {
         return {0.0f, 0.0f, 0.0f};
     }
 
-    static Vector3f one()
+    static Vector3 one()
     {
         return {1.0f, 1.0f, 1.0f};
     }
 
-    static float dot(Vector3f a, Vector3f b)
+    static float dot(Vector3 a, Vector3 b)
     {
         float dot = 0.0f;
         dot += a.x * b.x;
@@ -41,19 +41,19 @@ struct Vector3f {
         return dot;
     }
 
-    static float lengthSquared(Vector3f v)
+    static float lengthSquared(Vector3 v)
     {
         return dot(v, v);
     }
 
-    static float length(Vector3f v)
+    static float length(Vector3 v)
     {
         return ::sqrtf(lengthSquared(v));
     }
 
-    static Vector3f normalize(Vector3f v)
+    static Vector3 normalize(Vector3 v)
     {
-        Vector3f n = Vector3f::zero();
+        Vector3 n = Vector3::zero();
         float len = 1.0F / length(v);
         n.x = v.x * len;
         n.y = v.y * len;
@@ -61,7 +61,7 @@ struct Vector3f {
         return n;
     }
 
-    static Vector3f cross(Vector3f a, Vector3f b)
+    static Vector3 cross(Vector3 a, Vector3 b)
     {
         return {
             a.y * b.z - a.z * b.y,
@@ -69,35 +69,35 @@ struct Vector3f {
             a.x * b.y - a.y * b.x};
     }
 
-    static Vector3f transform(Vector3f v, const kame::math::Matrix4x4f& m);
-    static Vector3f transform(Vector3f v, Quaternionf q);
+    static Vector3 transform(Vector3 v, const kame::math::Matrix4x4& m);
+    static Vector3 transform(Vector3 v, Quaternion q);
 
-    static Vector3f lerp(Vector3f a, Vector3f b, float amount);
+    static Vector3 lerp(Vector3 a, Vector3 b, float amount);
 };
 
-static Vector3f operator+(Vector3f a, Vector3f b)
+static Vector3 operator+(Vector3 a, Vector3 b)
 {
-    return Vector3f(a.x + b.x, a.y + b.y, a.z + b.z);
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-static Vector3f operator-(Vector3f a, Vector3f b)
+static Vector3 operator-(Vector3 a, Vector3 b)
 {
-    return Vector3f(a.x - b.x, a.y - b.y, a.z - b.z);
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-static Vector3f operator*(Vector3f a, Vector3f b)
+static Vector3 operator*(Vector3 a, Vector3 b)
 {
-    return Vector3f(a.x * b.x, a.y * b.y, a.z * b.z);
+    return Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
 }
 
-static Vector3f operator/(Vector3f a, Vector3f b)
+static Vector3 operator/(Vector3 a, Vector3 b)
 {
-    return Vector3f(a.x / b.x, a.y / b.y, a.z / b.z);
+    return Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
 }
 
-static Vector3f operator*(Vector3f a, float scalar)
+static Vector3 operator*(Vector3 a, float scalar)
 {
-    return Vector3f(a.x * scalar, a.y * scalar, a.z * scalar);
+    return Vector3(a.x * scalar, a.y * scalar, a.z * scalar);
 }
 
 } // namespace kame::math

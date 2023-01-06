@@ -78,10 +78,10 @@ struct Shader {
 
     GLint getAttribLocation(const char* name);
     GLint getUniformLocation(const char* name);
-    void setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose = false);
-    void setMatrix4x4f(GLint location, const kame::math::Matrix4x4f& m, bool transpose = false);
-    void setVector4f(const char* name, kame::math::Vector4f v);
-    void setVector3f(const char* name, kame::math::Vector3f v);
+    void setMatrix4x4f(const char* name, const kame::math::Matrix4x4& m, bool transpose = false);
+    void setMatrix4x4f(GLint location, const kame::math::Matrix4x4& m, bool transpose = false);
+    void setVector4f(const char* name, kame::math::Vector4 v);
+    void setVector3f(const char* name, kame::math::Vector3 v);
     void setFloat(const char* name, float x);
     void setFloat(GLint location, float x);
     void setInt(const char* name, int x);
@@ -196,7 +196,7 @@ struct RasterizerStateBuilder {
 const char* getGlslVersionString();
 
 void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
-void setClearBuffer(GLbitfield mask, kame::math::Vector4f color);
+void setClearBuffer(GLbitfield mask, kame::math::Vector4 color);
 void setBlendState(BlendState state);
 void setDepthStencilState(DepthStencilState state);
 void setRasterizerState(RasterizerState state);

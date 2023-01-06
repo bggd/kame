@@ -12,6 +12,14 @@ void Lua::shutdownLua()
     lua_close(L);
     L = nullptr;
 }
+
+extern "C" int luaopen_kame_math_Vector3(lua_State* L);
+void Lua::openKameMath()
+{
+    luaL_requiref(L, "kame.math.Vector3", luaopen_kame_math_Vector3, 0);
+    clearStack();
+}
+
 void Lua::openLibs()
 {
     luaL_openlibs(L);
@@ -41,7 +49,7 @@ int Lua::doString(const char* code)
         const char* statusStr = _statusCodeToString(status);
         const char* errMsg = lua_tostring(L, -1);
         SPDLOG_INFO("status: [{}], error msg: {}", statusStr, errMsg);
-        lua_pop(L, 1);
+        pop();
     }
     return status;
 }
@@ -75,7 +83,7 @@ int Lua::getGlobal(const char* key)
 bool Lua::toBoolean()
 {
     int b = lua_toboolean(L, -1);
-    lua_pop(L, 1);
+    pop();
     return b;
 }
 
@@ -83,7 +91,7 @@ std::string Lua::toString()
 {
     size_t len;
     const char* cstr = lua_tolstring(L, -1, &len);
-    lua_pop(L, -1);
+    pop();
     if (cstr)
     {
         return std::string(cstr, len);
@@ -96,34 +104,53 @@ std::string Lua::toString()
 
 lua_Number Lua::toNumber(int* isnum)
 {
-    if (isnum)
-    {
-        lua_Number n = lua_tonumberx(L, -1, isnum);
-        lua_pop(L, -1);
-        return n;
-    }
-    else
-    {
-        lua_Number n = lua_tonumber(L, -1);
-        lua_pop(L, -1);
-        return n;
-    }
+    lua_Number n = lua_tonumberx(L, -1, isnum);
+    pop();
+    return n;
 }
 
 lua_Integer Lua::toInteger(int* isnum)
 {
-    if (isnum)
+    lua_Integer n = lua_tointegerx(L, -1, isnum);
+    pop();
+    return n;
+}
+
+kame::math::Vector3 Lua::toVector3()
+{
+    auto* v = (kame::math::Vector3*)lua_touserdata(L, -1);
+    pop();
+    return *v;
+}
+
+const char* Lua::_luaTypeToString(int type)
+{
+    switch (type)
     {
-        lua_Integer n = lua_tointegerx(L, -1, isnum);
-        lua_pop(L, -1);
-        return n;
+        case LUA_TNONE:
+            return "LUA_TNONE";
+        case LUA_TNIL:
+            return "LUA_TNIL";
+        case LUA_TBOOLEAN:
+            return "LUA_TBOOLEAN";
+        case LUA_TLIGHTUSERDATA:
+            return "LUA_TLIGHTUSERDATA";
+        case LUA_TNUMBER:
+            return "LUA_TNUMBER";
+        case LUA_TSTRING:
+            return "LUA_TSTRING";
+        case LUA_TTABLE:
+            return "LUA_TTABLE";
+        case LUA_TFUNCTION:
+            return "LUA_TFUNCTION";
+        case LUA_TUSERDATA:
+            return "LUA_TUSERDATA";
+        case LUA_TTHREAD:
+            return "LUA_TTHREAD";
+        default:
+            break;
     }
-    else
-    {
-        lua_Integer n = lua_tointeger(L, -1);
-        lua_pop(L, -1);
-        return n;
-    }
+    return "Unknown type";
 }
 
 const char* Lua::_statusCodeToString(int statusCode)

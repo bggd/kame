@@ -2,44 +2,44 @@
 
 namespace kame::math {
 
-struct Vector4f {
+struct Vector4 {
     float x, y, z, w;
 
-    Vector4f() {}
-    Vector4f(float valueForAll) : x(valueForAll), y(valueForAll), z(valueForAll), w(valueForAll) {}
-    Vector4f(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
+    Vector4() {}
+    Vector4(float valueForAll) : x(valueForAll), y(valueForAll), z(valueForAll), w(valueForAll) {}
+    Vector4(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
 
-    Vector4f operator-()
+    Vector4 operator-()
     {
-        return Vector4f(-x, -y, -z, -w);
+        return Vector4(-x, -y, -z, -w);
     }
 
-    static Vector4f zero()
+    static Vector4 zero()
     {
         return {0.0f, 0.0f, 0.0f, 0.0f};
     }
 
-    static Vector4f transform(Vector4f v, const kame::math::Matrix4x4f& m);
+    static Vector4 transform(Vector4 v, const kame::math::Matrix4x4& m);
 };
 
-static Vector4f operator+(Vector4f a, Vector4f b)
+static Vector4 operator+(Vector4 a, Vector4 b)
 {
-    return Vector4f(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+    return Vector4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
-static Vector4f operator-(Vector4f a, Vector4f b)
+static Vector4 operator-(Vector4 a, Vector4 b)
 {
-    return Vector4f(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+    return Vector4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 }
 
-static Vector4f operator*(Vector4f a, Vector4f b)
+static Vector4 operator*(Vector4 a, Vector4 b)
 {
-    return Vector4f(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
+    return Vector4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 }
 
-static Vector4f operator/(Vector4f a, Vector4f b)
+static Vector4 operator/(Vector4 a, Vector4 b)
 {
-    return Vector4f(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
+    return Vector4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 }
 
 } // namespace kame::math

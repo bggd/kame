@@ -66,7 +66,7 @@ void setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     glViewport(x, y, width, height);
 }
 
-void setClearBuffer(GLbitfield mask, kame::math::Vector4f color)
+void setClearBuffer(GLbitfield mask, kame::math::Vector4 color)
 {
     glClear(mask);
     glClearColor(color.x, color.y, color.z, color.w);
@@ -274,22 +274,22 @@ GLint Shader::getUniformLocation(const char* name)
     return loc;
 }
 
-void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4f& m, bool transpose)
+void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix4x4& m, bool transpose)
 {
     glUniformMatrix4fv(glGetUniformLocation(id, name), 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
 }
 
-void Shader::setMatrix4x4f(GLint location, const kame::math::Matrix4x4f& m, bool transpose)
+void Shader::setMatrix4x4f(GLint location, const kame::math::Matrix4x4& m, bool transpose)
 {
     glUniformMatrix4fv(location, 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
 }
 
-void Shader::setVector4f(const char* name, kame::math::Vector4f v)
+void Shader::setVector4f(const char* name, kame::math::Vector4 v)
 {
     glUniform4fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
 }
 
-void Shader::setVector3f(const char* name, kame::math::Vector3f v)
+void Shader::setVector3f(const char* name, kame::math::Vector3 v)
 {
     glUniform3fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
 }
