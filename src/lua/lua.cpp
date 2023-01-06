@@ -80,14 +80,14 @@ int Lua::getGlobal(const char* key)
     return t;
 }
 
-bool Lua::toBoolean()
+bool Lua::popBoolean()
 {
     int b = lua_toboolean(L, -1);
     pop();
     return b;
 }
 
-std::string Lua::toString()
+std::string Lua::popString()
 {
     size_t len;
     const char* cstr = lua_tolstring(L, -1, &len);
@@ -102,21 +102,21 @@ std::string Lua::toString()
     }
 }
 
-lua_Number Lua::toNumber(int* isnum)
+lua_Number Lua::popNumber(int* isnum)
 {
     lua_Number n = lua_tonumberx(L, -1, isnum);
     pop();
     return n;
 }
 
-lua_Integer Lua::toInteger(int* isnum)
+lua_Integer Lua::popInteger(int* isnum)
 {
     lua_Integer n = lua_tointegerx(L, -1, isnum);
     pop();
     return n;
 }
 
-kame::math::Vector3 Lua::toVector3()
+kame::math::Vector3 Lua::popVector3()
 {
     auto* v = (kame::math::Vector3*)lua_touserdata(L, -1);
     pop();

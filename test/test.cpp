@@ -229,13 +229,13 @@ r = { g = { b = { a = 'rgba' } } }
 
     EXPECT_TRUE(lua.getGlobal("x") == LUA_TNUMBER);
     int isnum = 0;
-    lua_Integer n = lua.toInteger(&isnum);
+    lua_Integer n = lua.popInteger(&isnum);
     EXPECT_TRUE(isnum);
     EXPECT_EQ(n, 1);
     EXPECT_TRUE(lua.getGlobal("isBool") == LUA_TBOOLEAN);
-    EXPECT_TRUE(lua.toBoolean());
+    EXPECT_TRUE(lua.popBoolean());
     EXPECT_TRUE(lua.getGlobal("foo.bar") == LUA_TSTRING);
-    EXPECT_EQ(lua.toString(), "baz");
+    EXPECT_EQ(lua.popString(), "baz");
     EXPECT_TRUE(lua.getGlobal("r.g.b.a") == LUA_TSTRING);
     EXPECT_EQ(lua.getStackSize(), 1);
 
@@ -265,9 +265,9 @@ v.z = 100.0
 return v.x, v.y, v.z
 )");
     EXPECT_EQ(lua.getStackSize(), 3);
-    float z = lua.toNumber();
-    float y = lua.toNumber();
-    float x = lua.toNumber();
+    float z = lua.popNumber();
+    float y = lua.popNumber();
+    float x = lua.popNumber();
     EXPECT_EQ(lua.getStackSize(), 0);
     EXPECT_FLOAT_EQ(x, 1.0f);
     EXPECT_FLOAT_EQ(y, 2.0f);
@@ -280,9 +280,9 @@ v.z = 100.0
 v = -v
 return v.x, v.y, v.z
 )");
-    z = lua.toNumber();
-    y = lua.toNumber();
-    x = lua.toNumber();
+    z = lua.popNumber();
+    y = lua.popNumber();
+    x = lua.popNumber();
     EXPECT_FLOAT_EQ(x, -1.0f);
     EXPECT_FLOAT_EQ(y, -2.0f);
     EXPECT_FLOAT_EQ(z, -100.0f);
@@ -293,7 +293,7 @@ local v = Vector3.new(-1.0, 0.0, 1.0)
 return v
 )");
 
-    kame::math::Vector3 v = lua.toVector3();
+    kame::math::Vector3 v = lua.popVector3();
     EXPECT_FLOAT_EQ(v.x, -1.0);
     EXPECT_FLOAT_EQ(v.y, 0.0);
     EXPECT_FLOAT_EQ(v.z, 1.0);

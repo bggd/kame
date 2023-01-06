@@ -31,12 +31,11 @@ struct Lua {
 
     int getGlobal(const char* key);
 
-    // Lua::to* functions pop the stack.
-    bool toBoolean();
-    std::string toString();
-    lua_Number toNumber(int* isnum = nullptr);
-    lua_Integer toInteger(int* isnum = nullptr);
-    kame::math::Vector3 toVector3();
+    bool popBoolean();
+    std::string popString();
+    lua_Number popNumber(int* isnum = nullptr);
+    lua_Integer popInteger(int* isnum = nullptr);
+    kame::math::Vector3 popVector3();
 
     static const char* _luaTypeToString(int type);
     static const char* _statusCodeToString(int statusCode);
