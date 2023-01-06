@@ -17,10 +17,11 @@ add_library(kame
         src/ogl/glad.cpp
         src/ogl/ogl.cpp
         src/gltf/gltf.cpp
+        src/lua/lua.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 
-target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog nlohmann_json::nlohmann_json pystring)
+target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog nlohmann_json::nlohmann_json pystring lua)
 
 target_include_directories(kame
     PUBLIC

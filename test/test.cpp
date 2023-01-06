@@ -211,3 +211,41 @@ TEST(Gltf, base64)
     EXPECT_EQ('M', d[0]);
     EXPECT_EQ(1, d.size());
 }
+
+#include <kame/lua/lua.hpp>
+
+TEST(Lua, LuaState)
+{
+    kame::lua::Lua lua;
+    lua.initLua();
+
+    lua.doString(R"(
+x = 1
+isBool = true
+foo = { bar = 'baz'; }
+r = { g = { b = { a = 'rgba' } } }
+)");
+    EXPECT_EQ(lua.getStackSize(), 0);
+
+    EXPECT_TRUE(lua.getGlobal("x") == LUA_TNUMBER);
+    int isnum = 0;
+    lua_Integer n = lua.toInteger(&isnum);
+    EXPECT_TRUE(isnum);
+    EXPECT_EQ(n, 1);
+    EXPECT_TRUE(lua.getGlobal("isBool") == LUA_TBOOLEAN);
+    EXPECT_TRUE(lua.toBoolean());
+    EXPECT_TRUE(lua.getGlobal("foo.bar") == LUA_TSTRING);
+    EXPECT_EQ(lua.toString(), "baz");
+    EXPECT_TRUE(lua.getGlobal("r.g.b.a") == LUA_TSTRING);
+    EXPECT_EQ(lua.getStackSize(), 1);
+
+    lua.clearStack();
+    EXPECT_EQ(lua.getStackSize(), 0);
+
+    lua.doString(R"(
+return 1, 2, 3
+)");
+    EXPECT_EQ(lua.getStackSize(), 3);
+
+    lua.shutdownLua();
+}

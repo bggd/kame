@@ -11,3 +11,4 @@ void kameShutdown();
 #include "ogl/ogl.hpp"
 #include "math/math.hpp"
 #include "gltf/gltf.hpp"
+#include "lua/lua.hpp"
