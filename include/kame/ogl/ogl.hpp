@@ -78,10 +78,10 @@ struct Shader {
 
     GLint getAttribLocation(const char* name);
     GLint getUniformLocation(const char* name);
-    void setMatrix4x4f(const char* name, const kame::math::Matrix& m, bool transpose = false);
-    void setMatrix4x4f(GLint location, const kame::math::Matrix& m, bool transpose = false);
-    void setVector4f(const char* name, kame::math::Vector4 v);
-    void setVector3f(const char* name, kame::math::Vector3 v);
+    void setMatrix(const char* name, const kame::math::Matrix& m, bool transpose = false);
+    void setMatrix(GLint location, const kame::math::Matrix& m, bool transpose = false);
+    void setVector4(const char* name, kame::math::Vector4 v);
+    void setVector3(const char* name, kame::math::Vector3 v);
     void setFloat(const char* name, float x);
     void setFloat(GLint location, float x);
     void setInt(const char* name, int x);

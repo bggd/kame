@@ -274,22 +274,22 @@ GLint Shader::getUniformLocation(const char* name)
     return loc;
 }
 
-void Shader::setMatrix4x4f(const char* name, const kame::math::Matrix& m, bool transpose)
+void Shader::setMatrix(const char* name, const kame::math::Matrix& m, bool transpose)
 {
     glUniformMatrix4fv(glGetUniformLocation(id, name), 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
 }
 
-void Shader::setMatrix4x4f(GLint location, const kame::math::Matrix& m, bool transpose)
+void Shader::setMatrix(GLint location, const kame::math::Matrix& m, bool transpose)
 {
     glUniformMatrix4fv(location, 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
 }
 
-void Shader::setVector4f(const char* name, kame::math::Vector4 v)
+void Shader::setVector4(const char* name, kame::math::Vector4 v)
 {
     glUniform4fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
 }
 
-void Shader::setVector3f(const char* name, kame::math::Vector3 v)
+void Shader::setVector3(const char* name, kame::math::Vector3 v)
 {
     glUniform3fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
 }
