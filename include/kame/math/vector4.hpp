@@ -19,7 +19,7 @@ struct Vector4 {
         return {0.0f, 0.0f, 0.0f, 0.0f};
     }
 
-    static Vector4 transform(Vector4 v, const kame::math::Matrix4x4& m);
+    static Vector4 transform(Vector4 v, const kame::math::Matrix& m);
 };
 
 static Vector4 operator+(Vector4 a, Vector4 b)

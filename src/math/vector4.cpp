@@ -1,6 +1,6 @@
 #include <kame/math/math.hpp>
 
-kame::math::Vector4 kame::math::Vector4::transform(kame::math::Vector4 v, const kame::math::Matrix4x4& m)
+kame::math::Vector4 kame::math::Vector4::transform(kame::math::Vector4 v, const kame::math::Matrix& m)
 {
     float x = (v.x * m.m11) + (v.y * m.m21) + (v.z * m.m31) + (v.w * m.m41);
     float y = (v.x * m.m12) + (v.y * m.m22) + (v.z * m.m32) + (v.w * m.m42);

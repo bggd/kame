@@ -91,13 +91,15 @@ std::string Lua::popString()
 {
     size_t len;
     const char* cstr = lua_tolstring(L, -1, &len);
-    pop();
     if (cstr)
     {
-        return std::string(cstr, len);
+        std::string str(cstr, len);
+        pop();
+        return str;
     }
     else
     {
+        pop();
         return "";
     }
 }

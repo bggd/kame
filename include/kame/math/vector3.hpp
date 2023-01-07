@@ -1,7 +1,7 @@
 #pragma once
 
 namespace kame::math {
-struct Matrix4x4;
+struct Matrix;
 struct Quaternion;
 } // namespace kame::math
 
@@ -69,7 +69,7 @@ struct Vector3 {
             a.x * b.y - a.y * b.x};
     }
 
-    static Vector3 transform(Vector3 v, const kame::math::Matrix4x4& m);
+    static Vector3 transform(Vector3 v, const kame::math::Matrix& m);
     static Vector3 transform(Vector3 v, Quaternion q);
 
     static Vector3 lerp(Vector3 a, Vector3 b, float amount);

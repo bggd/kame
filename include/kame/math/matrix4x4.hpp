@@ -8,19 +8,19 @@
 
 namespace kame::math {
 
-struct Matrix4x4 {
+struct Matrix {
 
     float m11, m12, m13, m14;
     float m21, m22, m23, m24;
     float m31, m32, m33, m34;
     float m41, m42, m43, m44;
 
-    Matrix4x4() {}
-    Matrix4x4(Vector4 row1, Vector4 row2, Vector4 row3, Vector4 row4)
+    Matrix() {}
+    Matrix(Vector4 row1, Vector4 row2, Vector4 row3, Vector4 row4)
     {
-        Matrix4x4(row1.x, row1.y, row1.y, row1.z, row2.x, row2.y, row2.y, row2.z, row3.x, row3.y, row3.y, row3.z, row4.x, row4.y, row4.y, row4.z);
+        Matrix(row1.x, row1.y, row1.y, row1.z, row2.x, row2.y, row2.y, row2.z, row3.x, row3.y, row3.y, row3.z, row4.x, row4.y, row4.y, row4.z);
     }
-    Matrix4x4(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
+    Matrix(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
     {
         this->m11 = m11;
         this->m12 = m12;
@@ -40,19 +40,19 @@ struct Matrix4x4 {
         this->m44 = m44;
     }
 
-    static Matrix4x4 zero()
+    static Matrix zero()
     {
-        return Matrix4x4(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+        return Matrix(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    static Matrix4x4 identity()
+    static Matrix identity()
     {
-        return Matrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+        return Matrix(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    static Matrix4x4 multiply(Matrix4x4& a, Matrix4x4& b)
+    static Matrix multiply(Matrix& a, Matrix& b)
     {
-        Matrix4x4 m = Matrix4x4::zero();
+        Matrix m = Matrix::zero();
         const float* A = (const float*)&a;
         const float* B = (const float*)&b;
         float* M = (float*)&m;
@@ -70,12 +70,12 @@ struct Matrix4x4 {
         return m;
     }
 
-    static Matrix4x4 createLookAt_RH(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUp)
+    static Matrix createLookAt_RH(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUp)
     {
         Vector3 f = Vector3::normalize(cameraTarget - cameraPosition);
         Vector3 s = Vector3::normalize(Vector3::cross(f, cameraUp));
         Vector3 u = Vector3::cross(s, f);
-        Matrix4x4 m(s.x, u.x, -f.x, 0.0f,
+        Matrix m(s.x, u.x, -f.x, 0.0f,
                     s.y, u.y, -f.y, 0.0f,
                     s.z, u.z, -f.z, 0.0f,
                     -Vector3::dot(s, cameraPosition), -Vector3::dot(u, cameraPosition), Vector3::dot(f, cameraPosition), 1.0f);
@@ -83,13 +83,13 @@ struct Matrix4x4 {
     }
 
     // Right Handed, Negative One to One Depth([-1.0, 1.0])
-    static Matrix4x4 createOrthographic_RH_NO(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
+    static Matrix createOrthographic_RH_NO(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
     {
         float tX = -((right + left) / (right - left));
         float tY = -((top + bottom) / (top - bottom));
         float tZ = -((zFarPlane + zNearPlane) / (zFarPlane - zNearPlane));
 
-        Matrix4x4 m(
+        Matrix m(
             2.0F / (right - left), 0.0F, 0.0F, 0.0F,
             0.0F, 2.0F / (top - bottom), 0.0F, 0.0F,
             0.0F, 0.0F, -2.0F / (zFarPlane - zNearPlane), 0.0F,
@@ -98,25 +98,25 @@ struct Matrix4x4 {
     }
 
     // Right Handed, Negative One to One Depth([-1.0, 1.0])
-    static Matrix4x4 createPerspectiveFieldOfView_RH_NO(float fovYRadian, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
+    static Matrix createPerspectiveFieldOfView_RH_NO(float fovYRadian, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
     {
         float a = 1.0f / tanf(fovYRadian / 2.0f);
 
-        Matrix4x4 m(a / aspectRatio, 0.0f, 0.0f, 0.0f,
+        Matrix m(a / aspectRatio, 0.0f, 0.0f, 0.0f,
                     0.0f, a, 0.0f, 0.0f,
                     0.0f, 0.0f, -((farPlaneDistance + nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), -1.0f,
                     0.0f, 0.0f, -((2.0f * farPlaneDistance * nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), 0.0f);
         return m;
     }
 
-    static Matrix4x4 createTranslation(Vector3 position)
+    static Matrix createTranslation(Vector3 position)
     {
         return createTranslation(position.x, position.y, position.z);
     }
 
-    static Matrix4x4 createTranslation(float x, float y, float z)
+    static Matrix createTranslation(float x, float y, float z)
     {
-        Matrix4x4 m(
+        Matrix m(
             1.0F, 0.0F, 0.0F, 0.0F,
             0.0F, 1.0F, 0.0F, 0.0F,
             0.0F, 0.0F, 1.0F, 0.0F,
@@ -124,7 +124,7 @@ struct Matrix4x4 {
         return m;
     };
 
-    static Matrix4x4 createFromAxisAngle(Vector3 axisUnit, float angleRadian)
+    static Matrix createFromAxisAngle(Vector3 axisUnit, float angleRadian)
     {
         float x = axisUnit.x;
         float y = axisUnit.y;
@@ -134,7 +134,7 @@ struct Matrix4x4 {
         float t = 1.0F - c;
 
         // clang-format off
-        Matrix4x4 m(
+        Matrix m(
             (x * x * t) + c, (y * x * t) + (z * s), (x * z * t) - (y * s), 0.0F,
             (x * y * t) - (z * s), (y * y * t) + c, (y * z * t) + (x * s), 0.0F,
             (x * z * t) + (y * s), (y * z * t) - (x * s), (z * z * t) + c, 0.0F,
@@ -143,24 +143,24 @@ struct Matrix4x4 {
         return m;
     }
 
-    static Matrix4x4 createRotationX(float radians)
+    static Matrix createRotationX(float radians)
     {
         return createFromAxisAngle(Vector3(1.0f, 0.0f, 0.0f), radians);
     }
 
-    static Matrix4x4 createRotationY(float radians)
+    static Matrix createRotationY(float radians)
     {
         return createFromAxisAngle(Vector3(0.0f, 1.0f, 0.0f), radians);
     }
 
-    static Matrix4x4 createRotationZ(float radians)
+    static Matrix createRotationZ(float radians)
     {
         return createFromAxisAngle(Vector3(0.0f, 0.0f, 1.0f), radians);
     }
 
-    static Matrix4x4 createScale(Vector3 v)
+    static Matrix createScale(Vector3 v)
     {
-        Matrix4x4 m = Matrix4x4::zero();
+        Matrix m = Matrix::zero();
         m.m11 = v.x;
         m.m22 = v.y;
         m.m33 = v.z;
@@ -168,12 +168,12 @@ struct Matrix4x4 {
         return m;
     }
 
-    static Matrix4x4 createScale(float scales)
+    static Matrix createScale(float scales)
     {
         return createScale(Vector3(scales));
     }
 
-    static Matrix4x4 CreateFromQuaternion(Quaternion q)
+    static Matrix CreateFromQuaternion(Quaternion q)
     {
         Vector3 r = Vector3::transform(Vector3(1.0f, 0.0f, 0.0f), q);
         Vector3 u = Vector3::transform(Vector3(0.0f, 1.0f, 0.0f), q);
@@ -184,9 +184,9 @@ struct Matrix4x4 {
                 0.0f, 0.0f, 0.0f, 1.0f};
     }
 
-    static Matrix4x4 transpose(const Matrix4x4& m)
+    static Matrix transpose(const Matrix& m)
     {
-        Matrix4x4 ret;
+        Matrix ret;
         ret.m11 = m.m11;
         ret.m12 = m.m21;
         ret.m13 = m.m31;
@@ -209,12 +209,12 @@ struct Matrix4x4 {
         return ret;
     }
 
-    static Matrix4x4 invert(const Matrix4x4& m);
+    static Matrix invert(const Matrix& m);
 };
 
-static Matrix4x4 operator+(const Matrix4x4& a, const Matrix4x4& b)
+static Matrix operator+(const Matrix& a, const Matrix& b)
 {
-    Matrix4x4 m = Matrix4x4::zero();
+    Matrix m = Matrix::zero();
     const float* A = (const float*)&a;
     const float* B = (const float*)&b;
     float* M = (float*)&m;
@@ -226,9 +226,9 @@ static Matrix4x4 operator+(const Matrix4x4& a, const Matrix4x4& b)
     return m;
 }
 
-static Matrix4x4 operator*(const Matrix4x4& a, const Matrix4x4& b)
+static Matrix operator*(const Matrix& a, const Matrix& b)
 {
-    Matrix4x4 m = Matrix4x4::zero();
+    Matrix m = Matrix::zero();
     const float* A = (const float*)&a;
     const float* B = (const float*)&b;
     float* M = (float*)&m;
@@ -246,9 +246,9 @@ static Matrix4x4 operator*(const Matrix4x4& a, const Matrix4x4& b)
     return m;
 }
 
-static Matrix4x4 operator*(const Matrix4x4& a, float scaleFactor)
+static Matrix operator*(const Matrix& a, float scaleFactor)
 {
-    Matrix4x4 m = Matrix4x4::zero();
+    Matrix m = Matrix::zero();
     const float* A = (const float*)&a;
     float* M = (float*)&m;
 
