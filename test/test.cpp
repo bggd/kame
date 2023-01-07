@@ -221,6 +221,7 @@ TEST(Lua, LuaState)
 
     lua.doString(R"(
 x = 1
+y = 'two'
 isBool = true
 foo = { bar = 'baz'; }
 r = { g = { b = { a = 'rgba' } } }
@@ -232,6 +233,9 @@ r = { g = { b = { a = 'rgba' } } }
     lua_Integer n = lua.popInteger(&isnum);
     EXPECT_TRUE(isnum);
     EXPECT_EQ(n, 1);
+    EXPECT_TRUE(lua.getGlobal("y") == LUA_TSTRING);
+    n = lua.popInteger(&isnum);
+    EXPECT_FALSE(isnum);
     EXPECT_TRUE(lua.getGlobal("isBool") == LUA_TBOOLEAN);
     EXPECT_TRUE(lua.popBoolean());
     EXPECT_TRUE(lua.getGlobal("foo.bar") == LUA_TSTRING);
