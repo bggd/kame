@@ -92,7 +92,7 @@ int main(int argc, char** argv)
         if (state.isCloseRequest)
             break;
         kame::ogl::setViewport(0, 0, 640, 480);
-        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(0, 0, 0, 1));
+        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4(0, 0, 0, 1));
         kame::ogl::setShader(shader);
         kame::ogl::setTexture2D(0, tex);
         vao.drawArrays(GL_TRIANGLES, 0, 6);

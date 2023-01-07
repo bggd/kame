@@ -7,18 +7,17 @@ option(KAME_BUILD_TESTS "Build kame tests" OFF)
 add_subdirectory(thirdparty)
 
 add_library(kame
-    STATIC
-        src/kame.cpp
-        src/math/vector3.cpp
-        src/math/vector4.cpp
-        src/math/matrix.cpp
-        src/math/quaternion.cpp
-        src/sdl/sdl.cpp
-        src/ogl/glad.cpp
-        src/ogl/ogl.cpp
-        src/gltf/gltf.cpp
-        src/lua/lua.cpp
-        src/lua/vector3.cpp
+    src/kame.cpp
+    src/math/vector3.cpp
+    src/math/vector4.cpp
+    src/math/matrix.cpp
+    src/math/quaternion.cpp
+    src/sdl/sdl.cpp
+    src/ogl/glad.cpp
+    src/ogl/ogl.cpp
+    src/gltf/gltf.cpp
+    src/lua/lua.cpp
+    src/lua/vector3.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 

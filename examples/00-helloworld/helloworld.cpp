@@ -18,7 +18,7 @@ int main(int argc, char** argv)
         auto state = win.getState();
         if (state.isCloseRequest)
             break;
-        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4f(1, 1, 1, 1));
+        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4(1, 1, 1, 1));
         win.swapWindow();
     }
 

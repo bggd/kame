@@ -70,8 +70,8 @@ int main(int argc, char** argv)
 
     auto* gltf = kame::gltf::loadGLTFFromMemory(examples_data_torus_gltf, examples_data_torus_gltf_len);
 
-    std::vector<kame::math::Vector3f> positions;
-    std::vector<kame::math::Vector2f> texcoords;
+    std::vector<kame::math::Vector3> positions;
+    std::vector<kame::math::Vector2> texcoords;
     std::vector<unsigned int> indices;
 
     for (auto& m : gltf->meshes)
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
                     auto& b = gltf->buffers[bv.buffer];
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
-                        auto v = ((kame::math::Vector3f*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector3*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
                         positions.push_back(v);
                     }
                 }
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
                     auto& b = gltf->buffers[bv.buffer];
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
-                        auto v = ((kame::math::Vector2f*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector2*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
                         texcoords.push_back(v);
                     }
                 }
@@ -158,15 +158,15 @@ int main(int argc, char** argv)
         if (state.isCloseRequest)
             break;
         kame::ogl::setViewport(0, 0, 640, 480);
-        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4f(0, 0, 0, 1));
+        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4(0, 0, 0, 1));
         kame::ogl::setShader(shader);
         kame::ogl::BlendState blendState = kame::ogl::BlendStateBuilder()
-                                                 .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
-                                                 .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-                                                 .build();
+                                               .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)
+                                               .blendFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+                                               .build();
         kame::ogl::DepthStencilState depthState = kame::ogl::DepthStencilStateBuilder()
-                                                        .depthFunc(GL_LESS)
-                                                        .build();
+                                                      .depthFunc(GL_LESS)
+                                                      .build();
         kame::ogl::setBlendState(blendState);
         kame::ogl::setDepthStencilState(depthState);
         kame::ogl::setTexture2D(0, tex);
@@ -175,9 +175,9 @@ int main(int argc, char** argv)
         {
             angle -= 360.0f;
         }
-        auto R = kame::math::Matrix4x4f::createRotationY(deg2rad(angle));
-        auto S = kame::math::Matrix4x4f::createScale(0.5f);
-        shader->setMatrix4x4f("uModel", S * R);
+        auto R = kame::math::Matrix::createRotationY(deg2rad(angle));
+        auto S = kame::math::Matrix::createScale(0.5f);
+        shader->setMatrix("uModel", S * R);
         vao.drawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT);
         win.swapWindow();
     }

@@ -100,7 +100,7 @@ int Vector3_unm(lua_State* L)
     return 1;
 }
 
-extern "C" int luaopen_kame_math_Vector3(lua_State* L)
+int luaopen_kame_math_Vector3(lua_State* L)
 {
     static const struct luaL_Reg vector3Funcs[] = {
         {"new", Vector3_new},
