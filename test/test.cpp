@@ -61,7 +61,7 @@ TEST(Matrix4x4, TRS)
 
 TEST(Matrix4x4, ViewMatrix)
 {
-    Matrix View = Matrix::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
+    Matrix View = Matrix::createLookAt(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
     glm::mat4 glmView = glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     float* M = (float*)&View;
@@ -73,7 +73,7 @@ TEST(Matrix4x4, ViewMatrix)
 
 TEST(Matrix4x4, ProjectionMatrix)
 {
-    Matrix Proj = Matrix::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
+    Matrix Proj = Matrix::createPerspectiveFieldOfView_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
     glm::mat4 glmProj = glm::perspectiveRH_NO(glm::radians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
 
     float* M = (float*)&Proj;
@@ -85,8 +85,8 @@ TEST(Matrix4x4, ProjectionMatrix)
 
 TEST(Matrix4x4, MVP)
 {
-    Matrix View = Matrix::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
-    Matrix Proj = Matrix::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
+    Matrix View = Matrix::createLookAt(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
+    Matrix Proj = Matrix::createPerspectiveFieldOfView_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
     Matrix MVP = View * Proj;
 
     glm::mat4 glmView = glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -102,7 +102,7 @@ TEST(Matrix4x4, MVP)
 
 TEST(Matrix4x4, OrthoMatrix)
 {
-    Matrix Ortho = Matrix::createOrthographic_RH_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
+    Matrix Ortho = Matrix::createOrthographic_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
     glm::mat4 glmOrtho = glm::orthoRH_NO(-320.0f, 320.0f, -240.0f, 240.0f, 0.01f, 100.0f);
 
     float* M = (float*)&Ortho;
@@ -114,7 +114,7 @@ TEST(Matrix4x4, OrthoMatrix)
 
 TEST(Matrix4x4, Transpose)
 {
-    Matrix tp = Matrix::transpose(Matrix::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0)));
+    Matrix tp = Matrix::transpose(Matrix::createLookAt(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0)));
 
     glm::mat4 glmTp = glm::transpose(glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 
@@ -148,8 +148,8 @@ TEST(Matrix4x4, Inverse)
 
 TEST(Vector3, Transform)
 {
-    Matrix View = Matrix::createLookAt_RH(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
-    Matrix Proj = Matrix::createPerspectiveFieldOfView_RH_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
+    Matrix View = Matrix::createLookAt(Vector3(3.0f, 4.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0));
+    Matrix Proj = Matrix::createPerspectiveFieldOfView_NO(toRadians(45.0f), 4.0f / 3.0f, 0.001f, 1000.0f);
     Matrix MVP = View * Proj;
 
     glm::mat4 glmView = glm::lookAtRH(glm::vec3(3.0f, 4.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));

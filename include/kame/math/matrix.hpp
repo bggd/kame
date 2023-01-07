@@ -70,20 +70,20 @@ struct Matrix {
         return m;
     }
 
-    static Matrix createLookAt_RH(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUp)
+    static Matrix createLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUp)
     {
         Vector3 f = Vector3::normalize(cameraTarget - cameraPosition);
         Vector3 s = Vector3::normalize(Vector3::cross(f, cameraUp));
         Vector3 u = Vector3::cross(s, f);
         Matrix m(s.x, u.x, -f.x, 0.0f,
-                    s.y, u.y, -f.y, 0.0f,
-                    s.z, u.z, -f.z, 0.0f,
-                    -Vector3::dot(s, cameraPosition), -Vector3::dot(u, cameraPosition), Vector3::dot(f, cameraPosition), 1.0f);
+                 s.y, u.y, -f.y, 0.0f,
+                 s.z, u.z, -f.z, 0.0f,
+                 -Vector3::dot(s, cameraPosition), -Vector3::dot(u, cameraPosition), Vector3::dot(f, cameraPosition), 1.0f);
         return m;
     }
 
     // Right Handed, Negative One to One Depth([-1.0, 1.0])
-    static Matrix createOrthographic_RH_NO(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
+    static Matrix createOrthographic_NO(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
     {
         float tX = -((right + left) / (right - left));
         float tY = -((top + bottom) / (top - bottom));
@@ -98,14 +98,14 @@ struct Matrix {
     }
 
     // Right Handed, Negative One to One Depth([-1.0, 1.0])
-    static Matrix createPerspectiveFieldOfView_RH_NO(float fovYRadian, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
+    static Matrix createPerspectiveFieldOfView_NO(float fovYRadian, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
     {
         float a = 1.0f / tanf(fovYRadian / 2.0f);
 
         Matrix m(a / aspectRatio, 0.0f, 0.0f, 0.0f,
-                    0.0f, a, 0.0f, 0.0f,
-                    0.0f, 0.0f, -((farPlaneDistance + nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), -1.0f,
-                    0.0f, 0.0f, -((2.0f * farPlaneDistance * nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), 0.0f);
+                 0.0f, a, 0.0f, 0.0f,
+                 0.0f, 0.0f, -((farPlaneDistance + nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), -1.0f,
+                 0.0f, 0.0f, -((2.0f * farPlaneDistance * nearPlaneDistance) / (farPlaneDistance - nearPlaneDistance)), 0.0f);
         return m;
     }
 
