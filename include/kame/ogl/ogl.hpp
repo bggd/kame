@@ -26,6 +26,8 @@ private:
 
 public:
     static Context& getInstance();
+    Context(const Context&) = delete;
+    void operator=(const Context&) = delete;
 };
 
 struct VertexBuffer {

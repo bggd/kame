@@ -33,7 +33,7 @@ int Vector3_new(lua_State* L)
         luaL_error(L, fmt::format("{} argment size is invalid", argc).c_str());
     }
 
-    luaL_getmetatable(L, "kame.math.Vector3");
+    luaL_getmetatable(L, mtVector3Name);
     lua_setmetatable(L, -2);
 
     return 1;

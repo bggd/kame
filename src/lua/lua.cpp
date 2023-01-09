@@ -47,7 +47,9 @@ int Lua::doString(const char* code)
     if (status != LUA_OK)
     {
         const char* statusStr = _statusCodeToString(status);
-        const char* errMsg = lua_tostring(L, -1);
+        size_t len = 0;
+        const char* pStr = lua_tolstring(L, -1, &len);
+        std::string errMsg(pStr, len);
         SPDLOG_INFO("status: [{}], error msg: {}", statusStr, errMsg);
         pop();
     }
