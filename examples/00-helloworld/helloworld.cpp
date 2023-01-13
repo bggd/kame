@@ -8,13 +8,12 @@ int main(int argc, char** argv)
 
     kame::sdl::WindowOGL win;
     win.setOglDebugMode(true);
-    win.setFpsCap(1.0 / 60.0);
     win.openWindow();
     win.setVsync(true);
 
     for (;;)
     {
-        win.update();
+        win.updateInput();
         auto state = win.getState();
         if (state.isCloseRequest)
             break;

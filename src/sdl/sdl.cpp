@@ -131,8 +131,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         kame::ogl::Context::getInstance().capability.arb_draw_instanced = true;
     }
 
-    freq = SDL_GetPerformanceFrequency();
-    prevTime = SDL_GetPerformanceCounter();
+    elapsedTimeUInt64 = SDL_GetPerformanceCounter();
 }
 
 void WindowOGL::closeWindow()
@@ -169,29 +168,8 @@ void WindowOGL::setVsync(bool vsync)
     isVsync = vsync;
 }
 
-void WindowOGL::setFpsCap(double cap)
+void WindowOGL::updateInput()
 {
-    fpsCap = cap;
-}
-
-void WindowOGL::update()
-{
-    uint64_t nowTime = SDL_GetPerformanceCounter();
-    double deltaTime = double(nowTime - prevTime) / freq;
-    prevTime = nowTime;
-
-    // skip fpsCap < 0
-    while (fpsCap > 0.0 && deltaTime < fpsCap)
-    {
-        uint32_t ms = (uint32_t)((fpsCap - deltaTime) * 1000.0);
-        SDL_Delay(ms);
-        nowTime = SDL_GetPerformanceCounter();
-        deltaTime += double(nowTime - prevTime) / freq;
-        prevTime = nowTime;
-    }
-
-    state.deltaTime = deltaTime;
-
     SDL_Event ev;
     while (SDL_PollEvent(&ev) != 0)
     {
@@ -232,6 +210,20 @@ const State& WindowOGL::getState()
 {
     return state;
 }
+
+double WindowOGL::getElapsedTime()
+{
+    uint64_t now = SDL_GetPerformanceCounter();
+    if (now < elapsedTimeUInt64)
+    {
+        elapsedTimeUInt64 = std::numeric_limits<uint64_t>::max() - elapsedTimeUInt64;
+    }
+    double x = double(now - elapsedTimeUInt64) / SDL_GetPerformanceFrequency();
+    elapsedTimeUInt64 = now;
+    elapsedTime += x;
+    return elapsedTime;
+}
+
 } // namespace kame::sdl
 
 void printSDL_GL_GetAttribute()
