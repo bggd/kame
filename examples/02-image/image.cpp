@@ -37,8 +37,6 @@ void main() {
 
 int main(int argc, char** argv)
 {
-    // assert(argc > 1);
-
     kame::kameInit();
 
     kame::sdl::WindowOGL win;
@@ -62,11 +60,6 @@ int main(int argc, char** argv)
 
     auto* vbo = kame::ogl::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
     vbo->setBuffer(vtx);
-
-    auto vao = kame::ogl::VertexArrayObjectBuilder()
-                   .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 5 * sizeof(float), 0)
-                   .bindAttribute(shader->getAttribLocation("aTexCoord"), vbo, 2, 5 * sizeof(float), 3 * sizeof(float))
-                   .build();
 
     unsigned char img[] = {
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
@@ -94,6 +87,10 @@ int main(int argc, char** argv)
         kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4(0, 0, 0, 1));
         kame::ogl::setShader(shader);
         kame::ogl::setTexture2D(0, tex);
+        auto vao = kame::ogl::VertexArrayObjectBuilder()
+                       .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 5 * sizeof(float), 0)
+                       .bindAttribute(shader->getAttribLocation("aTexCoord"), vbo, 2, 5 * sizeof(float), 3 * sizeof(float))
+                       .build();
         vao.drawArrays(GL_TRIANGLES, 0, 6);
         win.swapWindow();
     }

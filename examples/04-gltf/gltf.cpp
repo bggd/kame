@@ -140,12 +140,6 @@ int main(int argc, char** argv)
     auto* iboIndices = kame::ogl::createIndexBuffer(indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
     iboIndices->setBuffer((const unsigned int*)&indices[0]);
 
-    auto vao = kame::ogl::VertexArrayObjectBuilder()
-                   .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
-                   .bindAttribute(shader->getAttribLocation("vUV"), vboTexcoords, 2, 2 * sizeof(float), 0)
-                   .bindIndexBuffer(iboIndices)
-                   .build();
-
     auto* tex = kame::ogl::loadTexture2DFromMemory(Image_0_png, Image_0_png_len);
 
     float angle = 0.0f;
@@ -177,7 +171,14 @@ int main(int argc, char** argv)
         auto R = kame::math::Matrix::createRotationY(deg2rad(angle));
         auto S = kame::math::Matrix::createScale(0.5f);
         shader->setMatrix("uModel", S * R);
+
+        auto vao = kame::ogl::VertexArrayObjectBuilder()
+                       .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
+                       .bindAttribute(shader->getAttribLocation("vUV"), vboTexcoords, 2, 2 * sizeof(float), 0)
+                       .bindIndexBuffer(iboIndices)
+                       .build();
         vao.drawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT);
+
         win.swapWindow();
     }
 
