@@ -173,6 +173,8 @@ const char* Lua::_statusCodeToString(int statusCode)
             return "LUA_ERRMEM";
         case LUA_ERRERR:
             return "LUA_ERRERR";
+        case LUA_ERRFILE:
+            return "LUA_ERRFILE";
         default:
             break;
     }

@@ -302,5 +302,46 @@ return v
     EXPECT_FLOAT_EQ(v.y, 0.0);
     EXPECT_FLOAT_EQ(v.z, 1.0);
 
+    lua.doString(R"(
+local Vector3 = require 'kame.math.Vector3'
+return Vector3.new(1.0) + Vector3.new(1.0)
+)");
+
+    v = lua.popVector3();
+    EXPECT_FLOAT_EQ(v.x, 2.0);
+    EXPECT_FLOAT_EQ(v.y, 2.0);
+    EXPECT_FLOAT_EQ(v.z, 2.0);
+
+    lua.doString(R"(
+local Vector3 = require 'kame.math.Vector3'
+return Vector3.new(0.0) - Vector3.new(1.0)
+)");
+
+    v = lua.popVector3();
+    EXPECT_FLOAT_EQ(v.x, -1.0);
+    EXPECT_FLOAT_EQ(v.y, -1.0);
+    EXPECT_FLOAT_EQ(v.z, -1.0);
+
+    lua.doString(R"(
+local Vector3 = require 'kame.math.Vector3'
+local v = Vector3.new(2.0) * Vector3.new(5.0)
+return v * -1.0
+)");
+
+    v = lua.popVector3();
+    EXPECT_FLOAT_EQ(v.x, -10.0);
+    EXPECT_FLOAT_EQ(v.y, -10.0);
+    EXPECT_FLOAT_EQ(v.z, -10.0);
+
+    lua.doString(R"(
+local Vector3 = require 'kame.math.Vector3'
+return Vector3.new(1.0) / Vector3.new(60.0)
+)");
+
+    v = lua.popVector3();
+    EXPECT_FLOAT_EQ(v.x, 1.0 / 60.0);
+    EXPECT_FLOAT_EQ(v.y, 1.0 / 60.0);
+    EXPECT_FLOAT_EQ(v.z, 1.0 / 60.0);
+
     lua.shutdownLua();
 }

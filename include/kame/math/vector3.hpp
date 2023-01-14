@@ -100,4 +100,11 @@ static Vector3 operator*(Vector3 a, float scalar)
     return Vector3(a.x * scalar, a.y * scalar, a.z * scalar);
 }
 
+static Vector3 operator/(Vector3 a, float scalar)
+{
+    return Vector3(a.x / scalar, a.y / scalar, a.z / scalar);
+}
+
+
+
 } // namespace kame::math

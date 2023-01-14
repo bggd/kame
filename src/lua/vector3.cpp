@@ -100,6 +100,80 @@ int Vector3_unm(lua_State* L)
     return 1;
 }
 
+int Vector3_add(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    auto* b = (kame::math::Vector3*)luaL_checkudata(L, 2, mtVector3Name);
+    void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+    auto* v = new (p) kame::math::Vector3();
+    *v = *a + *b;
+    luaL_getmetatable(L, mtVector3Name);
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+int Vector3_sub(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    auto* b = (kame::math::Vector3*)luaL_checkudata(L, 2, mtVector3Name);
+    void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+    auto* v = new (p) kame::math::Vector3();
+    *v = *a - *b;
+    luaL_getmetatable(L, mtVector3Name);
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+int Vector3_mul(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    if (lua_isuserdata(L, 2))
+    {
+        auto* b = (kame::math::Vector3*)luaL_checkudata(L, 2, mtVector3Name);
+        void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+        auto* v = new (p) kame::math::Vector3();
+        *v = *a * *b;
+        luaL_getmetatable(L, mtVector3Name);
+        lua_setmetatable(L, -2);
+        return 1;
+    }
+    else
+    {
+        lua_Number b = luaL_checknumber(L, 2);
+        void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+        auto* v = new (p) kame::math::Vector3();
+        *v = *a * b;
+        luaL_getmetatable(L, mtVector3Name);
+        lua_setmetatable(L, -2);
+        return 1;
+    }
+}
+
+int Vector3_div(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    if (lua_isuserdata(L, 2))
+    {
+        auto* b = (kame::math::Vector3*)luaL_checkudata(L, 2, mtVector3Name);
+        void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+        auto* v = new (p) kame::math::Vector3();
+        *v = *a / *b;
+        luaL_getmetatable(L, mtVector3Name);
+        lua_setmetatable(L, -2);
+        return 1;
+    }
+    else
+    {
+        lua_Number b = luaL_checknumber(L, 2);
+        void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+        auto* v = new (p) kame::math::Vector3();
+        *v = *a / b;
+        luaL_getmetatable(L, mtVector3Name);
+        lua_setmetatable(L, -2);
+        return 1;
+    }
+}
+
 int luaopen_kame_math_Vector3(lua_State* L)
 {
     static const struct luaL_Reg vector3Funcs[] = {
@@ -109,6 +183,10 @@ int luaopen_kame_math_Vector3(lua_State* L)
         {"__newindex", Vector3_newIndex},
         {"__index", Vector3_index},
         {"__unm", Vector3_unm},
+        {"__add", Vector3_add},
+        {"__sub", Vector3_sub},
+        {"__mul", Vector3_mul},
+        {"__div", Vector3_div},
         {NULL, NULL}};
     luaL_newmetatable(L, mtVector3Name);
     luaL_setfuncs(L, vector3MetaMethods, 0);
