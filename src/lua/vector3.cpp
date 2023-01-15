@@ -10,7 +10,6 @@ int Vector3_new(lua_State* L)
 
     if (argc == 0)
     {
-
         new (p) kame::math::Vector3();
     }
     else if (argc == 1)
@@ -28,14 +27,77 @@ int Vector3_new(lua_State* L)
         auto z = luaL_checknumber(L, 3);
         new (p) kame::math::Vector3(x, y, z);
     }
-    else
-    {
-        luaL_error(L, fmt::format("{} argment size is invalid", argc).c_str());
-    }
 
     luaL_getmetatable(L, mtVector3Name);
     lua_setmetatable(L, -2);
 
+    return 1;
+}
+
+int Vector3_zero(lua_State* L)
+{
+    auto* v = (kame::math::Vector3*)lua_newuserdata(L, sizeof(kame::math::Vector3));
+    *v = kame::math::Vector3::zero();
+
+    luaL_getmetatable(L, mtVector3Name);
+    lua_setmetatable(L, -2);
+
+    return 1;
+}
+
+int Vector3_one(lua_State* L)
+{
+    auto* v = (kame::math::Vector3*)lua_newuserdata(L, sizeof(kame::math::Vector3));
+    *v = kame::math::Vector3::one();
+
+    luaL_getmetatable(L, mtVector3Name);
+    lua_setmetatable(L, -2);
+
+    return 1;
+}
+
+int Vector3_dot(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    auto* b = (kame::math::Vector3*)luaL_checkudata(L, 2, mtVector3Name);
+    lua_pushnumber(L, kame::math::Vector3::dot(*a, *b));
+    return 1;
+}
+
+int Vector3_lengthSquared(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    lua_pushnumber(L, kame::math::Vector3::lengthSquared(*a));
+    return 1;
+}
+
+int Vector3_length(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    lua_pushnumber(L, kame::math::Vector3::length(*a));
+    return 1;
+}
+
+int Vector3_normalize(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+    auto* v = new (p) kame::math::Vector3();
+    *v = kame::math::Vector3::normalize(*a);
+    luaL_getmetatable(L, mtVector3Name);
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+int Vector3_cross(lua_State* L)
+{
+    auto* a = (kame::math::Vector3*)luaL_checkudata(L, 1, mtVector3Name);
+    auto* b = (kame::math::Vector3*)luaL_checkudata(L, 2, mtVector3Name);
+    void* p = lua_newuserdata(L, sizeof(kame::math::Vector3));
+    auto* v = new (p) kame::math::Vector3();
+    *v = kame::math::Vector3::cross(*a, *b);
+    luaL_getmetatable(L, mtVector3Name);
+    lua_setmetatable(L, -2);
     return 1;
 }
 
@@ -62,8 +124,8 @@ int Vector3_index(lua_State* L)
         return 1;
     }
 
-    luaL_error(L, "invalid key");
-    return 0;
+    lua_pushnil(L);
+    return 1;
 }
 
 int Vector3_newIndex(lua_State* L)
@@ -89,8 +151,8 @@ int Vector3_newIndex(lua_State* L)
         return 0;
     }
 
-    luaL_error(L, "invalid key");
-    return 0;
+    lua_pushnil(L);
+    return 1;
 }
 
 int Vector3_unm(lua_State* L)
@@ -174,10 +236,17 @@ int Vector3_div(lua_State* L)
     }
 }
 
-int luaopen_kame_math_Vector3(lua_State* L)
+int openKameMathVector3(lua_State* L)
 {
     static const struct luaL_Reg vector3Funcs[] = {
         {"new", Vector3_new},
+        {"zero", Vector3_zero},
+        {"one", Vector3_one},
+        {"dot", Vector3_dot},
+        {"lengthSquared", Vector3_lengthSquared},
+        {"length", Vector3_length},
+        {"normalize", Vector3_normalize},
+        {"cross", Vector3_cross},
         {NULL, NULL}};
     static const struct luaL_Reg vector3MetaMethods[] = {
         {"__newindex", Vector3_newIndex},

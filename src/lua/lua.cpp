@@ -13,10 +13,10 @@ void Lua::shutdownLua()
     L = nullptr;
 }
 
-int luaopen_kame_math_Vector3(lua_State* L);
+int openKameMathVector3(lua_State* L);
 void Lua::openKameMath()
 {
-    luaL_requiref(L, "kame.math.Vector3", luaopen_kame_math_Vector3, 0);
+    luaL_requiref(L, "kame.math.Vector3", openKameMathVector3, 0);
     clearStack();
 }
 
