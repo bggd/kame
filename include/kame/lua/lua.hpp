@@ -12,7 +12,9 @@ extern "C" {
 
 namespace kame::lua {
 
+static const char* mtMatrixName = "kame.math.Matrix";
 static const char* mtVector3Name = "kame.math.Vector3";
+static const char* mtVector4Name = "kame.math.Vector4";
 
 struct Lua {
     lua_State* L = nullptr;
@@ -36,6 +38,8 @@ struct Lua {
     lua_Number popNumber(int* isnum = nullptr);
     lua_Integer popInteger(int* isnum = nullptr);
     kame::math::Vector3 popVector3();
+    kame::math::Vector4 popVector4();
+    kame::math::Matrix popMatrix();
 
     static const char* _luaTypeToString(int type);
     static const char* _statusCodeToString(int statusCode);

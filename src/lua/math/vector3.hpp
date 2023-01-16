@@ -1,3 +1,5 @@
+#pragma once
+
 #include <all.hpp>
 
 namespace kame::lua {

@@ -17,7 +17,6 @@ add_library(kame
     src/ogl/ogl.cpp
     src/gltf/gltf.cpp
     src/lua/lua.cpp
-    src/lua/vector3.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 

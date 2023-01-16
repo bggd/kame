@@ -1,5 +1,9 @@
 #include <all.hpp>
 
+#include "math/vector3.hpp"
+#include "math/vector4.hpp"
+#include "math/matrix.hpp"
+
 namespace kame::lua {
 
 void Lua::initLua()
@@ -13,10 +17,11 @@ void Lua::shutdownLua()
     L = nullptr;
 }
 
-int openKameMathVector3(lua_State* L);
 void Lua::openKameMath()
 {
+    luaL_requiref(L, "kame.math.Matrix", openKameMathMatrix, 0);
     luaL_requiref(L, "kame.math.Vector3", openKameMathVector3, 0);
+    luaL_requiref(L, "kame.math.Vector4", openKameMathVector4, 0);
     clearStack();
 }
 
@@ -123,6 +128,20 @@ lua_Integer Lua::popInteger(int* isnum)
 kame::math::Vector3 Lua::popVector3()
 {
     auto* v = (kame::math::Vector3*)lua_touserdata(L, -1);
+    pop();
+    return *v;
+}
+
+kame::math::Vector4 Lua::popVector4()
+{
+    auto* v = (kame::math::Vector4*)lua_touserdata(L, -1);
+    pop();
+    return *v;
+}
+
+kame::math::Matrix Lua::popMatrix()
+{
+    auto* v = (kame::math::Matrix*)lua_touserdata(L, -1);
     pop();
     return *v;
 }
