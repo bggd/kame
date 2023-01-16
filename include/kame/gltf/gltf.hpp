@@ -10,9 +10,6 @@ namespace kame::gltf {
 
 using integer = uint64_t;
 
-const integer ARRAY_BUFFER = 34962;
-const integer ELEMENT_ARRAY_BUFFER = 34963;
-
 struct Buffer {
     std::string name;
     std::string uri;
