@@ -105,6 +105,28 @@ static Vector3 operator/(Vector3 a, float scalar)
     return Vector3(a.x / scalar, a.y / scalar, a.z / scalar);
 }
 
+static Vector3& operator+=(Vector3& a, Vector3 b)
+{
+    a = a + b;
+    return a;
+}
 
+static Vector3& operator-=(Vector3& a, Vector3 b)
+{
+    a = a / b;
+    return a;
+}
+
+static Vector3& operator*=(Vector3& a, Vector3 b)
+{
+    a = a * b;
+    return a;
+}
+
+static Vector3& operator/=(Vector3& a, Vector3 b)
+{
+    a = a / b;
+    return a;
+}
 
 } // namespace kame::math

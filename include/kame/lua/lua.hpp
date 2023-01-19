@@ -29,6 +29,7 @@ struct Lua {
     int getStackSize();
     void pop(int n = 1);
 
+    int doFile(const char* path);
     int doString(const char* code);
 
     int getGlobal(const char* key);

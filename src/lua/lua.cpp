@@ -66,6 +66,34 @@ void Lua::pop(int n)
     lua_pop(L, n);
 }
 
+int Lua::doFile(const char* path)
+{
+    int status = luaL_loadfile(L, path);
+    if (status != LUA_OK)
+    {
+        const char* statusStr = _statusCodeToString(status);
+        size_t len = 0;
+        const char* pStr = lua_tolstring(L, -1, &len);
+        std::string errMsg(pStr, len);
+        SPDLOG_INFO("status: [{}], error msg: {}", statusStr, errMsg);
+        pop();
+    }
+    int base = lua_gettop(L);
+    lua_pushcfunction(L, msghandler);
+    lua_insert(L, base);
+    status = lua_pcall(L, 0, LUA_MULTRET, base);
+    if (status != LUA_OK)
+    {
+        const char* statusStr = _statusCodeToString(status);
+        size_t len = 0;
+        const char* pStr = lua_tolstring(L, -1, &len);
+        std::string errMsg(pStr, len);
+        SPDLOG_INFO("status: [{}], error msg: {}", statusStr, errMsg);
+    }
+    lua_remove(L, base);
+    return status;
+}
+
 int Lua::doString(const char* code)
 {
     int status = luaL_loadstring(L, code);
