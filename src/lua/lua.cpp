@@ -72,11 +72,8 @@ int Lua::doFile(const char* path)
     if (status != LUA_OK)
     {
         const char* statusStr = _statusCodeToString(status);
-        size_t len = 0;
-        const char* pStr = lua_tolstring(L, -1, &len);
-        std::string errMsg(pStr, len);
+        std::string errMsg = popString();
         SPDLOG_INFO("status: [{}], error msg: {}", statusStr, errMsg);
-        pop();
     }
     int base = lua_gettop(L);
     lua_pushcfunction(L, msghandler);
@@ -100,11 +97,8 @@ int Lua::doString(const char* code)
     if (status != LUA_OK)
     {
         const char* statusStr = _statusCodeToString(status);
-        size_t len = 0;
-        const char* pStr = lua_tolstring(L, -1, &len);
-        std::string errMsg(pStr, len);
+        std::string errMsg = popString();
         SPDLOG_INFO("status: [{}], error msg: {}", statusStr, errMsg);
-        pop();
     }
     int base = lua_gettop(L);
     lua_pushcfunction(L, msghandler);
