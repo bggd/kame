@@ -24,7 +24,10 @@ struct WindowOGL {
     SDL_Window* window = nullptr;
     SDL_GLContext glc = nullptr;
     bool isOGLDebugMode = false;
+    bool isForceGLVersion = false;
+    bool isForceCore = false;
     bool isVsync = false;
+    int forceMajor = 0, forceMinor;
     State state;
     uint64_t elapsedTimeUInt64 = 0;
     double elapsedTime = 0.0;
@@ -33,6 +36,7 @@ struct WindowOGL {
     void closeWindow();
     void swapWindow();
     void setOglDebugMode(bool debug);
+    void forceGLVersion(int majorVersion, int minorVersion, bool core);
     void setVsync(bool vsync);
     void updateInput();
     const State& getState();

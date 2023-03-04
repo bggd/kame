@@ -15,6 +15,29 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 
     SDL_Init(SDL_INIT_EVERYTHING);
 
+    if (isForceGLVersion)
+    {
+        SDL_GL_ResetAttributes();
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, isForceCore ? SDL_GL_CONTEXT_PROFILE_CORE : SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, forceMajor);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, forceMinor);
+
+        if (isOGLDebugMode)
+        {
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+        }
+
+        window = SDL_CreateWindow(title,
+                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                  w, h,
+                                  SDL_WINDOW_OPENGL);
+        assert(window);
+        glc = SDL_GL_CreateContext(window);
+        assert(glc);
+        goto glcontext_created;
+    }
+
     std::tuple<int, int> glVersions[] = {{4, 6}, {4, 5}, {4, 4}, {4, 3}, {4, 2}, {4, 1}, {4, 0}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
     for (std::tuple<int, int> ver : glVersions)
     {
@@ -69,6 +92,8 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         glc = SDL_GL_CreateContext(window);
         assert(glc);
     }
+
+glcontext_created:
 
     SDL_ShowWindow(window);
     SDL_GL_MakeCurrent(window, glc);
@@ -161,6 +186,14 @@ void WindowOGL::swapWindow()
 void WindowOGL::setOglDebugMode(bool debug)
 {
     isOGLDebugMode = debug;
+}
+
+void WindowOGL::forceGLVersion(int majorVersion, int minorVersion, bool core)
+{
+    isForceGLVersion = true;
+    forceMajor = majorVersion;
+    forceMinor = minorVersion;
+    isForceCore = core;
 }
 
 void WindowOGL::setVsync(bool vsync)
