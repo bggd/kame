@@ -215,6 +215,23 @@ void main() {
 
 using namespace kame::math;
 
+void drawUVSet(kame::ogl::Shader* shader, const std::vector<Mesh>& meshes, const std::vector<VBOMesh>& vboMeshes, GLenum mode)
+{
+    kame::ogl::setShader(shader);
+    GLint loc = shader->getAttribLocation("vUV");
+    int idx = 0;
+    for (auto& m : meshes)
+    {
+        auto& vbo = vboMeshes[idx];
+        auto vao = kame::ogl::VertexArrayObjectBuilder()
+                       .bindAttribute(loc, vbo.vboUVSets[0], 2, 2 * sizeof(float), 0)
+                       .bindIndexBuffer(vbo.iboIndices)
+                       .build();
+        vao.drawElements(mode, m.indices.size(), GL_UNSIGNED_INT);
+        ++idx;
+    }
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 2)
@@ -261,16 +278,6 @@ int main(int argc, char** argv)
     }
     kame::gltf::deleteGLTF(gltf);
 
-    std::vector<kame::ogl::VertexArrayObject> vaoList;
-    for (auto& vbo : vboMeshes)
-    {
-        auto vao = kame::ogl::VertexArrayObjectBuilder()
-                       .bindAttribute(shaderFrontFace->getAttribLocation("vUV"), vbo.vboUVSets[0], 2, 2 * sizeof(float), 0)
-                       .bindIndexBuffer(vbo.iboIndices)
-                       .build();
-        vaoList.push_back(vao);
-    }
-
     for (;;)
     {
         win.updateInput();
@@ -293,46 +300,25 @@ int main(int argc, char** argv)
 
         kame::ogl::setShader(shaderFrontFace);
         shaderFrontFace->setMatrix("uMVP", view * proj);
-        int idx = 0;
-        for (auto& m : meshes)
-        {
-            vaoList[idx].drawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT);
-            ++idx;
-        }
+        drawUVSet(shaderFrontFace, meshes, vboMeshes, GL_TRIANGLES);
 
         kame::ogl::setShader(shaderBackFace);
         shaderBackFace->setMatrix("uMVP", view * proj);
-        idx = 0;
-        for (auto& m : meshes)
-        {
-            vaoList[idx].drawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT);
-            ++idx;
-        }
+        drawUVSet(shaderBackFace, meshes, vboMeshes, GL_TRIANGLES);
 
         kame::ogl::setShader(shaderDrawLines);
         shaderDrawLines->setMatrix("uMVP", view * proj);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        idx = 0;
-        for (auto& m : meshes)
-        {
-            vaoList[idx].drawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT);
-            ++idx;
-        }
+        drawUVSet(shaderDrawLines, meshes, vboMeshes, GL_TRIANGLES);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         kame::ogl::setShader(shaderDrawPoints);
         shaderDrawPoints->setMatrix("uMVP", view * proj);
-        idx = 0;
-        for (auto& m : meshes)
-        {
-            vaoList[idx].drawElements(GL_POINTS, m.indices.size(), GL_UNSIGNED_INT);
-            ++idx;
-        }
+        drawUVSet(shaderDrawPoints, meshes, vboMeshes, GL_POINTS);
 
         win.swapWindow();
     }
 
-    vaoList.clear();
     vboMeshes.clear();
     kame::ogl::deleteShader(shaderDrawPoints);
     kame::ogl::deleteShader(shaderDrawLines);
