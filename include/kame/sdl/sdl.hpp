@@ -28,6 +28,7 @@ struct WindowOGL {
     bool isForceCore = false;
     bool isVsync = false;
     int forceMajor = 0, forceMinor;
+    uint32_t windowFlags = 0;
     State state;
     uint64_t elapsedTimeUInt64 = 0;
     double elapsedTime = 0.0;
@@ -37,6 +38,7 @@ struct WindowOGL {
     void swapWindow();
     void setOglDebugMode(bool debug);
     void forceGLVersion(int majorVersion, int minorVersion, bool core);
+    void setWindowFlags(uint32_t flags);
     void setVsync(bool vsync);
     void updateInput();
     const State& getState();

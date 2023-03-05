@@ -31,7 +31,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         window = SDL_CreateWindow(title,
                                   SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                   w, h,
-                                  SDL_WINDOW_OPENGL);
+                                  SDL_WINDOW_OPENGL | windowFlags);
         assert(window);
         glc = SDL_GL_CreateContext(window);
         assert(glc);
@@ -55,7 +55,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         window = SDL_CreateWindow(title,
                                   SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                   w, h,
-                                  SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+                                  SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | windowFlags);
         if (!window)
         {
             continue;
@@ -87,7 +87,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         window = SDL_CreateWindow(title,
                                   SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                   w, h,
-                                  SDL_WINDOW_OPENGL);
+                                  SDL_WINDOW_OPENGL | windowFlags);
         assert(window);
         glc = SDL_GL_CreateContext(window);
         assert(glc);
@@ -196,6 +196,11 @@ void WindowOGL::forceGLVersion(int majorVersion, int minorVersion, bool core)
     isForceCore = core;
 }
 
+void WindowOGL::setWindowFlags(uint32_t flags)
+{
+    windowFlags = flags;
+}
+
 void WindowOGL::setVsync(bool vsync)
 {
     isVsync = vsync;
@@ -218,11 +223,11 @@ void WindowOGL::updateInput()
 
     auto buttonState = SDL_GetMouseState(&state.mouseX, &state.mouseY);
     state.isDownLMB = state.isDownMMB = state.isDownRMB = state.isDownX1 = state.isDownX2 = false;
-    state.isDownLMB = buttonState & SDL_BUTTON_LEFT;
-    state.isDownMMB = buttonState & SDL_BUTTON_MIDDLE;
-    state.isDownRMB = buttonState & SDL_BUTTON_RIGHT;
-    state.isDownX1 = buttonState & SDL_BUTTON_X1;
-    state.isDownX2 = buttonState & SDL_BUTTON_X2;
+    state.isDownLMB = buttonState & SDL_BUTTON_LMASK;
+    state.isDownMMB = buttonState & SDL_BUTTON_MMASK;
+    state.isDownRMB = buttonState & SDL_BUTTON_RMASK;
+    state.isDownX1 = buttonState & SDL_BUTTON_X1MASK;
+    state.isDownX2 = buttonState & SDL_BUTTON_X2MASK;
 
     int numKeys;
     auto* scancodeState = SDL_GetKeyboardState(&numKeys);
