@@ -87,17 +87,17 @@ int main(int argc, char** argv)
                 {
                     if (acc.componentType == GL_UNSIGNED_BYTE)
                     {
-                        auto e = ((unsigned char*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((unsigned char*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         indices.push_back(e + offset);
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
-                        auto e = ((unsigned short*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((unsigned short*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         indices.push_back(e + offset);
                     }
                     else if (acc.componentType == GL_UNSIGNED_INT)
                     {
-                        auto e = ((unsigned int*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((unsigned int*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         indices.push_back(e + offset);
                     }
                 }
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
                     auto& b = gltf->buffers[bv.buffer];
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
-                        auto v = ((kame::math::Vector3*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector3*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         positions.push_back(v);
                     }
                 }
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
                     auto& b = gltf->buffers[bv.buffer];
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
-                        auto v = ((kame::math::Vector2*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector2*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         texcoords.push_back(v);
                     }
                 }

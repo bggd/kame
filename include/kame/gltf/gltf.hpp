@@ -14,7 +14,7 @@ struct Buffer {
     std::string name;
     std::string uri;
     integer byteLength;
-    std::vector<uint8_t> decodedData;
+    std::vector<uint8_t> binaryData;
 };
 
 struct BufferView {

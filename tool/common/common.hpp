@@ -88,7 +88,7 @@ std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf,
                 positions.reserve(acc.count);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
-                    auto v = ((kame::math::Vector3*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto v = ((kame::math::Vector3*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                     positions.push_back(v);
                 }
             }
@@ -123,17 +123,17 @@ std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::G
                 {
                     if (acc.componentType == GL_FLOAT)
                     {
-                        auto v = ((kame::math::Vector2*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector2*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         uvSets[uvid].push_back(v);
                     }
                     else if (acc.componentType == GL_UNSIGNED_BYTE)
                     {
-                        auto e = ((unsigned char*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((unsigned char*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         uvSets[uvid].push_back(e / 255.0f);
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
-                        auto e = ((unsigned short*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((unsigned short*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                         uvSets[uvid].push_back(e / 65535.0f);
                     }
                 }
@@ -160,17 +160,17 @@ std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const ka
             {
                 if (acc.componentType == GL_UNSIGNED_BYTE)
                 {
-                    auto e = ((unsigned char*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto e = ((unsigned char*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                     indices.push_back(e);
                 }
                 else if (acc.componentType == GL_UNSIGNED_SHORT)
                 {
-                    auto e = ((unsigned short*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto e = ((unsigned short*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                     indices.push_back(e);
                 }
                 else if (acc.componentType == GL_UNSIGNED_INT)
                 {
-                    auto e = ((unsigned int*)(b.decodedData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto e = ((unsigned int*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
                     indices.push_back(e);
                 }
             }

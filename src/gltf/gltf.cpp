@@ -125,8 +125,8 @@ void loadBuffers(Gltf* gltf, json& j)
                 if (pystring::startswith(buffer.uri, "data:application/octet-stream;base64,"))
                 {
                     assert(((buffer.uri.size() - std::string("data:application/octet-stream;base64,").size()) % 4) == 0);
-                    buffer.decodedData = decodeBase64(buffer.uri, std::string("data:application/octet-stream;base64,").size());
-                    assert(buffer.decodedData.size() == buffer.byteLength);
+                    buffer.binaryData = decodeBase64(buffer.uri, std::string("data:application/octet-stream;base64,").size());
+                    assert(buffer.binaryData.size() == buffer.byteLength);
                 }
             }
             gltf->buffers.push_back(buffer);
