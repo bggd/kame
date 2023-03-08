@@ -75,7 +75,7 @@ void loadNodes(Gltf* gltf, json& j)
                 int i = 0;
                 for (auto& n : e["translation"])
                 {
-                    node.matrix[i] = n.get<float>();
+                    node.translation[i] = n.get<float>();
                     ++i;
                 }
                 node.hasTranslation = true;
