@@ -31,7 +31,7 @@ target_include_directories(kame
 
 option(KAME_BUILD_TOOLS "Build kame tools" OFF)
 if (KAME_BUILD_TOOLS)
-    add_subdirectory(tool)
+    add_subdirectory(tools)
 endif()
 
 option(KAME_BUILD_EXAMPLES "Build kame examples" OFF)

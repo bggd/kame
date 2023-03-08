@@ -66,6 +66,8 @@ struct Vector4 {
     }
 
     static Vector4 transform(Vector4 v, const kame::math::Matrix& m);
+
+    static Vector4 lerp(Vector4 a, Vector4 b, float amount);
 };
 
 static Vector4 operator+(Vector4 a, Vector4 b)

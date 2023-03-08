@@ -8,3 +8,8 @@ kame::math::Vector4 kame::math::Vector4::transform(kame::math::Vector4 v, const 
     float w = (v.x * m.m14) + (v.y * m.m24) + (v.z * m.m34) + (v.w * m.m44);
     return {x, y, z, w};
 }
+
+kame::math::Vector4 kame::math::Vector4::lerp(kame::math::Vector4 a, kame::math::Vector4 b, float amount)
+{
+    return (a * (1.0f - amount)) + (b * amount);
+}
