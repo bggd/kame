@@ -1,6 +1,12 @@
 #include <kame/kame.hpp>
+#include <array>
 #include <vector>
+#include <map>
+#include <algorithm>
+#include <stack>
+#include <set>
 #include <cstdio>
+#include <cstdint>
 #include <cmath>
 
 #include "../common/common.hpp"
@@ -26,11 +32,28 @@ float aspectRatio(float x, float y)
 
 } // namespace fov
 
+namespace camera {
+// focial lengh(mm), aperture(mm)
+float getFov(float focialLength, float aperture)
+{
+    return 2.0f * atanf(aperture / (2.0f * focialLength));
+}
+
+float getFocialLength(float fieldOfView, float aperture)
+{
+    float x = fieldOfView / 2.0f;
+    return (aperture / 2.0f) * (cosf(x) / sinf(x));
+}
+} // namespace camera
+
 const char* vertGLSL = R"(#version 330
 in vec3 vPos;
-uniform mat4 uMVP;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProj;
 void main() {
-    gl_Position = uMVP * vec4(vPos, 1.0);
+    mat4 MVP = uProj * uView * uModel;
+    gl_Position = MVP * vec4(vPos, 1.0);
 }
 )";
 
@@ -48,20 +71,43 @@ void main() {
 }
 )";
 
-void drawModel(kame::ogl::Shader* shader, const std::vector<Mesh>& meshes, const std::vector<VBOMesh>& vboMeshes, GLenum mode)
+void updateGlobalXForm(Model& model, int id)
+{
+    Node& node = model.nodes[id];
+    auto local = node.updateLocalXForm();
+    auto global = kame::math::Matrix::identity();
+    if (node.parent >= 0)
+    {
+        global = model.nodes[node.parent].globalXForm;
+    }
+    else
+    {
+        global = model.nodes.back().globalXForm;
+    }
+    node.globalXForm = local * global;
+    for (auto c : node.children)
+    {
+        updateGlobalXForm(model, c);
+    }
+}
+
+void drawModel(kame::ogl::Shader* shader, const Model& model, GLenum mode)
 {
     kame::ogl::setShader(shader);
     GLint loc = shader->getAttribLocation("vPos");
-    int idx = 0;
-    for (auto& m : meshes)
+    for (auto& n : model.nodes)
     {
-        auto& vbo = vboMeshes[idx];
+        if (n.meshID < 0)
+        {
+            continue;
+        }
+        shader->setMatrix("uModel", n.globalXForm);
+        auto& vbo = model.vboMeshes[n.meshID];
         auto vao = kame::ogl::VertexArrayObjectBuilder()
                        .bindAttribute(loc, vbo.vboPositions, 3, 3 * sizeof(float), 0)
                        .bindIndexBuffer(vbo.iboIndices)
                        .build();
-        vao.drawElements(mode, m.indices.size(), GL_UNSIGNED_INT);
-        ++idx;
+        vao.drawElements(mode, vbo.numIndex, GL_UNSIGNED_INT);
     }
 }
 
@@ -86,22 +132,71 @@ int main(int argc, char** argv)
     win.setVsync(true);
 
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
-    std::vector<Mesh> meshes;
-    std::vector<VBOMesh> vboMeshes;
-    meshes.reserve(gltf->meshes.size());
-    vboMeshes.reserve(gltf->meshes.size());
+    Model model;
+    model.meshes.reserve(gltf->meshes.size());
+    model.vboMeshes.reserve(gltf->meshes.size());
     for (auto& m : gltf->meshes)
     {
-        meshes.emplace_back();
-        auto& mesh = meshes.back();
+        model.meshes.emplace_back();
+        auto& mesh = model.meshes.back();
 
         mesh.positions = toVertexPositions(gltf, m);
         mesh.uvSets = toVertexUVSets(gltf, m);
         mesh.indices = toVertexIndices(gltf, m);
 
-        vboMeshes.emplace_back();
-        auto& vbo = vboMeshes.back();
+        model.vboMeshes.emplace_back();
+        auto& vbo = model.vboMeshes.back();
         vbo.initVBOMesh(mesh);
+    }
+    model.nodes.resize(gltf->nodes.size() + 1);
+    int nodeID = 0;
+    for (auto& n : gltf->nodes)
+    {
+        Node& node = model.nodes[nodeID];
+        if (n.hasMesh)
+        {
+            node.meshID = n.mesh;
+        }
+        if (n.hasTranslation)
+        {
+            node.position.x = n.translation[0];
+            node.position.y = n.translation[1];
+            node.position.z = n.translation[2];
+        }
+        if (n.hasRotation)
+        {
+            node.rotation.x = n.rotation[0];
+            node.rotation.y = n.rotation[1];
+            node.rotation.z = n.rotation[2];
+            node.rotation.w = n.rotation[3];
+        }
+        if (n.hasScale)
+        {
+            node.scale.x = n.scale[0];
+            node.scale.y = n.scale[1];
+            node.scale.z = n.scale[2];
+        }
+        node.children.reserve(n.children.size());
+        for (auto c : n.children)
+        {
+            model.nodes[c].parent = nodeID;
+            node.children.push_back(c);
+        }
+        ++nodeID;
+    }
+    nodeID = 0;
+    for (auto& node : model.nodes)
+    {
+        if (nodeID >= gltf->nodes.size())
+        {
+            break;
+        }
+        if (node.parent < 0)
+        {
+            auto& root = model.nodes.back();
+            root.children.push_back(nodeID);
+        }
+        ++nodeID;
     }
     kame::gltf::deleteGLTF(gltf);
 
@@ -111,7 +206,7 @@ int main(int argc, char** argv)
     // for turntable rotation
     Matrix modelMtx = Matrix::identity();
     int prevMouseX = 0, prevMouseY = 0;
-    float sensitivity = 0.4; // degree
+    float sensitivity = 0.4f; // degree
     float rotX = 0.0f, rotY = 0.0f;
     float zoom = 0.0f;
 
@@ -143,6 +238,9 @@ int main(int argc, char** argv)
         prevMouseX = state.mouseX;
         prevMouseY = state.mouseY;
 
+        model.nodes.back().globalXForm = modelMtx;
+        updateGlobalXForm(model, model.nodes.size() - 1);
+
         kame::ogl::setViewport(0, 0, state.drawableSizeX, state.drawableSizeY);
         glDepthMask(GL_TRUE);
         kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4(0.5, 0.5, 0.5, 1));
@@ -167,12 +265,14 @@ int main(int argc, char** argv)
         Matrix proj = Matrix::createPerspectiveFieldOfView_NO(verticalFov, float(state.drawableSizeX) / float(state.drawableSizeY), 1.0f, 1000.0f);
 
         kame::ogl::setShader(shaderFrontFace);
-        shaderFrontFace->setMatrix("uMVP", modelMtx * view * proj);
+        shaderFrontFace->setMatrix("uView", view);
+        shaderFrontFace->setMatrix("uProj", proj);
 
-        drawModel(shaderFrontFace, meshes, vboMeshes, GL_TRIANGLES);
+        drawModel(shaderFrontFace, model, GL_TRIANGLES);
 
         kame::ogl::setShader(shaderDrawLines);
-        shaderDrawLines->setMatrix("uMVP", modelMtx * view * proj);
+        shaderDrawLines->setMatrix("uView", view);
+        shaderDrawLines->setMatrix("uProj", proj);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDepthMask(GL_FALSE);
         glEnable(GL_POLYGON_OFFSET_LINE);
@@ -181,7 +281,7 @@ int main(int argc, char** argv)
                          .depthFunc(GL_LEQUAL)
                          .build();
         kame::ogl::setDepthStencilState(depthState);
-        drawModel(shaderDrawLines, meshes, vboMeshes, GL_TRIANGLES);
+        drawModel(shaderDrawLines, model, GL_TRIANGLES);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         win.swapWindow();

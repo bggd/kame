@@ -47,20 +47,38 @@ void main() {
 
 using namespace kame::math;
 
-void drawUVSet(kame::ogl::Shader* shader, const std::vector<Mesh>& meshes, const std::vector<VBOMesh>& vboMeshes, GLenum mode)
+int getNumberOfUVSet(const kame::gltf::Gltf* gltf)
+{
+    int num = 0;
+
+    for (auto& m : gltf->meshes)
+    {
+        for (auto& pri : m.primitives)
+        {
+            for (auto& item : pri.attributes)
+            {
+                if (pystring::startswith(item.first, "TEXCOORD"))
+                {
+                    ++num;
+                }
+            }
+        }
+    }
+
+    return num;
+}
+
+void drawUVSet(kame::ogl::Shader* shader, const std::vector<VBOMesh>& vboMeshes, GLenum mode)
 {
     kame::ogl::setShader(shader);
     GLint loc = shader->getAttribLocation("vUV");
-    int idx = 0;
-    for (auto& m : meshes)
+    for (auto& vbo : vboMeshes)
     {
-        auto& vbo = vboMeshes[idx];
         auto vao = kame::ogl::VertexArrayObjectBuilder()
                        .bindAttribute(loc, vbo.vboUVSets[0], 2, 2 * sizeof(float), 0)
                        .bindIndexBuffer(vbo.iboIndices)
                        .build();
-        vao.drawElements(mode, m.indices.size(), GL_UNSIGNED_INT);
-        ++idx;
+        vao.drawElements(mode, vbo.numIndex, GL_UNSIGNED_INT);
     }
 }
 
@@ -68,7 +86,7 @@ int main(int argc, char** argv)
 {
     if (argc < 2)
     {
-        fprintf(stderr, "require *.gltf\n");
+        fprintf(stderr, "uvview: require *.gltf\n");
         return 1;
     }
 
@@ -90,7 +108,7 @@ int main(int argc, char** argv)
     fprintf(stdout, "Number Of UV Set: %d\n", numUVSet);
     if (numUVSet < 1)
     {
-        fprintf(stderr, "require TEXCOORD_* in gltf\n");
+        fprintf(stderr, "uvview: require TEXCOORD_* in gltf\n");
         return 1;
     }
     std::vector<Mesh> meshes;
@@ -134,21 +152,21 @@ int main(int argc, char** argv)
 
         kame::ogl::setShader(shaderFrontFace);
         shaderFrontFace->setMatrix("uMVP", view * proj);
-        drawUVSet(shaderFrontFace, meshes, vboMeshes, GL_TRIANGLES);
+        drawUVSet(shaderFrontFace, vboMeshes, GL_TRIANGLES);
 
         kame::ogl::setShader(shaderBackFace);
         shaderBackFace->setMatrix("uMVP", view * proj);
-        drawUVSet(shaderBackFace, meshes, vboMeshes, GL_TRIANGLES);
+        drawUVSet(shaderBackFace, vboMeshes, GL_TRIANGLES);
 
         kame::ogl::setShader(shaderDrawLines);
         shaderDrawLines->setMatrix("uMVP", view * proj);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        drawUVSet(shaderDrawLines, meshes, vboMeshes, GL_TRIANGLES);
+        drawUVSet(shaderDrawLines, vboMeshes, GL_TRIANGLES);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         kame::ogl::setShader(shaderDrawPoints);
         shaderDrawPoints->setMatrix("uMVP", view * proj);
-        drawUVSet(shaderDrawPoints, meshes, vboMeshes, GL_POINTS);
+        drawUVSet(shaderDrawPoints, vboMeshes, GL_POINTS);
 
         win.swapWindow();
     }

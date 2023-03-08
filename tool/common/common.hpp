@@ -1,33 +1,16 @@
 #pragma once
 #include <kame/kame.hpp>
+#include <array>
 #include <vector>
+#include <cstdint>
 
 #include <pystring.h>
-
-int getNumberOfUVSet(const kame::gltf::Gltf* gltf)
-{
-    int num = 0;
-
-    for (auto& m : gltf->meshes)
-    {
-        for (auto& pri : m.primitives)
-        {
-            for (auto& item : pri.attributes)
-            {
-                if (pystring::startswith(item.first, "TEXCOORD"))
-                {
-                    ++num;
-                }
-            }
-        }
-    }
-
-    return num;
-}
 
 struct Mesh {
     std::vector<kame::math::Vector3> positions;
     std::vector<std::vector<kame::math::Vector2>> uvSets;
+    std::vector<std::array<uint16_t, 4>> joints;
+    std::vector<kame::math::Vector4> weights;
     std::vector<unsigned int> indices;
 };
 
@@ -35,6 +18,7 @@ struct VBOMesh {
     kame::ogl::VertexBuffer* vboPositions = nullptr;
     std::vector<kame::ogl::VertexBuffer*> vboUVSets;
     kame::ogl::IndexBuffer* iboIndices = nullptr;
+    size_t numIndex = 0;
 
     void initVBOMesh(const Mesh& mesh)
     {
@@ -51,6 +35,7 @@ struct VBOMesh {
 
         iboIndices = kame::ogl::createIndexBuffer(mesh.indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
         iboIndices->setBuffer((const unsigned int*)&mesh.indices[0]);
+        numIndex = mesh.indices.size();
     }
 
     void shutdownVBOMesh()
@@ -102,15 +87,13 @@ std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::G
 {
     std::vector<std::vector<kame::math::Vector2>> uvSets;
 
-    int numUV = getNumberOfUVSet(gltf);
-    uvSets.resize(numUV);
-
     for (auto& pri : m.primitives)
     {
         for (auto& item : pri.attributes)
         {
             if (pystring::startswith(item.first, "TEXCOORD"))
             {
+                uvSets.emplace_back();
                 int uvid = stoi(pystring::lstrip(item.first, "TEXCOORD_"));
                 assert(uvid >= 0);
                 assert(uvid < uvSets.size());
@@ -179,3 +162,30 @@ std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const ka
 
     return indices;
 }
+
+struct Node {
+    kame::math::Vector3 position = kame::math::Vector3::zero();
+    kame::math::Vector3 scale = kame::math::Vector3::one();
+    kame::math::Quaternion rotation = kame::math::Quaternion::identity();
+
+    kame::math::Matrix localXForm = kame::math::Matrix::identity();
+    kame::math::Matrix globalXForm = kame::math::Matrix::identity();
+
+    int meshID = -1;
+
+    int parent = -1;
+    std::vector<int> children;
+    bool isJoint = false;
+
+    kame::math::Matrix updateLocalXForm()
+    {
+        localXForm = kame::math::Matrix::createScale(scale) * kame::math::Matrix::CreateFromQuaternion(rotation) * kame::math::Matrix::createTranslation(position);
+        return localXForm;
+    }
+};
+
+struct Model {
+    std::vector<Mesh> meshes;
+    std::vector<VBOMesh> vboMeshes;
+    std::vector<Node> nodes;
+};
