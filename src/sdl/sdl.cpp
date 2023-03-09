@@ -15,6 +15,8 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 
     SDL_Init(SDL_INIT_EVERYTHING);
 
+    std::tuple<int, int> glVersions[] = {{4, 6}, {4, 5}, {4, 4}, {4, 3}, {4, 2}, {4, 1}, {4, 0}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
+
     if (isForceGLVersion)
     {
         SDL_GL_ResetAttributes();
@@ -38,7 +40,6 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         goto glcontext_created;
     }
 
-    std::tuple<int, int> glVersions[] = {{4, 6}, {4, 5}, {4, 4}, {4, 3}, {4, 2}, {4, 1}, {4, 0}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
     for (std::tuple<int, int> ver : glVersions)
     {
         SDL_GL_ResetAttributes();

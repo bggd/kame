@@ -20,7 +20,7 @@ add_library(kame
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 
-target_link_libraries(kame PUBLIC SDL2::SDL2 SDL2::SDL2main spdlog::spdlog nlohmann_json::nlohmann_json pystring lua)
+target_link_libraries(kame PUBLIC SDL2::SDL2main SDL2::SDL2 spdlog::spdlog nlohmann_json::nlohmann_json pystring lua)
 
 target_include_directories(kame
     PUBLIC
