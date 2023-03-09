@@ -76,7 +76,7 @@ std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf,
                 positions.reserve(acc.count);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
-                    auto v = ((kame::math::Vector3*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                     positions.push_back(v);
                 }
             }
@@ -109,17 +109,17 @@ std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::G
                 {
                     if (acc.componentType == GL_FLOAT)
                     {
-                        auto v = ((kame::math::Vector2*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector2*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         uvSets[uvid].push_back(v);
                     }
                     else if (acc.componentType == GL_UNSIGNED_BYTE)
                     {
-                        auto e = ((unsigned char*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         uvSets[uvid].push_back(e / 255.0f);
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
-                        auto e = ((unsigned short*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         uvSets[uvid].push_back(e / 65535.0f);
                     }
                 }
@@ -148,7 +148,7 @@ std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::
                 {
                     if (acc.componentType == GL_UNSIGNED_BYTE)
                     {
-                        auto e = ((u8Array4*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((u8Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         u16Array4 v;
                         v[0] = e[0];
                         v[1] = e[1];
@@ -158,7 +158,7 @@ std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
-                        auto v = ((u16Array4*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((u16Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         joints.push_back(v);
                     }
                 }
@@ -187,12 +187,12 @@ std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, c
                 {
                     if (acc.componentType == GL_FLOAT)
                     {
-                        auto v = ((kame::math::Vector4*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         weights.push_back(v);
                     }
                     else if (acc.componentType == GL_UNSIGNED_BYTE)
                     {
-                        auto e = ((u8Array4*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((u8Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         kame::math::Vector4 v;
                         v.x = e[0] / 255.0f;
                         v.y = e[1] / 255.0f;
@@ -202,7 +202,7 @@ std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, c
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
-                        auto e = ((u16Array4*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto e = ((u16Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         kame::math::Vector4 v;
                         v.x = e[0] / 65535.0f;
                         v.y = e[1] / 65535.0f;
@@ -234,17 +234,17 @@ std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const ka
             {
                 if (acc.componentType == GL_UNSIGNED_BYTE)
                 {
-                    auto e = ((unsigned char*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto e = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                     indices.push_back(e);
                 }
                 else if (acc.componentType == GL_UNSIGNED_SHORT)
                 {
-                    auto e = ((unsigned short*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto e = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                     indices.push_back(e);
                 }
                 else if (acc.componentType == GL_UNSIGNED_INT)
                 {
-                    auto e = ((unsigned int*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto e = ((unsigned int*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                     indices.push_back(e);
                 }
             }

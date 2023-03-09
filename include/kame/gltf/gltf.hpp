@@ -15,6 +15,10 @@ struct Buffer {
     std::string uri;
     integer byteLength;
     std::vector<uint8_t> binaryData;
+    const unsigned char* data() const
+    {
+        return binaryData.data();
+    }
 };
 
 struct BufferView {

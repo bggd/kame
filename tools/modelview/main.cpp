@@ -356,7 +356,7 @@ int main(int argc, char** argv)
                 assert(acc.componentType == GL_FLOAT);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
-                    auto v = ((float*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto v = ((float*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                     smp.inputs.push_back(v);
                     clip.startTime = std::min(clip.startTime, v);
                     clip.endTime = std::max(clip.endTime, v);
@@ -372,7 +372,7 @@ int main(int argc, char** argv)
                 {
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
-                        auto v = ((kame::math::Vector3*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         smp.outputsVec4.push_back(kame::math::Vector4(v, 0.0f));
                     }
                 }
@@ -380,7 +380,7 @@ int main(int argc, char** argv)
                 {
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
-                        auto v = ((kame::math::Vector4*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+                        auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                         smp.outputsVec4.push_back(v);
                     }
                 }
@@ -399,7 +399,7 @@ int main(int argc, char** argv)
         skin.inverseBindMatrices.reserve(acc.count);
         for (unsigned int i = 0; i < acc.count; ++i)
         {
-            auto v = ((kame::math::Matrix*)(b.binaryData.data() + bv.byteOffset + acc.byteOffset))[i];
+            auto v = ((kame::math::Matrix*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
             skin.inverseBindMatrices.push_back(v);
         }
         skin.joints.reserve(s.joints.size());
