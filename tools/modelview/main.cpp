@@ -168,7 +168,7 @@ void drawModel(kame::ogl::Shader* shader, Model& model, GLenum mode)
         auto& vbo = model.vboMeshes[n.meshID];
 
         auto invertMtx = kame::math::Matrix::invert(n.globalXForm);
-        if (n.skinID >= 0)
+        if (n.skinID >= 0 && model.animationUpdated)
         {
             Skin& s = model.skins[n.skinID];
             static std::vector<kame::math::Matrix> skinMatrices;
@@ -207,6 +207,8 @@ void drawModel(kame::ogl::Shader* shader, Model& model, GLenum mode)
                        .build();
         vao.drawElements(mode, vbo.numIndex, GL_UNSIGNED_INT);
     }
+
+    model.animationUpdated = false;
 }
 
 using namespace kame::math;
