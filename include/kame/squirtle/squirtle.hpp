@@ -78,7 +78,7 @@ struct AnimationClip {
     std::vector<Channel> channels;
     std::vector<Sampler> samplers;
     float startTime = std::numeric_limits<float>::max();
-    float endTime = std::numeric_limits<float>::lowest();
+    float endTime = std::numeric_limits<float>::min();
 };
 
 struct Skin {
