@@ -4,6 +4,8 @@
 
 #include "../common/common.hpp"
 
+using namespace kame::squirtle;
+
 const char* vertGLSL = R"(#version 330
 in vec2 vUV;
 uniform mat4 uMVP;

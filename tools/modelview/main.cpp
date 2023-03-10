@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include "../common/common.hpp"
+using namespace kame::squirtle;
 
 namespace fov {
 // radians on calc
@@ -199,8 +200,7 @@ int main(int argc, char** argv)
             playTime = model.clips[0].startTime + (model.clips[0].endTime - playTime);
         }
         updateAnimation(model, model.nodes, model.clips[0], playTime);
-        model.nodes.back()
-            .globalXForm = modelMtx;
+        model.setGlobalXForm(modelMtx);
         updateGlobalXForm(model, model.nodes.size() - 1);
         updateSkinMatrices(model);
 

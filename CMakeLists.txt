@@ -16,6 +16,7 @@ add_library(kame
     src/ogl/glad.cpp
     src/ogl/ogl.cpp
     src/gltf/gltf.cpp
+    src/squirtle/squirtle.cpp
     src/lua/lua.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
