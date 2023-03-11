@@ -311,6 +311,7 @@ Model importModel(const kame::gltf::Gltf* gltf)
     {
         model.clips.emplace_back();
         AnimationClip& clip = model.clips.back();
+        clip.name = a.name;
         clip.channels.reserve(a.channels.size());
         for (auto& c : a.channels)
         {

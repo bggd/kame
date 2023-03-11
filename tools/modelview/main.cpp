@@ -9,6 +9,12 @@
 #include <cstdint>
 #include <cmath>
 
+#include <imgui.h>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_opengl3.h>
+
+#include <spdlog/spdlog.h>>
+
 #include "../common/common.hpp"
 using namespace kame::squirtle;
 
@@ -150,6 +156,15 @@ int main(int argc, char** argv)
     win.openWindow("modelview", 1280, 720);
     win.setVsync(true);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    ImGui::StyleColorsLight();
+    SDL_AddEventWatch([](void*, SDL_Event* e) -> int { ImGui_ImplSDL2_ProcessEvent(e); return 0; }, nullptr);
+    ImGui_ImplSDL2_InitForOpenGL(win.window, win.glc);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
     Model model = importModel(gltf);
     kame::gltf::deleteGLTF(gltf);
@@ -194,12 +209,34 @@ int main(int argc, char** argv)
         prevMouseX = state.mouseX;
         prevMouseY = state.mouseY;
 
-        playTime += 1.0 / 60.0f;
-        if (playTime > model.clips[0].endTime)
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+        // ImGui::ShowDemoWindow();
+
+        static std::vector<const char*> items;
+        items.clear();
+        items.reserve(model.clips.size());
+        for (auto& clip : model.clips)
         {
-            playTime = model.clips[0].startTime + (model.clips[0].endTime - playTime);
+            items.push_back(clip.name.c_str());
         }
-        updateAnimation(model, model.nodes, model.clips[0], playTime);
+        static int itemCurrent = 0;
+        static int itemSelect = 0;
+        ImGui::ListBox(fmt::format("{} clips", items.size()).data(), &itemSelect, items.data(), items.size(), 10);
+        if (itemCurrent != itemSelect)
+        {
+            playTime = -(1.0 / 60.0f);
+            itemCurrent = itemSelect;
+        }
+        AnimationClip clipCurrent = model.clips[itemCurrent];
+
+        playTime += 1.0 / 60.0f;
+        if (playTime > clipCurrent.endTime)
+        {
+            playTime = clipCurrent.startTime + (clipCurrent.endTime - playTime);
+        }
+        updateAnimation(model, model.nodes, clipCurrent, playTime);
         model.setGlobalXForm(modelMtx);
         updateGlobalXForm(model, model.nodes.size() - 1);
         updateSkinMatrices(model);
@@ -246,6 +283,9 @@ int main(int argc, char** argv)
         kame::ogl::setDepthStencilState(depthState);
         drawModel(shaderDrawLines, model, GL_TRIANGLES);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         win.swapWindow();
     }

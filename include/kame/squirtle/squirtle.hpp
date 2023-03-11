@@ -75,6 +75,7 @@ struct AnimationClip {
         std::vector<kame::math::Vector4> outputsVec4;
     };
 
+    std::string name;
     std::vector<Channel> channels;
     std::vector<Sampler> samplers;
     float startTime = std::numeric_limits<float>::max();
