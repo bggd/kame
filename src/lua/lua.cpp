@@ -62,7 +62,7 @@ int Lua::getStackSize()
 
 void Lua::pop(int n)
 {
-    assert(n > 0);
+    assert(n >= 0);
     lua_pop(L, n);
 }
 
@@ -199,6 +199,20 @@ kame::math::Matrix Lua::popMatrix()
     auto* v = (kame::math::Matrix*)lua_touserdata(L, -1);
     pop();
     return *v;
+}
+
+void Lua::ipairs(std::function<void(int, int)> fn)
+{
+    int e = luaL_len(L, -1);
+    for (lua_Unsigned i = 0; i < e; ++i)
+    {
+        int idx = i + 1;
+        int n = getStackSize();
+        int type = lua_geti(L, -1, idx);
+        fn(idx, type);
+        pop(getStackSize() - n);
+    }
+    pop();
 }
 
 const char* Lua::_luaTypeToString(int type)

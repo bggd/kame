@@ -56,3 +56,6 @@ out/
 p5/
 !examples/data/*.gltf
 !examples/data/*.png
+*.glsl
+*.spv
+*.lua

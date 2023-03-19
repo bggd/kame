@@ -7,6 +7,7 @@ extern "C" {
 }
 
 #include <string>
+#include <functional>
 
 #include <kame/math/math.hpp>
 
@@ -41,6 +42,8 @@ struct Lua {
     kame::math::Vector3 popVector3();
     kame::math::Vector4 popVector4();
     kame::math::Matrix popMatrix();
+
+    void ipairs(std::function<void(int, int)> fn);
 
     static const char* _luaTypeToString(int type);
     static const char* _statusCodeToString(int statusCode);
