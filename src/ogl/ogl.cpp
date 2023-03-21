@@ -55,9 +55,17 @@ const char* getGlslVersionString()
     {
         return "#version 460\n";
     }
-    else
+    else if (ctx.versionMajor == 2 && ctx.versionMinor == 1)
     {
         return "#version 120\n";
+    }
+    else if (ctx.versionMajor == 2 && ctx.versionMinor == 0)
+    {
+        return "#version 110\n";
+    }
+    else
+    {
+        return "";
     }
 }
 

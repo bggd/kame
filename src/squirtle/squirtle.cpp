@@ -500,4 +500,53 @@ void updateSkinMatrices(Model& model)
     }
 }
 
+void updateVBOMeshes(Model& model)
+{
+    for (auto& n : model.nodes)
+    {
+        if (n.meshID < 0)
+        {
+            continue;
+        }
+
+        auto& vbo = model.vboMeshes[n.meshID];
+
+        auto invertMtx = kame::math::Matrix::invert(n.globalXForm);
+        if (n.skinID >= 0 && model.animationUpdated)
+        {
+            Skin& s = model.skins[n.skinID];
+            static std::vector<kame::math::Matrix> skinMatrices;
+            skinMatrices.resize(s.matrices.size());
+            for (int i = 0; i < s.matrices.size(); ++i)
+            {
+                skinMatrices[i] = s.matrices[i] * invertMtx;
+            }
+
+            Mesh& srcMesh = model.meshes[n.meshID];
+            static Mesh dstMesh;
+            dstMesh.positions.clear();
+            dstMesh.positions.resize(srcMesh.positions.size());
+            for (auto i : srcMesh.indices)
+            {
+                auto vPos = srcMesh.positions[i];
+                auto vJoint = srcMesh.joints[i];
+                auto vWeight = srcMesh.weights[i];
+
+                // clang-format off
+                auto skinMtx =
+                      skinMatrices[vJoint[0]] * vWeight.x
+                    + skinMatrices[vJoint[1]] * vWeight.y
+                    + skinMatrices[vJoint[2]] * vWeight.z
+                    + skinMatrices[vJoint[3]] * vWeight.w;
+                // clang-format on
+
+                dstMesh.positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
+            }
+            vbo.vboPositions->setBuffer((const float*)&dstMesh.positions[0]);
+        }
+    }
+
+    model.animationUpdated = false;
+}
+
 } // namespace kame::squirtle

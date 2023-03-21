@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
     kame::sdl::WindowOGL win;
     win.setOglDebugMode(true);
-    win.forceGLVersion(3, 3, false);
+    win.setGLVersions({{3, 3, false}});
     win.openWindow("uvview", 512, 512);
     win.setVsync(true);
 

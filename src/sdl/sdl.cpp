@@ -15,38 +15,23 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    std::tuple<int, int> glVersions[] = {{4, 6}, {4, 5}, {4, 4}, {4, 3}, {4, 2}, {4, 1}, {4, 0}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
-
-    if (isForceGLVersion)
+    std::vector<GLVersion> versions;
+    if (this->glVersions.empty())
     {
-        SDL_GL_ResetAttributes();
-
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, isForceCore ? SDL_GL_CONTEXT_PROFILE_CORE : SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, forceMajor);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, forceMinor);
-
-        if (isOGLDebugMode)
-        {
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-        }
-
-        window = SDL_CreateWindow(title,
-                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                  w, h,
-                                  SDL_WINDOW_OPENGL | windowFlags);
-        assert(window);
-        glc = SDL_GL_CreateContext(window);
-        assert(glc);
-        goto glcontext_created;
+        versions = {{4, 6, true}, {4, 5, true}, {4, 4, true}, {4, 3, true}, {4, 2, true}, {4, 1, true}, {4, 0, true}, {3, 3, true}, {3, 2, true}, {3, 1, true}, {3, 0, true}, {2, 1, false}};
+    }
+    else
+    {
+        versions = this->glVersions;
     }
 
-    for (std::tuple<int, int> ver : glVersions)
+    for (GLVersion ver : versions)
     {
         SDL_GL_ResetAttributes();
 
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, std::get<0>(ver));
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, std::get<1>(ver));
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, ver.isCore ? SDL_GL_CONTEXT_PROFILE_CORE : SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, ver.major);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, ver.minor);
 
         if (isOGLDebugMode)
         {
@@ -93,8 +78,6 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         glc = SDL_GL_CreateContext(window);
         assert(glc);
     }
-
-glcontext_created:
 
     SDL_ShowWindow(window);
     SDL_GL_MakeCurrent(window, glc);
@@ -189,12 +172,9 @@ void WindowOGL::setOglDebugMode(bool debug)
     isOGLDebugMode = debug;
 }
 
-void WindowOGL::forceGLVersion(int majorVersion, int minorVersion, bool core)
+void WindowOGL::setGLVersions(std::vector<GLVersion> versions)
 {
-    isForceGLVersion = true;
-    forceMajor = majorVersion;
-    forceMinor = minorVersion;
-    isForceCore = core;
+    glVersions = versions;
 }
 
 void WindowOGL::setWindowFlags(uint32_t flags)

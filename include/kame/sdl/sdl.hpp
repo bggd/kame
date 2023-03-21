@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 
+#include <vector>
 #include <cstdint>
 
 namespace kame::sdl {
@@ -20,14 +21,18 @@ struct State {
     int32_t drawableSizeY = 0;
 };
 
+struct GLVersion {
+    int major;
+    int minor;
+    bool isCore;
+};
+
 struct WindowOGL {
     SDL_Window* window = nullptr;
     SDL_GLContext glc = nullptr;
+    std::vector<GLVersion> glVersions;
     bool isOGLDebugMode = false;
-    bool isForceGLVersion = false;
-    bool isForceCore = false;
     bool isVsync = false;
-    int forceMajor = 0, forceMinor;
     uint32_t windowFlags = 0;
     State state;
     uint64_t elapsedTimeUInt64 = 0;
@@ -37,7 +42,7 @@ struct WindowOGL {
     void closeWindow();
     void swapWindow();
     void setOglDebugMode(bool debug);
-    void forceGLVersion(int majorVersion, int minorVersion, bool core);
+    void setGLVersions(std::vector<GLVersion> versions);
     void setWindowFlags(uint32_t flags);
     void setVsync(bool vsync);
     void updateInput();
