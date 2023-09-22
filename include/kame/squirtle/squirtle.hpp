@@ -104,7 +104,7 @@ struct Model {
 
 Model importModel(const kame::gltf::Gltf* gltf);
 void updateAnimation(Model& model, std::vector<Node>& nodes, AnimationClip& clip, float time);
-void updateGlobalXForm(Model& model, int id);
+void updateGlobalXForm(Model& model);
 void updateSkinMatrices(Model& model);
 void updateVBOMeshes(Model& model);
 

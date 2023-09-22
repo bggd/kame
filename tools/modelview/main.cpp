@@ -202,7 +202,7 @@ int main(int argc, char** argv)
         }
         updateAnimation(model, model.nodes, clipCurrent, playTime);
         model.setGlobalXForm(modelMtx);
-        updateGlobalXForm(model, model.nodes.size() - 1);
+        updateGlobalXForm(model);
         updateSkinMatrices(model);
         updateVBOMeshes(model);
 

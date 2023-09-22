@@ -488,6 +488,12 @@ void updateGlobalXForm(Model& model, int id)
     }
 }
 
+void updateGlobalXForm(Model& model)
+{
+    if (model.nodes.empty()) return;
+    updateGlobalXForm(model, model.nodes.size() - 1);
+}
+
 void updateSkinMatrices(Model& model)
 {
     for (auto& skin : model.skins)
