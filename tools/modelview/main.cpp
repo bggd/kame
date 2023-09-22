@@ -127,7 +127,7 @@ int main(int argc, char** argv)
     ImGui::StyleColorsLight();
     SDL_AddEventWatch([](void*, SDL_Event* e) -> int { ImGui_ImplSDL2_ProcessEvent(e); return 0; }, nullptr);
     ImGui_ImplSDL2_InitForOpenGL(win.window, win.glc);
-    ImGui_ImplOpenGL3_Init("#version 130");
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
     Model model = importModel(gltf);
