@@ -2,12 +2,12 @@ include(FetchContent)
 
 set(SDL_STATIC OFF CACHE INTERNAL "")
 FetchContent_Declare(SDL
-    URL https://github.com/libsdl-org/SDL/releases/download/release-2.26.4/SDL2-2.26.4.tar.gz
+    URL https://github.com/libsdl-org/SDL/releases/download/release-2.28.3/SDL2-2.28.3.tar.gz
 )
 FetchContent_MakeAvailable(SDL)
 
 FetchContent_Declare(spdlog
-    URL https://github.com/gabime/spdlog/archive/refs/tags/v1.11.0.tar.gz
+    URL https://github.com/gabime/spdlog/archive/refs/tags/v1.12.0.tar.gz
 )
 FetchContent_MakeAvailable(spdlog)
 
@@ -19,7 +19,7 @@ FetchContent_Declare(json
 FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(lua
-    URL https://github.com/lua/lua/archive/refs/tags/v5.4.4.tar.gz
+    URL https://github.com/lua/lua/archive/refs/tags/v5.4.6.tar.gz
 )
 FetchContent_MakeAvailable(lua)
 add_library(lua STATIC
@@ -65,7 +65,7 @@ add_library(pystring STATIC pystring/pystring.cpp)
 target_include_directories(pystring PUBLIC pystring)
 
 FetchContent_Declare(imgui
-    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.89.3.tar.gz
+    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.89.9.tar.gz
 )
 FetchContent_MakeAvailable(imgui)
 add_library(imgui STATIC
@@ -85,7 +85,7 @@ target_link_libraries(imgui PUBLIC SDL2::SDL2)
 
 if(KAME_BUILD_TESTS)
     FetchContent_Declare(googletest
-        URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz
     )
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
