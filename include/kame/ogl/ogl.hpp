@@ -5,6 +5,8 @@
 #include <kame/math/math.hpp>
 
 #include <vector>
+#include <unordered_map>
+#include <string>
 #include <cassert>
 
 namespace kame::ogl {
@@ -77,15 +79,15 @@ struct VertexArrayObjectBuilder {
 
 struct Shader {
     GLint id;
+    std::unordered_map<std::string, GLint> attributeMap;
+    std::unordered_map<std::string, GLint> uniformMap;
 
     GLint getAttribLocation(const char* name);
     GLint getUniformLocation(const char* name);
     void setMatrix(const char* name, const kame::math::Matrix& m, bool transpose = false);
-    void setMatrix(GLint location, const kame::math::Matrix& m, bool transpose = false);
     void setVector4(const char* name, kame::math::Vector4 v);
     void setVector3(const char* name, kame::math::Vector3 v);
     void setFloat(const char* name, float x);
-    void setFloat(GLint location, float x);
     void setInt(const char* name, int x);
 };
 

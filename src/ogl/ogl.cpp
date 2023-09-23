@@ -272,49 +272,47 @@ void deleteShader(Shader* shader)
 
 GLint Shader::getAttribLocation(const char* name)
 {
-    GLint loc = glGetAttribLocation(id, name);
-    return loc;
+    if (attributeMap.find(name) == attributeMap.end())
+    {
+        GLint loc = glGetAttribLocation(id, name);
+        attributeMap[name] = loc;
+    }
+    return attributeMap[name];
 }
 
 GLint Shader::getUniformLocation(const char* name)
 {
-    GLint loc = glGetUniformLocation(id, name);
-    return loc;
+    if (uniformMap.find(name) == uniformMap.end())
+    {
+        GLint loc = glGetUniformLocation(id, name);
+        uniformMap[name] = loc;
+    }
+    return uniformMap[name];
 }
 
 void Shader::setMatrix(const char* name, const kame::math::Matrix& m, bool transpose)
 {
-    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
-}
-
-void Shader::setMatrix(GLint location, const kame::math::Matrix& m, bool transpose)
-{
-    glUniformMatrix4fv(location, 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
+    glUniformMatrix4fv(getUniformLocation(name), 1, transpose ? GL_TRUE : GL_FALSE, (const GLfloat*)&m);
 }
 
 void Shader::setVector4(const char* name, kame::math::Vector4 v)
 {
-    glUniform4fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
+    glUniform4fv(getUniformLocation(name), 1, (const GLfloat*)&v);
 }
 
 void Shader::setVector3(const char* name, kame::math::Vector3 v)
 {
-    glUniform3fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&v);
+    glUniform3fv(getUniformLocation(name), 1, (const GLfloat*)&v);
 }
 
 void Shader::setFloat(const char* name, float x)
 {
-    glUniform1fv(glGetUniformLocation(id, name), 1, (const GLfloat*)&x);
-}
-
-void Shader::setFloat(GLint location, float x)
-{
-    glUniform1fv(location, 1, (const GLfloat*)&x);
+    glUniform1fv(getUniformLocation(name), 1, (const GLfloat*)&x);
 }
 
 void Shader::setInt(const char* name, int x)
 {
-    glUniform1iv(glGetUniformLocation(id, name), 1, (const GLint*)&x);
+    glUniform1iv(getUniformLocation(name), 1, (const GLint*)&x);
 }
 
 VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
