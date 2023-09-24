@@ -13,7 +13,7 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
 
-#include <spdlog/spdlog.h>>
+#include <spdlog/spdlog.h>
 
 #include "../common/common.hpp"
 using namespace kame::squirtle;
