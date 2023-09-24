@@ -93,7 +93,7 @@ void drawModel(kame::ogl::Shader* shader, Model& model, GLenum mode)
         auto& vbo = model.vboMeshes[n.meshID];
 
         auto vao = kame::ogl::VertexArrayObjectBuilder()
-                       .bindAttribute(loc, vbo.vboPositions, 3, 3 * sizeof(float), 0)
+                       .bindAttribute(loc, vbo.vboPositions.getCurrentVBO(), 3, 3 * sizeof(float), 0)
                        .bindIndexBuffer(vbo.iboIndices)
                        .build();
         vao.drawElements(mode, vbo.numIndex, GL_UNSIGNED_INT);

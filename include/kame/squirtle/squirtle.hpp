@@ -17,8 +17,21 @@ struct Mesh {
     std::vector<unsigned int> indices;
 };
 
+struct VBODoubleBuffer {
+    int numBuffer = 2;
+    int currentBuffer = 0;
+    std::vector<kame::ogl::VertexBuffer*> buffers;
+
+    VBODoubleBuffer(int num_buffer = 2);
+
+    void initVBODoubleBuffer(GLsizeiptr numBytes, GLenum usage);
+    void setBuffer(const float* vertices);
+    kame::ogl::VertexBuffer* getCurrentVBO();
+    void shutDownVBODoubleBuffer();
+};
+
 struct VBOMesh {
-    kame::ogl::VertexBuffer* vboPositions = nullptr;
+    VBODoubleBuffer vboPositions;
     std::vector<kame::ogl::VertexBuffer*> vboUVSets;
     kame::ogl::IndexBuffer* iboIndices = nullptr;
     size_t numIndex = 0;

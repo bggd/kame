@@ -2,10 +2,53 @@
 
 namespace kame::squirtle {
 
+VBODoubleBuffer::VBODoubleBuffer(int num_buffer)
+{
+    assert(num_buffer > 0);
+    numBuffer = num_buffer;
+}
+
+void VBODoubleBuffer::initVBODoubleBuffer(GLsizeiptr numBytes, GLenum usage)
+{
+    buffers.reserve(numBuffer);
+
+    for (int i = 0; i < numBuffer; ++i)
+    {
+        kame::ogl::VertexBuffer* vbo = kame::ogl::createVertexBuffer(numBytes, usage);
+        buffers.push_back(vbo);
+    }
+}
+
+void VBODoubleBuffer::setBuffer(const float* vertices)
+{
+    kame::ogl::VertexBuffer* vbo = buffers[currentBuffer];
+    vbo->setBuffer(vertices);
+    currentBuffer++;
+    if (currentBuffer >= numBuffer)
+    {
+        currentBuffer = 0;
+    }
+}
+
+kame::ogl::VertexBuffer* VBODoubleBuffer::getCurrentVBO()
+{
+    return buffers[currentBuffer];
+}
+
+void VBODoubleBuffer::shutDownVBODoubleBuffer()
+{
+    for (int i = 0; i < numBuffer; ++i)
+    {
+        kame::ogl::VertexBuffer* vbo = buffers[i];
+        kame::ogl::deleteVertexBuffer(vbo);
+    }
+    buffers.clear();
+}
+
 void VBOMesh::initVBOMesh(const Mesh& mesh)
 {
-    vboPositions = kame::ogl::createVertexBuffer(mesh.positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
-    vboPositions->setBuffer((const float*)&mesh.positions[0]);
+    vboPositions.initVBODoubleBuffer(mesh.positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
+    vboPositions.setBuffer((const float*)&mesh.positions[0]);
 
     vboUVSets.reserve(mesh.uvSets.size());
     for (const auto& uv : mesh.uvSets)
@@ -27,7 +70,7 @@ void VBOMesh::shutdownVBOMesh()
     {
         kame::ogl::deleteVertexBuffer(uv);
     }
-    kame::ogl::deleteVertexBuffer(vboPositions);
+    vboPositions.shutDownVBODoubleBuffer();
 }
 
 void cleanupVBOMeshes(std::vector<VBOMesh>& vboMeshes)
@@ -490,7 +533,8 @@ void updateGlobalXForm(Model& model, int id)
 
 void updateGlobalXForm(Model& model)
 {
-    if (model.nodes.empty()) return;
+    if (model.nodes.empty())
+        return;
     updateGlobalXForm(model, model.nodes.size() - 1);
 }
 
@@ -548,7 +592,7 @@ void updateVBOMeshes(Model& model)
 
                 dstMesh.positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
             }
-            vbo.vboPositions->setBuffer((const float*)&dstMesh.positions[0]);
+            vbo.vboPositions.setBuffer((const float*)&dstMesh.positions[0]);
         }
     }
 
