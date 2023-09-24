@@ -19,7 +19,7 @@ add_library(kame
     src/squirtle/squirtle.cpp
     src/lua/lua.cpp
 )
-set_target_properties(kame PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
+set_target_properties(kame PROPERTIES CXX_STANDARD 20 CXX_EXTENSIONS OFF)
 
 target_link_libraries(kame PUBLIC SDL2::SDL2main SDL2::SDL2 spdlog::spdlog nlohmann_json::nlohmann_json pystring lua)
 
@@ -45,7 +45,7 @@ if(KAME_BUILD_TESTS)
 
     add_executable(unit_test test/test.cpp)
     target_include_directories(unit_test PRIVATE $<BUILD_INTERFACE:${glm_SOURCE_DIR}>)
-    set_target_properties(unit_test PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
+    set_target_properties(unit_test PROPERTIES CXX_STANDARD 20 CXX_EXTENSIONS OFF)
     target_link_libraries(unit_test PRIVATE kame GTest::gtest_main)
     include(GoogleTest)
     gtest_discover_tests(unit_test)

@@ -272,7 +272,7 @@ void deleteShader(Shader* shader)
 
 GLint Shader::getAttribLocation(const char* name)
 {
-    if (attributeMap.find(name) == attributeMap.end())
+    if (attributeMap.contains(name) == false)
     {
         GLint loc = glGetAttribLocation(id, name);
         attributeMap[name] = loc;
@@ -282,7 +282,7 @@ GLint Shader::getAttribLocation(const char* name)
 
 GLint Shader::getUniformLocation(const char* name)
 {
-    if (uniformMap.find(name) == uniformMap.end())
+    if (uniformMap.contains(name) == false)
     {
         GLint loc = glGetUniformLocation(id, name);
         uniformMap[name] = loc;
