@@ -204,7 +204,10 @@ int main(int argc, char** argv)
         model.setGlobalXForm(modelMtx);
         updateGlobalXForm(model);
         updateSkinMatrices(model);
-        updateVBOMeshes(model);
+        if (model.animationUpdated)
+        {
+            updateVBOMeshes(model);
+        }
 
         kame::ogl::setViewport(0, 0, state.drawableSizeX, state.drawableSizeY);
         glDepthMask(GL_TRUE);
