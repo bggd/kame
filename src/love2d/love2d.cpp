@@ -100,21 +100,3 @@ void kame::love2d::Context::setTexture(kame::ogl::Texture2D* tex)
         kame::ogl::setTexture2D(0, currentTexture);
     }
 }
-
-double kame::love2d::timer::getTime()
-{
-    assert(kame::love2d::Context::getInstance().win);
-    return kame::love2d::Context::getInstance().win->getElapsedTime();
-}
-
-int kame::love2d::mouse::getX()
-{
-    assert(kame::love2d::Context::getInstance().win);
-    return kame::love2d::Context::getInstance().win->getState().mouseX;
-}
-
-int kame::love2d::mouse::getY()
-{
-    assert(kame::love2d::Context::getInstance().win);
-    return kame::love2d::Context::getInstance().win->getState().mouseY;
-}

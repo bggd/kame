@@ -20,6 +20,8 @@ add_library(kame
     src/lua/lua.cpp
     src/love2d/love2d.cpp
     src/love2d/graphics.cpp
+    src/love2d/timer.cpp
+    src/love2d/mouse.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 20 CXX_EXTENSIONS OFF)
 

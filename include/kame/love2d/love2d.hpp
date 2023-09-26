@@ -46,17 +46,8 @@ public:
 
 } // namespace kame::love2d
 
-namespace kame::love2d::timer {
 
-double getTime();
-
-}
-
-namespace kame::love2d::mouse {
-
-int getX();
-int getY();
-
-}
 
 #include "graphics.hpp"
+#include "timer.hpp"
+#include "mouse.hpp"
