@@ -31,6 +31,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
     win.openWindow(conf.window.title, conf.window.width, conf.window.height);
     win.setVsync(true);
 
+    SPDLOG_INFO("Love2D init");
     kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
     ctx.win = &win;
 
@@ -69,6 +70,8 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
 
         win.swapWindow();
     }
+
+    SPDLOG_INFO("Love2D shutdown");
 
     ctx.win = nullptr;
 
