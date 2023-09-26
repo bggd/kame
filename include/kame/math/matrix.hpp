@@ -173,6 +173,11 @@ struct Matrix {
         return createScale(Vector3(scales));
     }
 
+    static Matrix createScale(float x, float y, float z)
+    {
+        return createScale(Vector3(x, y, z));
+    }
+
     static Matrix CreateFromQuaternion(Quaternion q)
     {
         Vector3 r = Vector3::transform(Vector3(1.0f, 0.0f, 0.0f), q);

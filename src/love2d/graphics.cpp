@@ -16,6 +16,18 @@ bool kame::love2d::graphics::Image::release()
     }
 }
 
+int kame::love2d::graphics::Image::getWidth()
+{
+    assert(tex);
+    return tex->width;
+}
+
+int kame::love2d::graphics::Image::getHeight()
+{
+    assert(tex);
+    return tex->height;
+}
+
 kame::love2d::graphics::Image* kame::love2d::graphics::newImage(const char* filename)
 {
     kame::love2d::graphics::Image* img = new kame::love2d::graphics::Image();
@@ -48,12 +60,15 @@ kame::love2d::graphics::Image* kame::love2d::graphics::newImage(const char* file
     return img;
 }
 
-void kame::love2d::graphics::draw(kame::love2d::graphics::Image* drawable, float x, float y)
+void kame::love2d::graphics::draw(kame::love2d::graphics::Image* drawable, float x, float y, float r, float sx, float sy, float ox, float oy)
 {
     assert(drawable->tex && drawable->vbo);
 
     kame::math::Matrix T = kame::math::Matrix::createTranslation(x, y, 0.0f);
-    kame::math::Matrix ModelMatrix = T;
+    kame::math::Matrix R = kame::math::Matrix::createRotationZ(r);
+    kame::math::Matrix S = kame::math::Matrix::createScale(sx, sy, 1.0f);
+    kame::math::Matrix O = kame::math::Matrix::createTranslation(ox * -1.0f, oy * -1.0f, 0.0f);
+    kame::math::Matrix ModelMatrix = O * S * R * T;
 
     kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
     kame::math::Matrix MVP = ModelMatrix * ctx.projectionMatrix;

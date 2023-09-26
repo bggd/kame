@@ -32,6 +32,8 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
     win.setVsync(true);
 
     kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
+    ctx.win = &win;
+
     ctx.shaderImageDraw = kame::ogl::createShader(imageDrawVertex, imageDrawFragment);
 
     app.onLoad();
@@ -95,4 +97,9 @@ void kame::love2d::Context::setTexture(kame::ogl::Texture2D* tex)
         currentTexture = tex;
         kame::ogl::setTexture2D(0, currentTexture);
     }
+}
+
+double kame::love2d::timer::getTime()
+{
+    return kame::love2d::Context::getInstance().win->getElapsedTime();
 }

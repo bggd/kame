@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kame/ogl/ogl.hpp>
+#include <kame/sdl/sdl.hpp>
 
 namespace kame::love2d {
 
@@ -24,6 +25,8 @@ void run(App& app, Config& conf);
 
 struct Context {
 
+    kame::sdl::WindowOGL* win = nullptr;
+
     kame::math::Matrix projectionMatrix;
     kame::ogl::Shader* shaderImageDraw = nullptr;
     kame::ogl::Shader* currentShader = nullptr;
@@ -42,5 +45,11 @@ public:
 };
 
 } // namespace kame::love2d
+
+namespace kame::love2d::timer {
+
+double getTime();
+
+}
 
 #include "graphics.hpp"
