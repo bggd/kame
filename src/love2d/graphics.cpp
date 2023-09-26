@@ -2,14 +2,16 @@
 
 bool kame::love2d::graphics::Image::release()
 {
-    if (tex && vbo) {
+    if (tex && vbo)
+    {
         kame::ogl::deleteTexture2D(tex);
         tex = nullptr;
         kame::ogl::deleteVertexBuffer(vbo);
         vbo = nullptr;
         return true;
     }
-    else {
+    else
+    {
         return false;
     }
 }
