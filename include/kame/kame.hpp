@@ -13,3 +13,4 @@ void kameShutdown();
 #include "gltf/gltf.hpp"
 #include "squirtle/squirtle.hpp"
 #include "lua/lua.hpp"
+#include "love2d/love2d.hpp"

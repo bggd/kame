@@ -14,4 +14,9 @@ add_executable(exampleKameGltf
     04-gltf/gltf.cpp)
 target_link_libraries(exampleKameGltf kame)
 
-set_target_properties(exampleKameHelloWorld exampleKameTriangle exampleKameImage exampleKameGltf PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
+set_target_properties(
+    exampleKameHelloWorld
+    exampleKameTriangle
+    exampleKameImage exampleKameGltf
+    PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF
+)

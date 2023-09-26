@@ -18,6 +18,8 @@ add_library(kame
     src/gltf/gltf.cpp
     src/squirtle/squirtle.cpp
     src/lua/lua.cpp
+    src/love2d/love2d.cpp
+    src/love2d/graphics.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 20 CXX_EXTENSIONS OFF)
 
