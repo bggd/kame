@@ -2,17 +2,22 @@
 
 const char* imageDrawVertex = R"(#version 330
 in vec2 vPos;
+in vec2 vUV;
 uniform mat4 uMVP;
 uniform mat4 uProj;
+out vec2 pUV;
 void main() {
+    pUV = vUV;
     gl_Position = uMVP * vec4(vPos, 0.0, 1.0);
 }
 )";
 
 const char* imageDrawFragment = R"(#version 330
+in vec2 pUV;
+uniform sampler2D albedo;
 out vec4 fragColor;
 void main() {
-    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    fragColor = texture(albedo, pUV);
 }
 )";
 

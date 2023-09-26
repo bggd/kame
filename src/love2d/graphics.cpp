@@ -27,13 +27,14 @@ kame::love2d::graphics::Image* kame::love2d::graphics::newImage(const char* file
     float w = img->tex->width;
     float h = img->tex->height;
 
+    // flip uv.y
     float vtx[] = {
-        w, y, 1.0f, 1.0f,
-        x, y, 0.0f, 1.0f,
-        x, h, 0.0f, 0.0f,
-        x, h, 0.0f, 0.0f,
-        w, h, 1.0f, 0.0f,
-        w, y, 1.0f, 1.0f};
+        w, y, 1.0f, 0.0f,
+        x, y, 0.0f, 0.0f,
+        x, h, 0.0f, 1.0f,
+        x, h, 0.0f, 1.0f,
+        w, h, 1.0f, 1.0f,
+        w, y, 1.0f, 0.0f};
 
     img->vbo = kame::ogl::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
     img->vbo->setBuffer(vtx);
