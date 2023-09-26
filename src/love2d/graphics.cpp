@@ -49,6 +49,8 @@ kame::love2d::graphics::Image* kame::love2d::graphics::newImage(const char* file
 
 void kame::love2d::graphics::draw(kame::love2d::graphics::Image* drawable, float x, float y)
 {
+    assert(drawable->tex && drawable->vbo);
+
     kame::math::Matrix T = kame::math::Matrix::createTranslation(x, y, 0.0f);
     kame::math::Matrix ModelMatrix = T;
 
