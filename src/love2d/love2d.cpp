@@ -37,7 +37,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
 
     ctx.shaderImageDraw = kame::ogl::createShader(imageDrawVertex, imageDrawFragment);
 
-    app.onLoad();
+    app.load();
 
     double prevTime = win.getElapsedTime();
 
@@ -49,7 +49,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
             break;
 
         double nowTime = win.getElapsedTime();
-        app.onUpdate(prevTime - nowTime);
+        app.update(prevTime - nowTime);
         prevTime = nowTime;
 
         kame::ogl::setViewport(0, 0, state.drawableSizeX, state.drawableSizeY);
@@ -66,7 +66,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
 
         ctx.projectionMatrix = kame::math::Matrix::createOrthographic_NO(0.0f, state.drawableSizeX, state.drawableSizeY, 0.0f, -1.0f, 1.0f);
 
-        app.onDraw();
+        app.draw();
 
         win.swapWindow();
     }

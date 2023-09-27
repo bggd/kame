@@ -6,9 +6,9 @@
 namespace kame::love2d {
 
 struct App {
-    virtual void onLoad() = 0;
-    virtual void onUpdate(float dt) = 0;
-    virtual void onDraw() = 0;
+    virtual void load() {}
+    virtual void update(float dt) {}
+    virtual void draw() {}
 };
 
 struct Config {
@@ -45,7 +45,6 @@ public:
 };
 
 } // namespace kame::love2d
-
 
 #include "detail/graphics.hpp"
 #include "graphics.hpp"
