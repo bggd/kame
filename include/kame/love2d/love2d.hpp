@@ -47,7 +47,7 @@ public:
 } // namespace kame::love2d
 
 
-
+#include "detail/graphics.hpp"
 #include "graphics.hpp"
 #include "timer.hpp"
 #include "mouse.hpp"
