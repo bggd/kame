@@ -27,6 +27,10 @@ struct Quad {
     int height = 0;
     int sw = 0;
     int sh = 0;
+
+    virtual ~Quad();
+
+    bool release();
 };
 
 Image* newImage(const char* filename);

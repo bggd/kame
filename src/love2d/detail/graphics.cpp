@@ -39,6 +39,31 @@ int kame::love2d::detail::graphics::Image::getHeight()
     return tex->height;
 }
 
+kame::love2d::detail::graphics::Quad::~Quad()
+{
+    release();
+}
+
+bool kame::love2d::detail::graphics::Quad::release()
+{
+    kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
+    if (!ctx.win)
+    {
+        return false;
+    }
+
+    if (vbo)
+    {
+        kame::ogl::deleteVertexBuffer(vbo);
+        vbo = nullptr;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 kame::love2d::detail::graphics::Image* kame::love2d::detail::graphics::newImage(const char* filename)
 {
     kame::love2d::detail::graphics::Image* img = new kame::love2d::detail::graphics::Image();
