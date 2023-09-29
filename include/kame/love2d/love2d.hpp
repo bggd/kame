@@ -3,6 +3,8 @@
 #include <kame/ogl/ogl.hpp>
 #include <kame/sdl/sdl.hpp>
 
+#include "detail/renderer.hpp"
+
 namespace kame::love2d {
 
 struct App {
@@ -27,13 +29,9 @@ struct Context {
 
     kame::sdl::WindowOGL* win = nullptr;
 
-    kame::math::Matrix projectionMatrix;
-    kame::ogl::Shader* shaderImageDraw = nullptr;
-    kame::ogl::Shader* currentShader = nullptr;
-    kame::ogl::Texture2D* currentTexture = nullptr;
+    kame::love2d::detail::Renderer* renderer = nullptr;
 
-    void setShaderImageDraw();
-    void setTexture(kame::ogl::Texture2D* tex);
+    bool isValid() { return win && renderer; }
 
 private:
     Context() {}
