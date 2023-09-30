@@ -326,7 +326,7 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::initializer_
         PolygonVertex v;
         v.x = *(vertices.begin() + i);
         v.y = *(vertices.begin() + i + 1);
-        polygons.push_back(v);
+        polygons.emplace_back(v);
     }
 
     size_t sendCount = 0;
@@ -386,7 +386,7 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float
         PolygonVertex v;
         v.x = *(vertices.begin() + i);
         v.y = *(vertices.begin() + i + 1);
-        polygons.push_back(v);
+        polygons.emplace_back(v);
     }
 
     size_t sendCount = 0;
