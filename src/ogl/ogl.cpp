@@ -365,14 +365,14 @@ void deleteVertexBuffer(VertexBuffer* vbo)
 void VertexBuffer::setBuffer(const unsigned char* vertices)
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, numBytes, vertices);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void VertexBuffer::setBuffer(const float* vertices)
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, numBytes, vertices);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -401,21 +401,21 @@ void deleteIndexBuffer(IndexBuffer* ibo)
 void IndexBuffer::setBuffer(const unsigned char* vertices)
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, numBytes, vertices);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void IndexBuffer::setBuffer(const unsigned short* vertices)
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, numBytes, vertices);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void IndexBuffer::setBuffer(const unsigned int* vertices)
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, vertices, usage);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, numBytes, vertices);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
