@@ -4,7 +4,6 @@ const char* imageDrawVertex = R"(#version 330
 in vec2 vPos;
 in vec2 vUV;
 uniform mat4 uMVP;
-uniform mat4 uProj;
 out vec2 pUV;
 void main() {
     pUV = vUV;
@@ -30,11 +29,10 @@ void kame::love2d::detail::Renderer::init()
 
 void kame::love2d::detail::Renderer::shutdown()
 {
-    if (shaderImageDraw)
-    {
-        kame::ogl::deleteShader(shaderImageDraw);
-        shaderImageDraw = nullptr;
-    }
+    assert(shaderImageDraw);
+
+    kame::ogl::deleteShader(shaderImageDraw);
+    shaderImageDraw = nullptr;
 }
 
 void kame::love2d::detail::Renderer::preDraw(int32_t drawableSizeX,
