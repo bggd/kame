@@ -73,7 +73,7 @@ struct Renderer {
 
     void draw(kame::love2d::detail::graphics::Image* drawable, float x, float y, float r, float sx, float sy, float ox = 0.0f, float oy = 0.0f);
     void draw(kame::love2d::detail::graphics::Image* drawable, kame::love2d::detail::graphics::Quad* quad, float x, float y, float r, float sx, float sy, float ox = 0.0f, float oy = 0.0f);
-    void polygon(const char* mode, std::initializer_list<float> vertices);
+    void polygon(const char* mode, std::initializer_list<float>& vertices);
     void polygon(const char* mode, std::vector<float>& vertices);
 };
 

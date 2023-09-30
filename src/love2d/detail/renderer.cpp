@@ -303,7 +303,7 @@ void kame::love2d::detail::Renderer::draw(kame::love2d::detail::graphics::Image*
     quad->vao.drawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void kame::love2d::detail::Renderer::polygon(const char* mode, std::initializer_list<float> vertices)
+void kame::love2d::detail::Renderer::polygon(const char* mode, std::initializer_list<float>& vertices)
 {
     assert(mode);
     assert(std::string(mode) == "fill" || std::string(mode) == "line");
