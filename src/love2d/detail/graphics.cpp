@@ -7,7 +7,7 @@ kame::love2d::detail::graphics::Image::~Image()
 
 bool kame::love2d::detail::graphics::Image::release()
 {
-    kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     if (!ctx.isValid())
     {
         return false;
@@ -52,7 +52,7 @@ kame::love2d::detail::graphics::Quad::~Quad()
 
 bool kame::love2d::detail::graphics::Quad::release()
 {
-    kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     if (!ctx.isValid())
     {
         return false;

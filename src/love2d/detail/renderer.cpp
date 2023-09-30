@@ -168,7 +168,7 @@ void kame::love2d::detail::Renderer::draw(kame::love2d::detail::graphics::Image*
     kame::math::Matrix O = kame::math::Matrix::createTranslation(ox * -1.0f, oy * -1.0f, 0.0f);
     kame::math::Matrix ModelMatrix = O * S * R * T;
 
-    kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     kame::math::Matrix MVP = ModelMatrix * projectionMatrix;
     setShaderImageDraw();
     shaderImageDraw->setMatrix("uMVP", MVP);

@@ -11,7 +11,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
     win.setVsync(true);
 
     SPDLOG_INFO("Love2D init");
-    kame::love2d::Context& ctx = kame::love2d::Context::getInstance();
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     ctx.win = &win;
 
     ctx.renderer = new kame::love2d::detail::Renderer();
@@ -50,10 +50,4 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
     win.closeWindow();
 
     kame::kameShutdown();
-}
-
-kame::love2d::Context& kame::love2d::Context::getInstance()
-{
-    static kame::love2d::Context ctx;
-    return ctx;
 }

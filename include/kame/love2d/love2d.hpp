@@ -25,29 +25,11 @@ struct Config {
 
 void run(App& app, Config& conf);
 
-struct Context {
-
-    kame::sdl::WindowOGL* win = nullptr;
-
-    kame::love2d::detail::Renderer* renderer = nullptr;
-
-    bool isValid() { return win && renderer; }
-
-private:
-    Context() {}
-
-public:
-    static Context& getInstance();
-    Context(const Context&) = delete;
-    void operator=(const Context&) = delete;
-};
-
 } // namespace kame::love2d
 
 #include "types.hpp"
 #include "detail/graphics.hpp"
+#include "detail/context.hpp"
 #include "graphics.hpp"
 #include "timer.hpp"
 #include "mouse.hpp"
-
-

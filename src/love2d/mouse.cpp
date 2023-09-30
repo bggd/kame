@@ -2,12 +2,12 @@
 
 int kame::love2d::mouse::getX()
 {
-    assert(kame::love2d::Context::getInstance().win);
-    return kame::love2d::Context::getInstance().win->getState().mouseX;
+    assert(kame::love2d::detail::Context::getInstance().isValid());
+    return kame::love2d::detail::Context::getInstance().win->getState().mouseX;
 }
 
 int kame::love2d::mouse::getY()
 {
-    assert(kame::love2d::Context::getInstance().win);
-    return kame::love2d::Context::getInstance().win->getState().mouseY;
+    assert(kame::love2d::detail::Context::getInstance().isValid());
+    return kame::love2d::detail::Context::getInstance().win->getState().mouseY;
 }
