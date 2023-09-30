@@ -1,5 +1,90 @@
 #include <all.hpp>
 
+void kame::love2d::detail::PolygonVBO::init()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    ctx.renderer->setShaderPolygonDraw();
+
+    vbo = kame::ogl::createVertexBuffer(sizeof(PolygonVertex) * numVertex, GL_DYNAMIC_DRAW);
+    vao = kame::ogl::VertexArrayObjectBuilder()
+              .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
+              .build();
+}
+
+void kame::love2d::detail::PolygonVBO::shutdown()
+{
+    kame::ogl::deleteVertexBuffer(vbo);
+}
+
+void kame::love2d::detail::PolygonVBO::sendBufferAndDraw(GLenum mode, std::span<PolygonVertex> vertices)
+{
+    vbo->setBuffer(this->size(), vertices.size() * 2 * sizeof(float), (const float*)vertices.data());
+    vao.drawArrays(mode, this->size(), vertices.size());
+    this->n += vertices.size();
+}
+
+void kame::love2d::detail::PolygonVBOPool::shutdown()
+{
+    for (auto& vbo : pool)
+    {
+        vbo.shutdown();
+    }
+}
+
+kame::love2d::detail::PolygonVBO& kame::love2d::detail::PolygonVBOPool::get()
+{
+    for (auto& vbo : pool)
+    {
+        if (vbo.size() <= vbo.capacity() - 1)
+        {
+            return vbo;
+        }
+    }
+    pool.emplace_back();
+    auto& vbo = pool.back();
+    vbo.init();
+    return vbo;
+}
+
+void kame::love2d::detail::DoubleBufferPolygonVBOPool::initDoubleBufferPolygonVBOPool(int n)
+{
+    numBuffer = n;
+    for (int i = 0; i < n; ++i)
+    {
+        buffers.emplace_back();
+    }
+}
+
+void kame::love2d::detail::DoubleBufferPolygonVBOPool::shutdownDoubleBufferPolygonVBOPool()
+{
+    for (auto& pool : buffers)
+    {
+        pool.shutdown();
+    }
+    buffers.clear();
+}
+
+kame::love2d::detail::PolygonVBOPool& kame::love2d::detail::DoubleBufferPolygonVBOPool::getCurrentPool()
+{
+    return buffers[currentBuffer];
+}
+
+void kame::love2d::detail::DoubleBufferPolygonVBOPool::flip()
+{
+    currentBuffer++;
+    if (currentBuffer >= numBuffer)
+    {
+        currentBuffer = 0;
+    }
+
+    for (auto& vbo : getCurrentPool().pool)
+    {
+        vbo.n = 0;
+    }
+}
+
 const char* imageDrawVertex = R"(#version 330
 in vec2 vPos;
 in vec2 vUV;
@@ -20,19 +105,48 @@ void main() {
 }
 )";
 
+const char* polygonDrawVertex = R"(#version 330
+in vec2 vPos;
+uniform mat4 uMVP;
+void main() {
+    gl_Position = uMVP * vec4(vPos, 0.0, 1.0);
+}
+)";
+
+const char* polygonDrawFragment = R"(#version 330
+uniform vec4 uColor;
+out vec4 fragColor;
+void main() {
+    fragColor = uColor;
+}
+)";
+
 void kame::love2d::detail::Renderer::init()
 {
     assert(!shaderImageDraw);
+    assert(!shaderPolygonDraw);
 
     shaderImageDraw = kame::ogl::createShader(imageDrawVertex, imageDrawFragment);
+
+    shaderPolygonDraw = kame::ogl::createShader(polygonDrawVertex, polygonDrawFragment);
+
+    poolBuffer.initDoubleBufferPolygonVBOPool();
 }
 
 void kame::love2d::detail::Renderer::shutdown()
 {
     assert(shaderImageDraw);
+    assert(shaderPolygonDraw);
 
     kame::ogl::deleteShader(shaderImageDraw);
     shaderImageDraw = nullptr;
+
+    kame::ogl::deleteShader(shaderPolygonDraw);
+    shaderPolygonDraw = nullptr;
+
+    currentShader = nullptr;
+
+    poolBuffer.shutdownDoubleBufferPolygonVBOPool();
 }
 
 void kame::love2d::detail::Renderer::preDraw(int32_t drawableSizeX,
@@ -51,6 +165,8 @@ void kame::love2d::detail::Renderer::preDraw(int32_t drawableSizeX,
     kame::ogl::setDepthStencilState(depthState);
 
     projectionMatrix = kame::math::Matrix::createOrthographic_NO(0.0f, drawableSizeX, drawableSizeY, 0.0f, -1.0f, 1.0f);
+
+    poolBuffer.flip();
 }
 
 void kame::love2d::detail::Renderer::setShaderImageDraw()
@@ -58,6 +174,15 @@ void kame::love2d::detail::Renderer::setShaderImageDraw()
     if (currentShader != shaderImageDraw)
     {
         currentShader = shaderImageDraw;
+        kame::ogl::setShader(currentShader);
+    }
+}
+
+void kame::love2d::detail::Renderer::setShaderPolygonDraw()
+{
+    if (currentShader != shaderPolygonDraw)
+    {
+        currentShader = shaderPolygonDraw;
         kame::ogl::setShader(currentShader);
     }
 }
@@ -176,4 +301,124 @@ void kame::love2d::detail::Renderer::draw(kame::love2d::detail::graphics::Image*
     setTexture(drawable->tex);
 
     quad->vao.drawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void kame::love2d::detail::Renderer::polygon(const char* mode, std::initializer_list<float> vertices)
+{
+    assert(mode);
+    assert(std::string(mode) == "fill" || std::string(mode) == "line");
+    GLenum drawMode;
+    if (std::string(mode) == "fill")
+    {
+        drawMode = GL_TRIANGLES;
+    }
+    else
+    {
+        drawMode = GL_LINES;
+    }
+
+    static std::vector<PolygonVertex> polygons;
+    polygons.reserve(vertices.size());
+    polygons.clear();
+
+    for (size_t i = 0; i < vertices.size(); i += 2)
+    {
+        PolygonVertex v;
+        v.x = *(vertices.begin() + i);
+        v.y = *(vertices.begin() + i + 1);
+        polygons.push_back(v);
+    }
+
+    size_t sendCount = 0;
+
+    setShaderPolygonDraw();
+    shaderPolygonDraw->setMatrix("uMVP", projectionMatrix);
+    shaderPolygonDraw->setVector4("uColor", kame::math::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    for (;;)
+    {
+        size_t restPolygon = polygons.size() - sendCount;
+        if (restPolygon <= 0)
+        {
+            break;
+        }
+
+        auto& vbo = poolBuffer.getCurrentPool().get();
+        size_t rest = vbo.capacity() - vbo.size();
+
+        if (rest >= restPolygon)
+        {
+            std::span<PolygonVertex> ary{
+                polygons.begin() + sendCount, restPolygon};
+            vbo.sendBufferAndDraw(drawMode, ary);
+            break;
+        }
+        else
+        {
+            std::span<PolygonVertex> ary{
+                polygons.begin() + sendCount, rest};
+            vbo.sendBufferAndDraw(drawMode, ary);
+            sendCount += rest;
+        }
+    }
+}
+
+void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float>& vertices)
+{
+    assert(mode);
+    assert(std::string(mode) == "fill" || std::string(mode) == "line");
+    GLenum drawMode;
+    if (std::string(mode) == "fill")
+    {
+        drawMode = GL_TRIANGLES;
+    }
+    else
+    {
+        drawMode = GL_LINES;
+    }
+
+    static std::vector<PolygonVertex> polygons;
+    polygons.reserve(vertices.size());
+    polygons.clear();
+
+    for (size_t i = 0; i < vertices.size(); i += 2)
+    {
+        PolygonVertex v;
+        v.x = *(vertices.begin() + i);
+        v.y = *(vertices.begin() + i + 1);
+        polygons.push_back(v);
+    }
+
+    size_t sendCount = 0;
+
+    setShaderPolygonDraw();
+    shaderPolygonDraw->setMatrix("uMVP", projectionMatrix);
+    shaderPolygonDraw->setVector4("uColor", kame::math::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    for (;;)
+    {
+        size_t restPolygon = polygons.size() - sendCount;
+        if (restPolygon <= 0)
+        {
+            break;
+        }
+
+        auto& vbo = poolBuffer.getCurrentPool().get();
+        size_t rest = vbo.capacity() - vbo.size();
+
+        if (rest >= restPolygon)
+        {
+            std::span<PolygonVertex> ary{
+                polygons.begin() + sendCount, restPolygon};
+            vbo.sendBufferAndDraw(drawMode, ary);
+            break;
+        }
+        else
+        {
+            std::span<PolygonVertex> ary{
+                polygons.begin() + sendCount, rest};
+            vbo.sendBufferAndDraw(drawMode, ary);
+            sendCount += rest;
+        }
+    }
 }

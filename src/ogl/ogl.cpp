@@ -376,6 +376,13 @@ void VertexBuffer::setBuffer(const float* vertices)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void VertexBuffer::setBuffer(GLintptr offset, GLsizeiptr size, const float* vertices)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, id);
+    glBufferSubData(GL_ARRAY_BUFFER, offset, size, vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 IndexBuffer* createIndexBuffer(GLsizeiptr numBytes, GLenum usage)
 {
     IndexBuffer* ibo = new IndexBuffer();

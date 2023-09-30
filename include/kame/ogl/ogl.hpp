@@ -39,6 +39,7 @@ struct VertexBuffer {
 
     void setBuffer(const unsigned char* vertices);
     void setBuffer(const float* vertices);
+    void setBuffer(GLintptr offset, GLsizeiptr size, const float* vertices); // glBufferSubData
 };
 
 struct IndexBuffer {
