@@ -201,12 +201,16 @@ kame::love2d::detail::physics::World* kame::love2d::detail::physics::Physics::ne
 kame::love2d::detail::physics::Body* kame::love2d::detail::physics::Physics::newBody(kame::love2d::detail::physics::World* world, float x, float y, const char* type)
 {
     assert(type);
-    assert(std::string(type) == "dynamic" || std::string(type) == "static");
+    assert(std::string(type) == "kinematic" || std::string(type) == "dynamic" || std::string(type) == "static");
 
     b2BodyDef defBody = b2BodyDef();
     if (std::string(type) == "dynamic")
     {
         defBody.type = b2_dynamicBody;
+    }
+    else if (std::string(type) == "kinematic")
+    {
+        defBody.type = b2_kinematicBody;
     }
     defBody.position = scaleDown(b2Vec2(x, y));
 
