@@ -83,6 +83,13 @@ target_include_directories(imgui PUBLIC
 )
 target_link_libraries(imgui PUBLIC SDL2::SDL2)
 
+FetchContent_Declare(box2d
+    URL https://github.com/erincatto/box2d/archive/refs/tags/v2.4.1.tar.gz
+)
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(box2d)
+
 if(KAME_BUILD_TESTS)
     FetchContent_Declare(googletest
         URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz

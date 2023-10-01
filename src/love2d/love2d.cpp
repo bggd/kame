@@ -18,6 +18,9 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
     assert(ctx.renderer);
     ctx.renderer->init();
 
+    ctx.physics = new kame::love2d::detail::physics::Physics();
+    assert(ctx.physics);
+
     app.load();
 
     double prevTime = win.getElapsedTime();
@@ -30,7 +33,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
             break;
 
         double nowTime = win.getElapsedTime();
-        app.update(prevTime - nowTime);
+        app.update(nowTime - prevTime);
         prevTime = nowTime;
 
         ctx.renderer->preDraw(state.drawableSizeX, state.drawableSizeY);
@@ -42,8 +45,13 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
 
     SPDLOG_INFO("Love2D shutdown");
 
+    ctx.physics->destroyQueues();
+    delete ctx.physics;
+    ctx.physics = nullptr;
+
     ctx.renderer->shutdown();
 
+    delete ctx.renderer;
     ctx.renderer = nullptr;
     ctx.win = nullptr;
 

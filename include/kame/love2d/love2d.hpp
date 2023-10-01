@@ -30,6 +30,8 @@ void run(App& app, Config& conf);
 #include "types.hpp"
 #include "detail/graphics.hpp"
 #include "detail/context.hpp"
+#include "detail/physics.hpp"
 #include "graphics.hpp"
+#include "physics.hpp"
 #include "timer.hpp"
 #include "mouse.hpp"

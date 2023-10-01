@@ -22,13 +22,15 @@ add_library(kame
     src/love2d/detail/context.cpp
     src/love2d/detail/graphics.cpp
     src/love2d/detail/renderer.cpp
+    src/love2d/detail/physics.cpp
     src/love2d/graphics.cpp
+    src/love2d/physics.cpp
     src/love2d/timer.cpp
     src/love2d/mouse.cpp
 )
 set_target_properties(kame PROPERTIES CXX_STANDARD 20 CXX_EXTENSIONS OFF)
 
-target_link_libraries(kame PUBLIC SDL2::SDL2main SDL2::SDL2 spdlog::spdlog nlohmann_json::nlohmann_json pystring lua)
+target_link_libraries(kame PUBLIC SDL2::SDL2main SDL2::SDL2 spdlog::spdlog nlohmann_json::nlohmann_json pystring lua box2d)
 
 target_include_directories(kame
     PUBLIC

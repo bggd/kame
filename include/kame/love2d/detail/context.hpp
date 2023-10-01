@@ -3,6 +3,7 @@
 #include <kame/sdl/sdl.hpp>
 
 #include "renderer.hpp"
+#include "physics.hpp"
 
 namespace kame::love2d::detail {
 
@@ -11,8 +12,9 @@ struct Context {
     kame::sdl::WindowOGL* win = nullptr;
 
     kame::love2d::detail::Renderer* renderer = nullptr;
+    kame::love2d::detail::physics::Physics* physics = nullptr;
 
-    bool isValid() { return win && renderer; }
+    bool isValid() { return win && renderer && physics; }
 
 private:
     Context() {}
