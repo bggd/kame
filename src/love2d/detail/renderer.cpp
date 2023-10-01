@@ -20,7 +20,7 @@ void kame::love2d::detail::PolygonVBO::shutdown()
 
 void kame::love2d::detail::PolygonVBO::sendBufferAndDraw(GLenum mode, std::span<PolygonVertex> vertices)
 {
-    vbo->setBuffer(this->size(), vertices.size() * 2 * sizeof(float), (const float*)vertices.data());
+    vbo->setBuffer(this->size() * 2 * sizeof(float), vertices.size() * 2 * sizeof(float), (const float*)vertices.data());
     vao.drawArrays(mode, this->size(), vertices.size());
     this->n += vertices.size();
 }
