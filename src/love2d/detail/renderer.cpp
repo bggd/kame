@@ -359,6 +359,15 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float
         }
         else
         {
+            if (restPolygon - rest < 4)
+            {
+                rest -= 4;
+                if (rest <= 0)
+                {
+                    vbo.n = vbo.capacity();
+                    break;
+                }
+            }
             std::span<PolygonVertex> ary{
                 polygons.begin() + sendCount, rest};
             vbo.sendBufferAndDraw(drawMode, ary);
