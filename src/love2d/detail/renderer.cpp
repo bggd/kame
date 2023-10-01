@@ -303,66 +303,6 @@ void kame::love2d::detail::Renderer::draw(kame::love2d::detail::graphics::Image*
     quad->vao.drawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void kame::love2d::detail::Renderer::polygon(const char* mode, std::initializer_list<float>& vertices)
-{
-    assert(mode);
-    assert(std::string(mode) == "fill" || std::string(mode) == "line");
-    GLenum drawMode;
-    if (std::string(mode) == "fill")
-    {
-        drawMode = GL_TRIANGLES;
-    }
-    else
-    {
-        drawMode = GL_LINES;
-    }
-
-    static std::vector<PolygonVertex> polygons;
-    polygons.reserve(vertices.size());
-    polygons.clear();
-
-    for (size_t i = 0; i < vertices.size(); i += 2)
-    {
-        PolygonVertex v;
-        v.x = *(vertices.begin() + i);
-        v.y = *(vertices.begin() + i + 1);
-        polygons.emplace_back(v);
-    }
-
-    size_t sendCount = 0;
-
-    setShaderPolygonDraw();
-    shaderPolygonDraw->setMatrix("uMVP", projectionMatrix);
-    shaderPolygonDraw->setVector4("uColor", kame::math::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-
-    for (;;)
-    {
-        size_t restPolygon = polygons.size() - sendCount;
-        if (restPolygon <= 0)
-        {
-            break;
-        }
-
-        auto& vbo = poolBuffer.getCurrentPool().get();
-        size_t rest = vbo.capacity() - vbo.size();
-
-        if (rest >= restPolygon)
-        {
-            std::span<PolygonVertex> ary{
-                polygons.begin() + sendCount, restPolygon};
-            vbo.sendBufferAndDraw(drawMode, ary);
-            break;
-        }
-        else
-        {
-            std::span<PolygonVertex> ary{
-                polygons.begin() + sendCount, rest};
-            vbo.sendBufferAndDraw(drawMode, ary);
-            sendCount += rest;
-        }
-    }
-}
-
 void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float>& vertices)
 {
     assert(mode);

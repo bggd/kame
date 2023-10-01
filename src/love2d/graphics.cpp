@@ -42,14 +42,14 @@ void kame::love2d::graphics::draw(kame::love2d::Image drawable, kame::love2d::Qu
     ctx.renderer->draw(drawable.get(), quad.get(), x, y, r, sx, sx);
 }
 
-void kame::love2d::graphics::polygon(const char* mode, std::initializer_list<float> vertices)
+void kame::love2d::graphics::polygon(const char* mode, std::vector<float>& vertices)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
     ctx.renderer->polygon(mode, vertices);
 }
 
-void kame::love2d::graphics::polygon(const char* mode, std::vector<float>& vertices)
+void kame::love2d::graphics::polygon(const char* mode, std::vector<float> vertices)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());

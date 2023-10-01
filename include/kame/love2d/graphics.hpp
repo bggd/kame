@@ -18,8 +18,8 @@ void draw(Image drawable, Quad quad, float x, float y, float r, float sx, float 
 
 void draw(Image drawable, Quad quad, float x = 0.0f, float y = 0.0f, float r = 0.0f, float sx = 1.0f);
 
-void polygon(const char* mode, std::initializer_list<float> vertices);
 void polygon(const char* mode, std::vector<float>& vertices);
+void polygon(const char* mode, std::vector<float> vertices);
 
 template <typename... Args>
 void polygon(const char* mode, Args... args)
