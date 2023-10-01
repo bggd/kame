@@ -23,6 +23,10 @@ void kame::love2d::detail::PolygonVBO::sendBufferAndDraw(GLenum mode, std::span<
     vbo->setBuffer(this->size() * 2 * sizeof(float), vertices.size() * 2 * sizeof(float), (const float*)vertices.data());
     vao.drawArrays(mode, this->size(), vertices.size());
     this->n += vertices.size();
+    if (this->capacity() - this->size() < 4)
+    {
+        this->n = this->capacity();
+    }
 }
 
 void kame::love2d::detail::PolygonVBOPool::shutdown()
@@ -310,11 +314,11 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float
     GLenum drawMode;
     if (std::string(mode) == "fill")
     {
-        drawMode = GL_TRIANGLES;
+        drawMode = GL_TRIANGLE_FAN;
     }
     else
     {
-        drawMode = GL_LINES;
+        drawMode = GL_LINE_LOOP;
     }
 
     static std::vector<PolygonVertex> polygons;
