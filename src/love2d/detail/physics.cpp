@@ -242,6 +242,30 @@ kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Phys
     return shape;
 }
 
+kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Physics::newRectangleShape(float width, float height)
+{
+    kame::love2d::detail::physics::PolygonShape* shape = new kame::love2d::detail::physics::PolygonShape();
+    assert(shape);
+
+    shape->polygonShape = b2PolygonShape();
+
+    shape->polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f));
+
+    return shape;
+}
+
+kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Physics::newRectangleShape(float x, float y, float width, float height, float angle)
+{
+    kame::love2d::detail::physics::PolygonShape* shape = new kame::love2d::detail::physics::PolygonShape();
+    assert(shape);
+
+    shape->polygonShape = b2PolygonShape();
+
+    shape->polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f), scaleDown(b2Vec2(x, y)), angle);
+
+    return shape;
+}
+
 kame::love2d::detail::physics::Fixture* kame::love2d::detail::physics::Physics::newFixture(Body* body, PolygonShape* shape, float density)
 {
     kame::love2d::detail::physics::Fixture* fixture = new kame::love2d::detail::physics::Fixture();

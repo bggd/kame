@@ -59,6 +59,8 @@ struct Physics {
     World* newWorld(float xg = 0.0f, float yg = 0.0f, bool sleep = true);
     Body* newBody(World* world, float x = 0.0f, float y = 0.0f, const char* type = "static");
     PolygonShape* newPolygonShape(std::vector<float>& vertices);
+    PolygonShape* newRectangleShape(float width, float height);
+    PolygonShape* newRectangleShape(float x, float y, float width, float height, float angle = 0.0f);
     Fixture* newFixture(Body* body, PolygonShape* shape, float density = 1.0f);
 };
 
