@@ -184,6 +184,7 @@ void kame::love2d::detail::physics::Physics::destroyQueues()
     {
         delete world;
     }
+    destroyQueueWorld.clear();
 }
 
 kame::love2d::detail::physics::World* kame::love2d::detail::physics::Physics::newWorld(float xg, float yg, bool sleep)
