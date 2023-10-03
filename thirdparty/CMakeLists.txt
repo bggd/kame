@@ -1,9 +1,10 @@
 include(FetchContent)
 
-set(SDL_STATIC OFF CACHE INTERNAL "")
+
 FetchContent_Declare(SDL
-    URL https://github.com/libsdl-org/SDL/releases/download/release-2.28.3/SDL2-2.28.3.tar.gz
+    URL https://github.com/libsdl-org/SDL/releases/download/release-2.28.4/SDL2-2.28.4.tar.gz
 )
+set(SDL_STATIC OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(SDL)
 
 FetchContent_Declare(spdlog
@@ -11,11 +12,12 @@ FetchContent_Declare(spdlog
 )
 FetchContent_MakeAvailable(spdlog)
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-set(JSON_Install OFF CACHE INTERNAL "")
+
 FetchContent_Declare(json
     URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
 )
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+set(JSON_Install OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(lua
