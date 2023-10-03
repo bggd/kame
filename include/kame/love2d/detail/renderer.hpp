@@ -4,7 +4,6 @@
 #include <kame/ogl/ogl.hpp>
 
 #include <span>
-#include <initializer_list>
 
 namespace kame::love2d::detail::graphics {
 struct Image;
