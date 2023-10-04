@@ -116,7 +116,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         }
         else
         {
-            SPDLOG_INFO("GL_KHR_debug is unavaliable");
+            SPDLOG_WARN("GL_KHR_debug is unavaliable");
         }
     }
 
