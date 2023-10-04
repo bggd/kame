@@ -70,32 +70,32 @@ struct Vector4 {
     static Vector4 lerp(Vector4 a, Vector4 b, float amount);
 };
 
-static Vector4 operator+(Vector4 a, Vector4 b)
+static inline Vector4 operator+(Vector4 a, Vector4 b)
 {
     return Vector4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
-static Vector4 operator-(Vector4 a, Vector4 b)
+static inline Vector4 operator-(Vector4 a, Vector4 b)
 {
     return Vector4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 }
 
-static Vector4 operator*(Vector4 a, Vector4 b)
+static inline Vector4 operator*(Vector4 a, Vector4 b)
 {
     return Vector4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 }
 
-static Vector4 operator/(Vector4 a, Vector4 b)
+static inline Vector4 operator/(Vector4 a, Vector4 b)
 {
     return Vector4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 }
 
-static Vector4 operator*(Vector4 a, float scalar)
+static inline Vector4 operator*(Vector4 a, float scalar)
 {
     return Vector4(a.x * scalar, a.y * scalar, a.z * scalar, a.w * scalar);
 }
 
-static Vector4 operator/(Vector4 a, float scalar)
+static inline Vector4 operator/(Vector4 a, float scalar)
 {
     return Vector4(a.x / scalar, a.y / scalar, a.z / scalar, a.w / scalar);
 }

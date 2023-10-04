@@ -63,17 +63,17 @@ struct Quaternion {
     static Quaternion slerp(Quaternion a, Quaternion b, float amount);
 };
 
-static Quaternion operator+(Quaternion a, Quaternion b)
+static inline Quaternion operator+(Quaternion a, Quaternion b)
 {
     return Quaternion(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
-static Quaternion operator-(Quaternion a, Quaternion b)
+static inline Quaternion operator-(Quaternion a, Quaternion b)
 {
     return Quaternion(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 }
 
-static Quaternion operator*(Quaternion a, Quaternion b)
+static inline Quaternion operator*(Quaternion a, Quaternion b)
 {
     // clang-format off
     return Quaternion(
@@ -84,7 +84,7 @@ static Quaternion operator*(Quaternion a, Quaternion b)
     // clang-format on
 }
 
-static Quaternion operator*(Quaternion a, float scalar)
+static inline Quaternion operator*(Quaternion a, float scalar)
 {
     return Quaternion(a.x * scalar, a.y * scalar, a.z * scalar, a.w * scalar);
 }

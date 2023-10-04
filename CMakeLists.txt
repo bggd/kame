@@ -28,7 +28,21 @@ add_library(kame
     src/love2d/timer.cpp
     src/love2d/mouse.cpp
 )
-set_target_properties(kame PROPERTIES CXX_STANDARD 20 CXX_EXTENSIONS OFF)
+
+if (MSVC)
+    set_target_properties(kame PROPERTIES
+        CXX_STANDARD 20
+        CXX_EXTENSIONS OFF
+    )
+    target_compile_options(kame PRIVATE /W4)
+else()
+    set_target_properties(kame PROPERTIES
+        CXX_STANDARD 20
+        CXX_EXTENSIONS OFF
+        COMPILE_WARNING_AS_ERROR ON
+    )
+    target_compile_options(kame PRIVATE -Wall -Wextra -pedantic)
+endif()
 
 target_link_libraries(kame PUBLIC SDL2::SDL2main SDL2::SDL2 spdlog::spdlog nlohmann_json::nlohmann_json pystring lua box2d)
 

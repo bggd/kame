@@ -217,7 +217,7 @@ struct Matrix {
     static Matrix invert(const Matrix& m);
 };
 
-static Matrix operator+(const Matrix& a, const Matrix& b)
+static inline Matrix operator+(const Matrix& a, const Matrix& b)
 {
     Matrix m = Matrix::zero();
     const float* A = (const float*)&a;
@@ -231,7 +231,7 @@ static Matrix operator+(const Matrix& a, const Matrix& b)
     return m;
 }
 
-static Matrix operator*(const Matrix& a, const Matrix& b)
+static inline Matrix operator*(const Matrix& a, const Matrix& b)
 {
     Matrix m = Matrix::zero();
     const float* A = (const float*)&a;
@@ -251,7 +251,7 @@ static Matrix operator*(const Matrix& a, const Matrix& b)
     return m;
 }
 
-static Matrix operator*(const Matrix& a, float scaleFactor)
+static inline Matrix operator*(const Matrix& a, float scaleFactor)
 {
     Matrix m = Matrix::zero();
     const float* A = (const float*)&a;

@@ -120,7 +120,7 @@ std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::G
                 uvSets.emplace_back();
                 int uvid = stoi(pystring::lstrip(item.first, "TEXCOORD_"));
                 assert(uvid >= 0);
-                assert(uvid < uvSets.size());
+                assert(size_t(uvid) < uvSets.size());
 
                 auto& acc = gltf->accessors[item.second];
                 auto& bv = gltf->bufferViews[acc.bufferView];
@@ -296,7 +296,7 @@ Model importModel(const kame::gltf::Gltf* gltf)
         vbo.initVBOMesh(mesh);
     }
     model.nodes.resize(gltf->nodes.size() + 1);
-    int nodeID = 0;
+    size_t nodeID = 0;
     for (auto& n : gltf->nodes)
     {
         Node& node = model.nodes[nodeID];
@@ -567,7 +567,7 @@ void updateVBOMeshes(Model& model)
             Skin& s = model.skins[n.skinID];
             static std::vector<kame::math::Matrix> skinMatrices;
             skinMatrices.resize(s.matrices.size());
-            for (int i = 0; i < s.matrices.size(); ++i)
+            for (size_t i = 0; i < s.matrices.size(); ++i)
             {
                 skinMatrices[i] = s.matrices[i] * invertMtx;
             }

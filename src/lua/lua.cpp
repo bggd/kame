@@ -120,7 +120,7 @@ int Lua::getGlobal(const char* key)
 {
     auto sequence = pystring::split(key, ".");
     std::string prevName;
-    for (int i = 0; i < sequence.size(); ++i)
+    for (size_t i = 0; i < sequence.size(); ++i)
     {
         auto name = sequence.at(i);
         if (i == 0)
@@ -203,8 +203,8 @@ kame::math::Matrix Lua::popMatrix()
 
 void Lua::ipairs(std::function<void(int, int)> fn)
 {
-    int e = luaL_len(L, -1);
-    for (lua_Unsigned i = 0; i < e; ++i)
+    lua_Integer e = luaL_len(L, -1);
+    for (lua_Integer i = 0; i < e; ++i)
     {
         int idx = i + 1;
         int n = getStackSize();

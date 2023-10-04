@@ -2,6 +2,19 @@
 
 namespace kame::ogl {
 
+BlendState BlendStateBuilder::build()
+{
+    if (useBlendFn && useBlendEq)
+    {
+        state.useBlend = true;
+    }
+    else
+    {
+        assert(!useBlendFn && !useBlendEq);
+    }
+    return state;
+}
+
 Context& Context::getInstance()
 {
     static Context ctx;

@@ -9,7 +9,7 @@ namespace kame::love2d {
 
 struct App {
     virtual void load() {}
-    virtual void update(float dt) {}
+    virtual void update([[maybe_unused]] float dt) {}
     virtual void draw() {}
 };
 

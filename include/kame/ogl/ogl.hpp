@@ -1,13 +1,12 @@
 #pragma once
 
-#include "glad.hpp"
+#include "glad_header.hpp"
 
 #include <kame/math/math.hpp>
 
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include <cassert>
 
 namespace kame::ogl {
 
@@ -142,18 +141,7 @@ struct BlendStateBuilder {
         return *this;
     }
 
-    BlendState build()
-    {
-        if (useBlendFn && useBlendEq)
-        {
-            state.useBlend = true;
-        }
-        else
-        {
-            assert(!useBlendFn && !useBlendEq);
-        }
-        return state;
-    }
+    BlendState build();
 };
 
 struct DepthStencilState {

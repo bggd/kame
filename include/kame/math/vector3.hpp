@@ -75,55 +75,55 @@ struct Vector3 {
     static Vector3 lerp(Vector3 a, Vector3 b, float amount);
 };
 
-static Vector3 operator+(Vector3 a, Vector3 b)
+static inline Vector3 operator+(Vector3 a, Vector3 b)
 {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
-static Vector3 operator-(Vector3 a, Vector3 b)
+static inline Vector3 operator-(Vector3 a, Vector3 b)
 {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
-static Vector3 operator*(Vector3 a, Vector3 b)
+static inline Vector3 operator*(Vector3 a, Vector3 b)
 {
     return Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
 }
 
-static Vector3 operator/(Vector3 a, Vector3 b)
+static inline Vector3 operator/(Vector3 a, Vector3 b)
 {
     return Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
 }
 
-static Vector3 operator*(Vector3 a, float scalar)
+static inline Vector3 operator*(Vector3 a, float scalar)
 {
     return Vector3(a.x * scalar, a.y * scalar, a.z * scalar);
 }
 
-static Vector3 operator/(Vector3 a, float scalar)
+static inline Vector3 operator/(Vector3 a, float scalar)
 {
     return Vector3(a.x / scalar, a.y / scalar, a.z / scalar);
 }
 
-static Vector3& operator+=(Vector3& a, Vector3 b)
+static inline Vector3& operator+=(Vector3& a, Vector3 b)
 {
     a = a + b;
     return a;
 }
 
-static Vector3& operator-=(Vector3& a, Vector3 b)
+static inline Vector3& operator-=(Vector3& a, Vector3 b)
 {
     a = a / b;
     return a;
 }
 
-static Vector3& operator*=(Vector3& a, Vector3 b)
+static inline Vector3& operator*=(Vector3& a, Vector3 b)
 {
     a = a * b;
     return a;
 }
 
-static Vector3& operator/=(Vector3& a, Vector3 b)
+static inline Vector3& operator/=(Vector3& a, Vector3 b)
 {
     a = a / b;
     return a;

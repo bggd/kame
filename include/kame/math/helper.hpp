@@ -2,7 +2,7 @@
 
 namespace kame::math::helper {
 
-static float toRadians(float degree)
+static inline float toRadians(float degree)
 {
     return degree * (3.14159265358979323846F / 180.0F);
 }

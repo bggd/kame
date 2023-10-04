@@ -15,22 +15,22 @@ struct Vector2 {
     }
 };
 
-static Vector2 operator+(Vector2 a, Vector2 b)
+static inline Vector2 operator+(Vector2 a, Vector2 b)
 {
     return Vector2(a.x + b.x, a.y + b.y);
 }
 
-static Vector2 operator-(Vector2 a, Vector2 b)
+static inline Vector2 operator-(Vector2 a, Vector2 b)
 {
     return Vector2(a.x - b.x, a.y - b.y);
 }
 
-static Vector2 operator*(Vector2 a, Vector2 b)
+static inline Vector2 operator*(Vector2 a, Vector2 b)
 {
     return Vector2(a.x * b.x, a.y * b.y);
 }
 
-static Vector2 operator/(Vector2 a, Vector2 b)
+static inline Vector2 operator/(Vector2 a, Vector2 b)
 {
     return Vector2(a.x / b.x, a.y / b.y);
 }

@@ -268,7 +268,7 @@ void printSDL_GL_GetAttribute()
     SPDLOG_INFO("SDL_GL_BUFFER_SIZE: {0}", v);
 }
 
-void debugGLMessageCallback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam)
+void debugGLMessageCallback(GLenum source, GLenum type, unsigned int id, GLenum severity, [[maybe_unused]] GLsizei length, const char* message, [[maybe_unused]] const void* userParam)
 {
 
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
@@ -345,7 +345,7 @@ void debugGLMessageCallback(GLenum source, GLenum type, unsigned int id, GLenum 
     SPDLOG_DEBUG("Debug message ({0}): {1}({2},{3},{4})", id, message, msgSource, msgType, msgSeverity);
 }
 
-void spdlogSDL2(void* userdata, int category, SDL_LogPriority priority, const char* message)
+void spdlogSDL2([[maybe_unused]] void* userdata, int category, SDL_LogPriority priority, const char* message)
 {
     std::string msg;
     const char* categoryString[] = {
