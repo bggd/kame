@@ -48,6 +48,7 @@ struct WindowOGL {
     void updateInput();
     const State& getState();
     double getElapsedTime();
+    void delay(double sec);
 };
 
 } // namespace kame::sdl

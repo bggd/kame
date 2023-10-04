@@ -41,6 +41,8 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
         app.draw();
 
         win.swapWindow();
+
+        win.delay(0.001);
     }
 
     SPDLOG_INFO("Love2D shutdown");

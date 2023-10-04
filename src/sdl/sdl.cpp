@@ -243,6 +243,14 @@ double WindowOGL::getElapsedTime()
     return elapsedTime;
 }
 
+void WindowOGL::delay(double sec)
+{
+    if (sec >= 0)
+    {
+        SDL_Delay((Uint32)(sec * 1000.0));
+    }
+}
+
 } // namespace kame::sdl
 
 void printSDL_GL_GetAttribute()
