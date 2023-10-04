@@ -3,7 +3,7 @@
 void kame::love2d::detail::PolygonVBO::init()
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
-    assert(ctx.isValid());
+    assert(ctx.win && ctx.renderer);
 
     ctx.renderer->setShaderPolygonDraw();
 
@@ -15,78 +15,84 @@ void kame::love2d::detail::PolygonVBO::init()
 
 void kame::love2d::detail::PolygonVBO::shutdown()
 {
+    for (auto* i : deleteQueue)
+    {
+        kame::ogl::deleteVertexBuffer(i);
+    }
+    deleteQueue.clear();
     kame::ogl::deleteVertexBuffer(vbo);
 }
 
-void kame::love2d::detail::PolygonVBO::sendBufferAndDraw(GLenum mode, std::span<PolygonVertex> vertices)
+void kame::love2d::detail::PolygonVBO::clear()
+{
+    n = 0;
+
+    for (auto* i : deleteQueue)
+    {
+        kame::ogl::deleteVertexBuffer(i);
+    }
+    deleteQueue.clear();
+}
+
+void kame::love2d::detail::PolygonVBO::reserve(size_t newSize)
+{
+    numVertex = newSize;
+
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    SPDLOG_DEBUG("[love2d] PolygonVBO({0}) size: {1}", ctx.renderer->polygonBuffer.currentBuffer, numVertex);
+
+    deleteQueue.push_back(vbo);
+
+    ctx.renderer->setShaderPolygonDraw();
+
+    vbo = kame::ogl::createVertexBuffer(sizeof(PolygonVertex) * numVertex, GL_DYNAMIC_DRAW);
+    vao = kame::ogl::VertexArrayObjectBuilder()
+              .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
+              .build();
+
+    n = 0;
+}
+
+void kame::love2d::detail::PolygonVBO::sendBufferAndDraw(GLenum mode, std::vector<PolygonVertex>& vertices)
 {
     vbo->setBuffer(this->size() * 2 * sizeof(float), vertices.size() * 2 * sizeof(float), (const float*)vertices.data());
     vao.drawArrays(mode, this->size(), vertices.size());
     this->n += vertices.size();
-    if (this->capacity() - this->size() < 4)
-    {
-        this->n = this->capacity();
-    }
 }
 
-void kame::love2d::detail::PolygonVBOPool::shutdown()
-{
-    for (auto& vbo : pool)
-    {
-        vbo.shutdown();
-    }
-}
-
-kame::love2d::detail::PolygonVBO& kame::love2d::detail::PolygonVBOPool::get()
-{
-    for (auto& vbo : pool)
-    {
-        if (vbo.size() <= vbo.capacity() - 1)
-        {
-            return vbo;
-        }
-    }
-    pool.emplace_back();
-    auto& vbo = pool.back();
-    vbo.init();
-    return vbo;
-}
-
-void kame::love2d::detail::DoubleBufferPolygonVBOPool::initDoubleBufferPolygonVBOPool(int n)
+void kame::love2d::detail::DoubleBufferPolygonVBO::initDoubleBufferPolygonVBO(int n)
 {
     numBuffer = n;
     for (int i = 0; i < n; ++i)
     {
         buffers.emplace_back();
+        buffers.back().init();
     }
 }
 
-void kame::love2d::detail::DoubleBufferPolygonVBOPool::shutdownDoubleBufferPolygonVBOPool()
+void kame::love2d::detail::DoubleBufferPolygonVBO::shutdownDoubleBufferPolygonVBO()
 {
-    for (auto& pool : buffers)
+    for (int i = 0; i < numBuffer; ++i)
     {
-        pool.shutdown();
+        buffers[i].shutdown();
     }
-    buffers.clear();
 }
 
-kame::love2d::detail::PolygonVBOPool& kame::love2d::detail::DoubleBufferPolygonVBOPool::getCurrentPool()
+kame::love2d::detail::PolygonVBO& kame::love2d::detail::DoubleBufferPolygonVBO::getCurrentVBO()
 {
     return buffers[currentBuffer];
 }
 
-void kame::love2d::detail::DoubleBufferPolygonVBOPool::flip()
+void kame::love2d::detail::DoubleBufferPolygonVBO::flip()
 {
     currentBuffer++;
     if (currentBuffer >= numBuffer)
     {
         currentBuffer = 0;
     }
-
-    for (auto& vbo : getCurrentPool().pool)
-    {
-        vbo.n = 0;
-    }
+    buffers[currentBuffer].clear();
 }
 
 const char* imageDrawVertex = R"(#version 330
@@ -130,17 +136,21 @@ void kame::love2d::detail::Renderer::init()
     assert(!shaderImageDraw);
     assert(!shaderPolygonDraw);
 
+    SPDLOG_INFO("Love2D::Renderer init");
+
     shaderImageDraw = kame::ogl::createShader(imageDrawVertex, imageDrawFragment);
 
     shaderPolygonDraw = kame::ogl::createShader(polygonDrawVertex, polygonDrawFragment);
 
-    poolBuffer.initDoubleBufferPolygonVBOPool();
+    polygonBuffer.initDoubleBufferPolygonVBO();
 }
 
 void kame::love2d::detail::Renderer::shutdown()
 {
     assert(shaderImageDraw);
     assert(shaderPolygonDraw);
+
+    SPDLOG_INFO("Love2D::Renderer shutdown");
 
     kame::ogl::deleteShader(shaderImageDraw);
     shaderImageDraw = nullptr;
@@ -150,7 +160,7 @@ void kame::love2d::detail::Renderer::shutdown()
 
     currentShader = nullptr;
 
-    poolBuffer.shutdownDoubleBufferPolygonVBOPool();
+    polygonBuffer.shutdownDoubleBufferPolygonVBO();
 }
 
 void kame::love2d::detail::Renderer::preDraw(int32_t drawableSizeX,
@@ -170,7 +180,7 @@ void kame::love2d::detail::Renderer::preDraw(int32_t drawableSizeX,
 
     projectionMatrix = kame::math::Matrix::createOrthographic_NO(0.0f, drawableSizeX, drawableSizeY, 0.0f, -1.0f, 1.0f);
 
-    poolBuffer.flip();
+    polygonBuffer.flip();
 }
 
 void kame::love2d::detail::Renderer::setShaderImageDraw()
@@ -332,45 +342,34 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float
         polygons.emplace_back(v);
     }
 
-    size_t sendCount = 0;
-
     setShaderPolygonDraw();
     shaderPolygonDraw->setMatrix("uMVP", projectionMatrix);
     shaderPolygonDraw->setVector4("uColor", kame::math::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
     for (;;)
     {
-        size_t restPolygon = polygons.size() - sendCount;
-        if (restPolygon <= 0)
+        if (polygons.size() <= 0)
         {
             break;
         }
 
-        auto& vbo = poolBuffer.getCurrentPool().get();
+        auto& vbo = polygonBuffer.getCurrentVBO();
         size_t rest = vbo.capacity() - vbo.size();
 
-        if (rest >= restPolygon)
+        if (rest >= polygons.size())
         {
-            std::span<PolygonVertex> ary{
-                polygons.begin() + sendCount, restPolygon};
-            vbo.sendBufferAndDraw(drawMode, ary);
+            vbo.sendBufferAndDraw(drawMode, polygons);
             break;
         }
         else
         {
-            if (restPolygon - rest < 4)
+            size_t resize = vbo.capacity() * 2;
+            for (; resize < polygons.size();)
             {
-                rest -= 4;
-                if (rest <= 0)
-                {
-                    vbo.n = vbo.capacity();
-                    break;
-                }
+                resize *= 2;
             }
-            std::span<PolygonVertex> ary{
-                polygons.begin() + sendCount, rest};
-            vbo.sendBufferAndDraw(drawMode, ary);
-            sendCount += rest;
+            vbo.reserve(resize);
+            continue;
         }
     }
 }

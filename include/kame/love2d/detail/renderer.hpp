@@ -3,8 +3,6 @@
 #include <kame/math/math.hpp>
 #include <kame/ogl/ogl.hpp>
 
-#include <span>
-
 namespace kame::love2d::detail::graphics {
 struct Image;
 struct Quad;
@@ -22,6 +20,7 @@ struct PolygonVBO {
     kame::ogl::VertexArrayObject vao;
     size_t numVertex = 256;
     size_t n = 0;
+    std::vector<kame::ogl::VertexBuffer*> deleteQueue;
 
     size_t size() { return n; }
     size_t capacity() { return numVertex; }
@@ -29,24 +28,21 @@ struct PolygonVBO {
     void init();
     void shutdown();
 
-    void sendBufferAndDraw(GLenum mode, std::span<PolygonVertex> vertices);
+    void clear();
+    void reserve(size_t newSize);
+
+    void sendBufferAndDraw(GLenum mode, std::vector<PolygonVertex>& vertices);
 };
 
-struct PolygonVBOPool {
-    std::vector<PolygonVBO> pool;
+struct DoubleBufferPolygonVBO {
+    std::vector<PolygonVBO> buffers;
 
-    void shutdown();
-    PolygonVBO& get();
-};
-
-struct DoubleBufferPolygonVBOPool {
-    std::vector<PolygonVBOPool> buffers;
     int numBuffer = 2;
     int currentBuffer = 0;
 
-    void initDoubleBufferPolygonVBOPool(int n = 2);
-    void shutdownDoubleBufferPolygonVBOPool();
-    PolygonVBOPool& getCurrentPool();
+    void initDoubleBufferPolygonVBO(int n = 2);
+    void shutdownDoubleBufferPolygonVBO();
+    PolygonVBO& getCurrentVBO();
     void flip();
 };
 
@@ -57,7 +53,7 @@ struct Renderer {
     kame::ogl::Shader* shaderPolygonDraw = nullptr;
     kame::ogl::Shader* currentShader = nullptr;
     kame::ogl::Texture2D* currentTexture = nullptr;
-    DoubleBufferPolygonVBOPool poolBuffer;
+    DoubleBufferPolygonVBO polygonBuffer;
 
     void init();
     void shutdown();

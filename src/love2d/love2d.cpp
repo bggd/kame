@@ -18,6 +18,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
     assert(ctx.renderer);
     ctx.renderer->init();
 
+    SPDLOG_INFO("Love2D::Physics init");
     ctx.physics = new kame::love2d::detail::physics::Physics();
     assert(ctx.physics);
 
@@ -45,8 +46,6 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
         win.delay(0.001);
     }
 
-    SPDLOG_INFO("Love2D shutdown");
-
     ctx.physics->destroyQueues();
     delete ctx.physics;
     ctx.physics = nullptr;
@@ -58,6 +57,8 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
     ctx.win = nullptr;
 
     win.closeWindow();
+
+    SPDLOG_INFO("Love2D shutdown");
 
     kame::kameShutdown();
 }
