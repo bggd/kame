@@ -144,11 +144,28 @@ std::vector<float> kame::love2d::detail::physics::PolygonShape::getPoints() cons
 const kame::love2d::Shape* kame::love2d::detail::physics::Fixture::getShape()
 {
     b2Shape* s = fixture->GetShape();
-    assert(s->GetType() == b2Shape::Type::e_polygon);
+    assert(s->GetType() == b2Shape::Type::e_circle || s->GetType() == b2Shape::Type::e_polygon);
 
-    memcpy((void*)&shape.polygonShape, (void*)s, sizeof(b2PolygonShape));
+    if (s->GetType() == b2Shape::Type::e_polygon)
+    {
+        kame::love2d::detail::physics::PolygonShape poly = kame::love2d::detail::physics::PolygonShape();
 
-    return &shape;
+        memcpy((void*)&poly.polygonShape, (void*)s, sizeof(b2PolygonShape));
+
+        shape = poly;
+
+        return &std::get<kame::love2d::detail::physics::PolygonShape>(shape);
+    }
+    else
+    {
+        kame::love2d::detail::physics::CircleShape circle = kame::love2d::detail::physics::CircleShape();
+
+        memcpy((void*)&circle.circleShape, (void*)s, sizeof(b2CircleShape));
+
+        shape = circle;
+
+        return &std::get<kame::love2d::detail::physics::CircleShape>(shape);
+    }
 }
 
 void kame::love2d::detail::physics::Physics::setMeter(float scale)
@@ -240,6 +257,17 @@ kame::love2d::detail::physics::Body* kame::love2d::detail::physics::Physics::new
     return body;
 }
 
+kame::love2d::detail::physics::CircleShape kame::love2d::detail::physics::Physics::newCircleShape(float radius)
+{
+    kame::love2d::detail::physics::CircleShape shape;
+    shape.circleShape = b2CircleShape();
+
+    shape.circleShape.m_p.SetZero();
+    shape.circleShape.m_radius = scaleDown(radius);
+
+    return shape;
+}
+
 kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physics::newPolygonShape(std::vector<float>& vertices)
 {
     assert(vertices.size() % 2 == 0);
@@ -247,8 +275,7 @@ kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physi
     assert(vcount >= 3);
     assert(vcount <= b2_maxPolygonVertices);
 
-    kame::love2d::detail::physics::PolygonShape shape = kame::love2d::detail::physics::PolygonShape();
-
+    kame::love2d::detail::physics::PolygonShape shape;
     shape.polygonShape = b2PolygonShape();
 
     std::vector<float> points = vertices;
@@ -264,8 +291,7 @@ kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physi
 
 kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physics::newRectangleShape(float width, float height)
 {
-    kame::love2d::detail::physics::PolygonShape shape = kame::love2d::detail::physics::PolygonShape();
-
+    kame::love2d::detail::physics::PolygonShape shape;
     shape.polygonShape = b2PolygonShape();
 
     shape.polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f));
@@ -275,13 +301,28 @@ kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physi
 
 kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physics::newRectangleShape(float x, float y, float width, float height, float angle)
 {
-    kame::love2d::detail::physics::PolygonShape shape = kame::love2d::detail::physics::PolygonShape();
-
+    kame::love2d::detail::physics::PolygonShape shape;
     shape.polygonShape = b2PolygonShape();
 
     shape.polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f), scaleDown(b2Vec2(x, y)), angle);
 
     return shape;
+}
+
+kame::love2d::detail::physics::Fixture* kame::love2d::detail::physics::Physics::newFixture(Body* body, const CircleShape& shape, float density)
+{
+    kame::love2d::detail::physics::Fixture* fixture = new kame::love2d::detail::physics::Fixture();
+    assert(fixture);
+
+    b2FixtureDef defFixture = b2FixtureDef();
+
+    defFixture.shape = &shape.circleShape;
+    defFixture.density = density;
+
+    fixture->fixture = body->body->CreateFixture(&defFixture);
+    assert(fixture->fixture);
+
+    return fixture;
 }
 
 kame::love2d::detail::physics::Fixture* kame::love2d::detail::physics::Physics::newFixture(Body* body, const PolygonShape& shape, float density)

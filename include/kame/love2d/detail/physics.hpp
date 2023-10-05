@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <string>
-#include <memory>
+#include <variant>
 
 namespace kame::love2d::detail::physics {
 
@@ -31,7 +31,20 @@ struct Body {
 
 struct Shape {
     virtual ~Shape() {}
-    virtual const std::string getType() = 0;
+    virtual const std::string getType() const
+    {
+        return "";
+    }
+};
+
+struct CircleShape : Shape {
+    b2CircleShape circleShape;
+
+    virtual ~CircleShape() override {}
+    const std::string getType() const override
+    {
+        return "circle";
+    }
 };
 
 struct PolygonShape : Shape {
@@ -39,7 +52,7 @@ struct PolygonShape : Shape {
 
     virtual ~PolygonShape() override {}
 
-    const std::string getType() override
+    const std::string getType() const override
     {
         return "polygon";
     }
@@ -56,7 +69,7 @@ namespace kame::love2d::detail::physics {
 
 struct Fixture {
     b2Fixture* fixture = nullptr;
-    PolygonShape shape;
+    std::variant<kame::love2d::detail::physics::CircleShape, kame::love2d::detail::physics::PolygonShape> shape;
 
     ~Fixture();
     bool release();
@@ -81,9 +94,11 @@ struct Physics {
 
     World* newWorld(float xg = 0.0f, float yg = 0.0f, bool sleep = true);
     Body* newBody(World* world, float x = 0.0f, float y = 0.0f, const char* type = "static");
+    CircleShape newCircleShape(float radius);
     PolygonShape newPolygonShape(std::vector<float>& vertices);
     PolygonShape newRectangleShape(float width, float height);
     PolygonShape newRectangleShape(float x, float y, float width, float height, float angle = 0.0f);
+    Fixture* newFixture(Body* body, const CircleShape& shape, float density = 1.0f);
     Fixture* newFixture(Body* body, const PolygonShape& shape, float density = 1.0f);
 };
 
