@@ -46,7 +46,7 @@ void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
         win.delay(0.001);
     }
 
-    ctx.physics->destroyQueues();
+    kame::love2d::detail::physics::Physics::destroyQueues();
     delete ctx.physics;
     ctx.physics = nullptr;
 

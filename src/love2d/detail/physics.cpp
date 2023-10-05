@@ -2,7 +2,16 @@
 
 kame::love2d::detail::physics::World::~World()
 {
-    release();
+    if (release())
+    {
+        return;
+    }
+
+    if (world)
+    {
+        kame::love2d::detail::physics::Physics::destroyQueueWorld.emplace_back(world);
+        world = nullptr;
+    }
 }
 
 bool kame::love2d::detail::physics::World::release()
@@ -15,7 +24,7 @@ bool kame::love2d::detail::physics::World::release()
 
     if (world)
     {
-        ctx.physics->destroyQueueWorld.emplace_back(world);
+        kame::love2d::detail::physics::Physics::destroyQueueWorld.emplace_back(world);
         world = nullptr;
         return true;
     }
@@ -27,7 +36,16 @@ bool kame::love2d::detail::physics::World::release()
 
 kame::love2d::detail::physics::Body::~Body()
 {
-    release();
+    if (release())
+    {
+        return;
+    }
+
+    if (body)
+    {
+        kame::love2d::detail::physics::Physics::destroyQueueBody.emplace_back(body);
+        body = nullptr;
+    }
 }
 
 bool kame::love2d::detail::physics::Body::release()
@@ -40,7 +58,7 @@ bool kame::love2d::detail::physics::Body::release()
 
     if (body)
     {
-        ctx.physics->destroyQueueBody.emplace_back(body);
+        kame::love2d::detail::physics::Physics::destroyQueueBody.emplace_back(body);
         body = nullptr;
         return true;
     }
@@ -52,7 +70,16 @@ bool kame::love2d::detail::physics::Body::release()
 
 kame::love2d::detail::physics::Fixture::~Fixture()
 {
-    release();
+    if (release())
+    {
+        return;
+    }
+
+    if (fixture)
+    {
+        kame::love2d::detail::physics::Physics::destroyQueueFixture.emplace_back(fixture);
+        fixture = nullptr;
+    }
 }
 
 bool kame::love2d::detail::physics::Fixture::release()
@@ -65,7 +92,7 @@ bool kame::love2d::detail::physics::Fixture::release()
 
     if (fixture)
     {
-        ctx.physics->destroyQueueFixture.emplace_back(fixture);
+        kame::love2d::detail::physics::Physics::destroyQueueFixture.emplace_back(fixture);
         fixture = nullptr;
         return true;
     }
@@ -82,7 +109,7 @@ void kame::love2d::detail::physics::World::update(float dt, int velocityiteratio
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
 
-    ctx.physics->destroyQueues();
+    kame::love2d::detail::physics::Physics::destroyQueues();
 }
 
 std::vector<float> kame::love2d::detail::physics::Body::getWorldPoints(std::vector<float> vertices)
@@ -204,21 +231,35 @@ void kame::love2d::detail::physics::Physics::destroyQueues()
     for (auto* fixture : destroyQueueFixture)
     {
         fixture->GetBody()->DestroyFixture(fixture);
+        kame::love2d::detail::physics::Physics::deletedFixtureCount++;
     }
     destroyQueueFixture.clear();
 
     for (auto* body : destroyQueueBody)
     {
         body->GetWorld()->DestroyBody(body);
+        kame::love2d::detail::physics::Physics::deletedBodyCount++;
     }
     destroyQueueBody.clear();
 
     for (auto* world : destroyQueueWorld)
     {
         delete world;
+        kame::love2d::detail::physics::Physics::deletedWorldCount++;
     }
     destroyQueueWorld.clear();
 }
+
+std::vector<b2Fixture*> kame::love2d::detail::physics::Physics::destroyQueueFixture;
+std::vector<b2Body*> kame::love2d::detail::physics::Physics::destroyQueueBody;
+std::vector<b2World*> kame::love2d::detail::physics::Physics::destroyQueueWorld;
+
+size_t kame::love2d::detail::physics::Physics::createdWorldCount = 0;
+size_t kame::love2d::detail::physics::Physics::deletedWorldCount = 0;
+size_t kame::love2d::detail::physics::Physics::createdBodyCount = 0;
+size_t kame::love2d::detail::physics::Physics::deletedBodyCount = 0;
+size_t kame::love2d::detail::physics::Physics::createdFixtureCount = 0;
+size_t kame::love2d::detail::physics::Physics::deletedFixtureCount = 0;
 
 kame::love2d::detail::physics::World* kame::love2d::detail::physics::Physics::newWorld(float xg, float yg, bool sleep)
 {
@@ -228,6 +269,8 @@ kame::love2d::detail::physics::World* kame::love2d::detail::physics::Physics::ne
     world->world = new b2World(scaleDown(b2Vec2(xg, yg)));
     assert(world->world);
     world->world->SetAllowSleeping(sleep);
+
+    kame::love2d::detail::physics::Physics::createdWorldCount++;
 
     return world;
 }
@@ -253,6 +296,8 @@ kame::love2d::detail::physics::Body* kame::love2d::detail::physics::Physics::new
 
     body->body = world->world->CreateBody(&defBody);
     assert(body->body);
+
+    kame::love2d::detail::physics::Physics::createdBodyCount++;
 
     return body;
 }
@@ -322,6 +367,8 @@ kame::love2d::detail::physics::Fixture* kame::love2d::detail::physics::Physics::
     fixture->fixture = body->body->CreateFixture(&defFixture);
     assert(fixture->fixture);
 
+    kame::love2d::detail::physics::Physics::createdFixtureCount++;
+
     return fixture;
 }
 
@@ -337,6 +384,8 @@ kame::love2d::detail::physics::Fixture* kame::love2d::detail::physics::Physics::
 
     fixture->fixture = body->body->CreateFixture(&defFixture);
     assert(fixture->fixture);
+
+    kame::love2d::detail::physics::Physics::createdFixtureCount++;
 
     return fixture;
 }

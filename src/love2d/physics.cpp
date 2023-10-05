@@ -25,7 +25,9 @@ kame::love2d::Body kame::love2d::physics::newBody(kame::love2d::World world, flo
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
-    return kame::love2d::Body(ctx.physics->newBody(world.get(), x, y, type));
+    auto body = kame::love2d::Body(ctx.physics->newBody(world.get(), x, y, type));
+    body->pWorld = world;
+    return body;
 }
 
 kame::love2d::CircleShape kame::love2d::physics::newCircleShape(float radius)
@@ -67,12 +69,16 @@ kame::love2d::Fixture kame::love2d::physics::newFixture(kame::love2d::Body body,
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
-    return kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape, density));
+    auto fixture = kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape, density));
+    fixture.get()->pBody = body;
+    return fixture;
 }
 
 kame::love2d::Fixture kame::love2d::physics::newFixture(kame::love2d::Body body, const kame::love2d::PolygonShape& shape, float density)
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
-    return kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape, density));
+    auto fixture = kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape, density));
+    fixture.get()->pBody = body;
+    return fixture;
 }

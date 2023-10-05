@@ -2,6 +2,7 @@
 
 #include <box2d/box2d.h>
 
+#include <memory>
 #include <vector>
 #include <string>
 #include <variant>
@@ -19,6 +20,7 @@ struct World {
 
 struct Body {
     b2Body* body = nullptr;
+    std::shared_ptr<kame::love2d::detail::physics::World> pWorld;
 
     virtual ~Body();
     bool release();
@@ -69,6 +71,7 @@ namespace kame::love2d::detail::physics {
 
 struct Fixture {
     b2Fixture* fixture = nullptr;
+    std::shared_ptr<kame::love2d::detail::physics::Body> pBody;
     std::variant<kame::love2d::detail::physics::CircleShape, kame::love2d::detail::physics::PolygonShape> shape;
 
     ~Fixture();
@@ -79,11 +82,17 @@ struct Fixture {
 
 struct Physics {
     float meter = 30.0f;
-    std::vector<b2Fixture*> destroyQueueFixture;
-    std::vector<b2Body*> destroyQueueBody;
-    std::vector<b2World*> destroyQueueWorld;
 
-    void destroyQueues();
+    static std::vector<b2Fixture*> destroyQueueFixture;
+    static std::vector<b2Body*> destroyQueueBody;
+    static std::vector<b2World*> destroyQueueWorld;
+    static void destroyQueues();
+    static size_t createdWorldCount;
+    static size_t deletedWorldCount;
+    static size_t createdBodyCount;
+    static size_t deletedBodyCount;
+    static size_t createdFixtureCount;
+    static size_t deletedFixtureCount;
 
     void setMeter(float scale);
     float getMeter();
