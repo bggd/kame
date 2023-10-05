@@ -56,9 +56,9 @@ kame::love2d::PolygonShape kame::love2d::physics::newRectangleShape(float x, flo
     return kame::love2d::PolygonShape(ctx.physics->newRectangleShape(x, y, width, height, angle));
 }
 
-kame::love2d::Fixture kame::love2d::physics::newFixture(kame::love2d::Body body, kame::love2d::PolygonShape shape, float density)
+kame::love2d::Fixture kame::love2d::physics::newFixture(kame::love2d::Body body, const kame::love2d::PolygonShape& shape, float density)
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
-    return kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape.get(), density));
+    return kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape, density));
 }

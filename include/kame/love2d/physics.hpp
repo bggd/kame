@@ -18,6 +18,6 @@ PolygonShape newPolygonShape(Args... args)
 }
 PolygonShape newRectangleShape(float width, float height);
 PolygonShape newRectangleShape(float x, float y, float width, float height, float angle = 0.0f);
-Fixture newFixture(Body body, PolygonShape shape, float density = 1.0f);
+Fixture newFixture(Body body, const PolygonShape& shape, float density = 1.0f);
 
 } // namespace kame::love2d::physics

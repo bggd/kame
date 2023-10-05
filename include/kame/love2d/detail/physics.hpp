@@ -3,7 +3,8 @@
 #include <box2d/box2d.h>
 
 #include <vector>
-#include <span>
+#include <string>
+#include <memory>
 
 namespace kame::love2d::detail::physics {
 
@@ -23,13 +24,35 @@ struct Body {
     bool release();
 
     std::vector<float> getWorldPoints(std::vector<float> vertices);
+
+    float getX();
+    float getY();
 };
 
-struct PolygonShape {
+struct Shape {
+    virtual ~Shape() {}
+    virtual const std::string getType() = 0;
+};
+
+struct PolygonShape : Shape {
     b2PolygonShape polygonShape;
+
+    virtual ~PolygonShape() override {}
+
+    const std::string getType() override
+    {
+        return "polygon";
+    }
 
     std::vector<float> getPoints() const;
 };
+} // namespace kame::love2d::detail::physics
+
+namespace kame::love2d {
+using Shape = kame::love2d::detail::physics::Shape;
+}
+
+namespace kame::love2d::detail::physics {
 
 struct Fixture {
     b2Fixture* fixture = nullptr;
@@ -38,7 +61,7 @@ struct Fixture {
     ~Fixture();
     bool release();
 
-    const PolygonShape* getShape();
+    const kame::love2d::Shape* getShape();
 };
 
 struct Physics {
@@ -58,10 +81,10 @@ struct Physics {
 
     World* newWorld(float xg = 0.0f, float yg = 0.0f, bool sleep = true);
     Body* newBody(World* world, float x = 0.0f, float y = 0.0f, const char* type = "static");
-    PolygonShape* newPolygonShape(std::vector<float>& vertices);
-    PolygonShape* newRectangleShape(float width, float height);
-    PolygonShape* newRectangleShape(float x, float y, float width, float height, float angle = 0.0f);
-    Fixture* newFixture(Body* body, PolygonShape* shape, float density = 1.0f);
+    PolygonShape newPolygonShape(std::vector<float>& vertices);
+    PolygonShape newRectangleShape(float width, float height);
+    PolygonShape newRectangleShape(float x, float y, float width, float height, float angle = 0.0f);
+    Fixture* newFixture(Body* body, const PolygonShape& shape, float density = 1.0f);
 };
 
 } // namespace kame::love2d::detail::physics

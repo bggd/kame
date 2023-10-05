@@ -107,6 +107,22 @@ std::vector<float> kame::love2d::detail::physics::Body::getWorldPoints(std::vect
     return points;
 }
 
+float kame::love2d::detail::physics::Body::getX()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    return ctx.physics->scaleUp(body->GetPosition().x);
+}
+
+float kame::love2d::detail::physics::Body::getY()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    return ctx.physics->scaleUp(body->GetPosition().y);
+}
+
 std::vector<float> kame::love2d::detail::physics::PolygonShape::getPoints() const
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
@@ -125,7 +141,7 @@ std::vector<float> kame::love2d::detail::physics::PolygonShape::getPoints() cons
     return points;
 }
 
-const kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Fixture::getShape()
+const kame::love2d::Shape* kame::love2d::detail::physics::Fixture::getShape()
 {
     b2Shape* s = fixture->GetShape();
     assert(s->GetType() == b2Shape::Type::e_polygon);
@@ -224,17 +240,16 @@ kame::love2d::detail::physics::Body* kame::love2d::detail::physics::Physics::new
     return body;
 }
 
-kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Physics::newPolygonShape(std::vector<float>& vertices)
+kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physics::newPolygonShape(std::vector<float>& vertices)
 {
     assert(vertices.size() % 2 == 0);
     size_t vcount = vertices.size() / 2;
     assert(vcount >= 3);
     assert(vcount <= b2_maxPolygonVertices);
 
-    kame::love2d::detail::physics::PolygonShape* shape = new kame::love2d::detail::physics::PolygonShape();
-    assert(shape);
+    kame::love2d::detail::physics::PolygonShape shape = kame::love2d::detail::physics::PolygonShape();
 
-    shape->polygonShape = b2PolygonShape();
+    shape.polygonShape = b2PolygonShape();
 
     std::vector<float> points = vertices;
     for (auto& i : points)
@@ -242,43 +257,41 @@ kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Phys
         i = scaleDown(i);
     }
 
-    shape->polygonShape.Set((b2Vec2*)points.data(), vcount);
+    shape.polygonShape.Set((b2Vec2*)points.data(), vcount);
 
     return shape;
 }
 
-kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Physics::newRectangleShape(float width, float height)
+kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physics::newRectangleShape(float width, float height)
 {
-    kame::love2d::detail::physics::PolygonShape* shape = new kame::love2d::detail::physics::PolygonShape();
-    assert(shape);
+    kame::love2d::detail::physics::PolygonShape shape = kame::love2d::detail::physics::PolygonShape();
 
-    shape->polygonShape = b2PolygonShape();
+    shape.polygonShape = b2PolygonShape();
 
-    shape->polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f));
+    shape.polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f));
 
     return shape;
 }
 
-kame::love2d::detail::physics::PolygonShape* kame::love2d::detail::physics::Physics::newRectangleShape(float x, float y, float width, float height, float angle)
+kame::love2d::detail::physics::PolygonShape kame::love2d::detail::physics::Physics::newRectangleShape(float x, float y, float width, float height, float angle)
 {
-    kame::love2d::detail::physics::PolygonShape* shape = new kame::love2d::detail::physics::PolygonShape();
-    assert(shape);
+    kame::love2d::detail::physics::PolygonShape shape = kame::love2d::detail::physics::PolygonShape();
 
-    shape->polygonShape = b2PolygonShape();
+    shape.polygonShape = b2PolygonShape();
 
-    shape->polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f), scaleDown(b2Vec2(x, y)), angle);
+    shape.polygonShape.SetAsBox(scaleDown(width / 2.0f), scaleDown(height / 2.0f), scaleDown(b2Vec2(x, y)), angle);
 
     return shape;
 }
 
-kame::love2d::detail::physics::Fixture* kame::love2d::detail::physics::Physics::newFixture(Body* body, PolygonShape* shape, float density)
+kame::love2d::detail::physics::Fixture* kame::love2d::detail::physics::Physics::newFixture(Body* body, const PolygonShape& shape, float density)
 {
     kame::love2d::detail::physics::Fixture* fixture = new kame::love2d::detail::physics::Fixture();
     assert(fixture);
 
     b2FixtureDef defFixture = b2FixtureDef();
 
-    defFixture.shape = &shape->polygonShape;
+    defFixture.shape = &shape.polygonShape;
     defFixture.density = density;
 
     fixture->fixture = body->body->CreateFixture(&defFixture);
