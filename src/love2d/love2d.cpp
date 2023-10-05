@@ -1,6 +1,6 @@
 #include <all.hpp>
 
-void kame::love2d::run(kame::love2d::App& app, kame::love2d::Config& conf)
+void kame::love2d::runApp(kame::love2d::App& app, kame::love2d::Config& conf)
 {
     kame::kameInit();
 

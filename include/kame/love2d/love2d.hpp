@@ -23,7 +23,7 @@ struct Config {
     Window window;
 };
 
-void run(App& app, Config& conf);
+void runApp(App& app, Config& conf);
 
 } // namespace kame::love2d
 
