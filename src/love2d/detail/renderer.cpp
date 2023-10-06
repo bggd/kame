@@ -316,6 +316,20 @@ void kame::love2d::detail::Renderer::draw(kame::love2d::detail::graphics::Image*
     quad->vao.drawArrays(GL_TRIANGLES, 0, 6);
 }
 
+void kame::love2d::detail::Renderer::line(std::vector<float>& points)
+{
+    assert(points.size() >= 4);
+
+    drawPolygon(GL_LINES, points);
+}
+
+void kame::love2d::detail::Renderer::points(std::vector<float>& points)
+{
+    assert(points.size() >= 2);
+
+    drawPolygon(GL_POINTS, points);
+}
+
 void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float>& vertices)
 {
     assert(mode);
@@ -330,6 +344,11 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float
         drawMode = GL_LINE_LOOP;
     }
 
+    drawPolygon(drawMode, vertices);
+}
+
+void kame::love2d::detail::Renderer::drawPolygon(GLenum drawMode, const std::vector<float>& vertices)
+{
     static std::vector<PolygonVertex> polygons;
     polygons.reserve(vertices.size());
     polygons.clear();
@@ -344,7 +363,7 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float
 
     setShaderPolygonDraw();
     shaderPolygonDraw->setMatrix("uMVP", projectionMatrix);
-    shaderPolygonDraw->setVector4("uColor", kame::math::Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    shaderPolygonDraw->setVector4("uColor", color);
 
     for (;;)
     {
@@ -372,4 +391,21 @@ void kame::love2d::detail::Renderer::polygon(const char* mode, std::vector<float
             continue;
         }
     }
+}
+
+void kame::love2d::detail::Renderer::setColor(float red, float green, float blue, float alpha)
+{
+    color = kame::math::Vector4(red, green, blue, alpha);
+}
+
+void kame::love2d::detail::Renderer::setColor(std::vector<float>& rgba)
+{
+    assert(rgba.size() >= 3);
+
+    if (rgba.size() == 3)
+    {
+        rgba.push_back(1.0f);
+    }
+
+    setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
 }

@@ -48,6 +48,7 @@ struct DoubleBufferPolygonVBO {
 
 struct Renderer {
 
+    kame::math::Vector4 color = kame::math::Vector4::one();
     kame::math::Matrix projectionMatrix = kame::math::Matrix::identity();
     kame::ogl::Shader* shaderImageDraw = nullptr;
     kame::ogl::Shader* shaderPolygonDraw = nullptr;
@@ -68,7 +69,13 @@ struct Renderer {
 
     void draw(kame::love2d::detail::graphics::Image* drawable, float x, float y, float r, float sx, float sy, float ox = 0.0f, float oy = 0.0f);
     void draw(kame::love2d::detail::graphics::Image* drawable, kame::love2d::detail::graphics::Quad* quad, float x, float y, float r, float sx, float sy, float ox = 0.0f, float oy = 0.0f);
+    void line(std::vector<float>& points);
+    void points(std::vector<float>& points);
     void polygon(const char* mode, std::vector<float>& vertices);
+    void drawPolygon(GLenum drawMode, const std::vector<float>& vertices);
+
+    void setColor(float red, float green, float blue, float alpha = 1.0f);
+    void setColor(std::vector<float>& rgba);
 };
 
 } // namespace kame::love2d::detail

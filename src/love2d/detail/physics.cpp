@@ -112,6 +112,11 @@ void kame::love2d::detail::physics::World::update(float dt, int velocityiteratio
     kame::love2d::detail::physics::Physics::destroyQueues();
 }
 
+void kame::love2d::detail::physics::World::debugDraw()
+{
+    world->DebugDraw();
+}
+
 std::vector<float> kame::love2d::detail::physics::Body::getWorldPoints(std::vector<float> vertices)
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
@@ -260,6 +265,7 @@ size_t kame::love2d::detail::physics::Physics::createdBodyCount = 0;
 size_t kame::love2d::detail::physics::Physics::deletedBodyCount = 0;
 size_t kame::love2d::detail::physics::Physics::createdFixtureCount = 0;
 size_t kame::love2d::detail::physics::Physics::deletedFixtureCount = 0;
+kame::love2d::detail::physics::DebugDraw kame::love2d::detail::physics::Physics::debugDraw;
 
 kame::love2d::detail::physics::World* kame::love2d::detail::physics::Physics::newWorld(float xg, float yg, bool sleep)
 {
@@ -269,6 +275,10 @@ kame::love2d::detail::physics::World* kame::love2d::detail::physics::Physics::ne
     world->world = new b2World(scaleDown(b2Vec2(xg, yg)));
     assert(world->world);
     world->world->SetAllowSleeping(sleep);
+
+    world->world->SetDebugDraw(&kame::love2d::detail::physics::Physics::debugDraw);
+    // kame::love2d::detail::physics::Physics::debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_aabbBit | b2Draw::e_pairBit | b2Draw::e_centerOfMassBit);
+    kame::love2d::detail::physics::Physics::debugDraw.SetFlags(b2Draw::e_shapeBit);
 
     kame::love2d::detail::physics::Physics::createdWorldCount++;
 
