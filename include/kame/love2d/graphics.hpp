@@ -1,7 +1,5 @@
 #pragma once
 
-#include <initializer_list>
-
 #include "types.hpp"
 
 namespace kame::love2d::graphics {
