@@ -7,15 +7,15 @@ void atexit_handler()
 {
     kame::love2d::detail::physics::Physics::destroyQueues();
 
-    SPDLOG_DEBUG("kame::love2d::World: Count {0} / {1}",
+    SPDLOG_DEBUG("kame::love2d::World Count: {0} / {1}",
                  kame::love2d::detail::physics::Physics::deletedWorldCount,
                  kame::love2d::detail::physics::Physics::createdWorldCount);
-    SPDLOG_DEBUG("kame::love2d::Body: Count {0} / {1}",
+    SPDLOG_DEBUG("kame::love2d::Body Count: {0} / {1}",
                  kame::love2d::detail::physics::Physics::deletedBodyCount,
                  kame::love2d::detail::physics::Physics::createdBodyCount);
     SPDLOG_DEBUG("kame::love2d::Fixture Count: {0} / {1}",
-                 kame::love2d::detail::physics::Physics::deletedBodyCount,
-                 kame::love2d::detail::physics::Physics::createdBodyCount);
+                 kame::love2d::detail::physics::Physics::deletedFixtureCount,
+                 kame::love2d::detail::physics::Physics::createdFixtureCount);
 }
 
 namespace kame {

@@ -1,5 +1,47 @@
 #include <all.hpp>
 
+void kame::love2d::detail::physics::ContactListener::BeginContact(b2Contact* contact)
+{
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureA()));
+    kame::love2d::Fixture::weak_type fixture_a = ctx.physics->fixtureMap[contact->GetFixtureA()];
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureB()));
+    kame::love2d::Fixture::weak_type fixture_b = ctx.physics->fixtureMap[contact->GetFixtureB()];
+
+    assert(!fixture_a.expired());
+    assert(!fixture_b.expired());
+
+    Contact c;
+    c.contact = contact;
+
+    kame::love2d::Fixture a = fixture_a.lock();
+    kame::love2d::Fixture b = fixture_b.lock();
+    _beginContact(a, b, c);
+}
+
+void kame::love2d::detail::physics::ContactListener::EndContact(b2Contact* contact)
+{
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureA()));
+    kame::love2d::Fixture::weak_type fixture_a = ctx.physics->fixtureMap[contact->GetFixtureA()];
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureB()));
+    kame::love2d::Fixture::weak_type fixture_b = ctx.physics->fixtureMap[contact->GetFixtureB()];
+
+    assert(!fixture_a.expired());
+    assert(!fixture_b.expired());
+
+    Contact c;
+    c.contact = contact;
+
+    kame::love2d::Fixture a = fixture_a.lock();
+    kame::love2d::Fixture b = fixture_b.lock();
+    _endContact(a, b, c);
+}
+
 kame::love2d::detail::physics::World::~World()
 {
     if (release())
@@ -10,6 +52,7 @@ kame::love2d::detail::physics::World::~World()
     if (world)
     {
         kame::love2d::detail::physics::Physics::destroyQueueWorld.emplace_back(world);
+        world->SetContactListener(nullptr);
         world = nullptr;
     }
 }
@@ -25,6 +68,7 @@ bool kame::love2d::detail::physics::World::release()
     if (world)
     {
         kame::love2d::detail::physics::Physics::destroyQueueWorld.emplace_back(world);
+        world->SetContactListener(nullptr);
         world = nullptr;
         return true;
     }
@@ -110,6 +154,13 @@ void kame::love2d::detail::physics::World::update(float dt, int velocityiteratio
     assert(ctx.isValid());
 
     kame::love2d::detail::physics::Physics::destroyQueues();
+}
+
+void kame::love2d::detail::physics::World::setCallback(kame::love2d::detail::physics::CollisionCallbackContact beginContact, kame::love2d::detail::physics::CollisionCallbackContact endContact)
+{
+    listener._beginContact = beginContact;
+    listener._endContact = endContact;
+    world->SetContactListener(&listener);
 }
 
 void kame::love2d::detail::physics::World::debugDraw()
@@ -233,8 +284,15 @@ float kame::love2d::detail::physics::Physics::scaleDown(float v)
 
 void kame::love2d::detail::physics::Physics::destroyQueues()
 {
+    // auto& ctx = kame::love2d::detail::Context::getInstance();
+
     for (auto* fixture : destroyQueueFixture)
     {
+        // if (ctx.isValid())
+        //{
+        //     assert(ctx.physics->fixtureMap.contains(fixture));
+        //     ctx.physics->fixtureMap.erase(ctx.physics->fixtureMap.find(fixture));
+        // }
         fixture->GetBody()->DestroyFixture(fixture);
         kame::love2d::detail::physics::Physics::deletedFixtureCount++;
     }

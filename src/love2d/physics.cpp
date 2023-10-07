@@ -70,7 +70,8 @@ kame::love2d::Fixture kame::love2d::physics::newFixture(kame::love2d::Body body,
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
     auto fixture = kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape, density));
-    fixture.get()->pBody = body;
+    fixture->pBody = body;
+    ctx.physics->fixtureMap[fixture->fixture] = fixture;
     return fixture;
 }
 
@@ -79,6 +80,7 @@ kame::love2d::Fixture kame::love2d::physics::newFixture(kame::love2d::Body body,
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
     auto fixture = kame::love2d::Fixture(ctx.physics->newFixture(body.get(), shape, density));
-    fixture.get()->pBody = body;
+    fixture->pBody = body;
+    ctx.physics->fixtureMap[fixture->fixture] = fixture;
     return fixture;
 }

@@ -6,31 +6,10 @@
 #include <vector>
 #include <string>
 #include <variant>
+#include <unordered_map>
+#include <functional>
 
 namespace kame::love2d::detail::physics {
-
-struct World {
-    b2World* world = nullptr;
-
-    virtual ~World();
-    bool release();
-
-    void update(float dt, int velocityiterations = 8, int positioniterations = 3);
-    void debugDraw();
-};
-
-struct Body {
-    b2Body* body = nullptr;
-    std::shared_ptr<kame::love2d::detail::physics::World> pWorld;
-
-    virtual ~Body();
-    bool release();
-
-    std::vector<float> getWorldPoints(std::vector<float> vertices);
-
-    float getX();
-    float getY();
-};
 
 struct Shape {
     virtual ~Shape() {}
@@ -82,13 +61,71 @@ struct DebugDraw : b2Draw {
 
 struct Fixture {
     b2Fixture* fixture = nullptr;
-    std::shared_ptr<kame::love2d::detail::physics::Body> pBody;
+    std::shared_ptr<void> pBody;
     std::variant<kame::love2d::detail::physics::CircleShape, kame::love2d::detail::physics::PolygonShape> shape;
 
     ~Fixture();
     bool release();
 
     const kame::love2d::Shape* getShape();
+};
+} // namespace kame::love2d::detail::physics
+
+namespace kame::love2d {
+using Fixture = std::shared_ptr<kame::love2d::detail::physics::Fixture>;
+}
+
+namespace kame::love2d::detail::physics {
+
+struct Contact {
+    b2Contact* contact = nullptr;
+};
+
+using CollisionCallbackContact = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, Contact)>;
+
+struct ContactListener : b2ContactListener {
+    CollisionCallbackContact _beginContact;
+    CollisionCallbackContact _endContact;
+
+    ~ContactListener() {}
+
+    void BeginContact(b2Contact* contact) override;
+    void EndContact(b2Contact* contact) override;
+    void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override
+    {
+        B2_NOT_USED(contact);
+        B2_NOT_USED(oldManifold);
+    }
+    void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override
+    {
+        B2_NOT_USED(contact);
+        B2_NOT_USED(impulse);
+    }
+};
+
+struct World {
+    b2World* world = nullptr;
+    ContactListener listener;
+
+    virtual ~World();
+    bool release();
+
+    void update(float dt, int velocityiterations = 8, int positioniterations = 3);
+    void setCallback(CollisionCallbackContact beginContact, CollisionCallbackContact endContact);
+    void debugDraw();
+};
+
+struct Body {
+    b2Body* body = nullptr;
+    std::shared_ptr<kame::love2d::detail::physics::World> pWorld;
+
+    virtual ~Body();
+    bool release();
+
+    std::vector<float> getWorldPoints(std::vector<float> vertices);
+
+    float getX();
+    float getY();
 };
 
 struct Physics {
@@ -104,6 +141,7 @@ struct Physics {
     static size_t deletedBodyCount;
     static size_t createdFixtureCount;
     static size_t deletedFixtureCount;
+    std::unordered_map<b2Fixture*, kame::love2d::Fixture::weak_type> fixtureMap;
     static DebugDraw debugDraw;
 
     void setMeter(float scale);
