@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.11)
 
 project(kame LANGUAGES C CXX)
 
-option(KAME_BUILD_TESTS "Build kame tests" OFF)
-
 add_subdirectory(thirdparty)
 
 add_library(kame
@@ -64,6 +62,7 @@ if(KAME_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
+option(KAME_BUILD_TESTS "Build kame tests" OFF)
 if(KAME_BUILD_TESTS)
     enable_testing()
 

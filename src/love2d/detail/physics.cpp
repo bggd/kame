@@ -13,7 +13,7 @@ void kame::love2d::detail::physics::ContactListener::BeginContact(b2Contact* con
     assert(!fixture_a.expired());
     assert(!fixture_b.expired());
 
-    Contact c;
+    kame::love2d::detail::physics::Contact c;
     c.contact = contact;
 
     kame::love2d::Fixture a = fixture_a.lock();
@@ -34,12 +34,64 @@ void kame::love2d::detail::physics::ContactListener::EndContact(b2Contact* conta
     assert(!fixture_a.expired());
     assert(!fixture_b.expired());
 
-    Contact c;
+    kame::love2d::detail::physics::Contact c;
     c.contact = contact;
 
     kame::love2d::Fixture a = fixture_a.lock();
     kame::love2d::Fixture b = fixture_b.lock();
     _endContact(a, b, c);
+}
+
+void kame::love2d::detail::physics::ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+{
+    B2_NOT_USED(oldManifold);
+
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureA()));
+    kame::love2d::Fixture::weak_type fixture_a = ctx.physics->fixtureMap[contact->GetFixtureA()];
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureB()));
+    kame::love2d::Fixture::weak_type fixture_b = ctx.physics->fixtureMap[contact->GetFixtureB()];
+
+    assert(!fixture_a.expired());
+    assert(!fixture_b.expired());
+
+    kame::love2d::detail::physics::Contact c;
+    c.contact = contact;
+
+    kame::love2d::Fixture a = fixture_a.lock();
+    kame::love2d::Fixture b = fixture_b.lock();
+    _preSolve(a, b, c);
+}
+
+void kame::love2d::detail::physics::ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
+{
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureA()));
+    kame::love2d::Fixture::weak_type fixture_a = ctx.physics->fixtureMap[contact->GetFixtureA()];
+    assert(ctx.physics->fixtureMap.contains(contact->GetFixtureB()));
+    kame::love2d::Fixture::weak_type fixture_b = ctx.physics->fixtureMap[contact->GetFixtureB()];
+
+    assert(!fixture_a.expired());
+    assert(!fixture_b.expired());
+
+    kame::love2d::detail::physics::Contact c;
+    c.contact = contact;
+
+    kame::love2d::Fixture a = fixture_a.lock();
+    kame::love2d::Fixture b = fixture_b.lock();
+
+    static std::vector<std::pair<float, float>> contactImpulse;
+    contactImpulse.reserve(impulse->count);
+    contactImpulse.clear();
+    for (int i = 0; i < impulse->count; ++i)
+    {
+        contactImpulse.emplace_back(impulse->normalImpulses[i], impulse->tangentImpulses[i]);
+    }
+    _postSolve(a, b, c, contactImpulse);
 }
 
 kame::love2d::detail::physics::World::~World()
@@ -156,10 +208,12 @@ void kame::love2d::detail::physics::World::update(float dt, int velocityiteratio
     kame::love2d::detail::physics::Physics::destroyQueues();
 }
 
-void kame::love2d::detail::physics::World::setCallback(kame::love2d::detail::physics::CollisionCallbackContact beginContact, kame::love2d::detail::physics::CollisionCallbackContact endContact)
+void kame::love2d::detail::physics::World::setCallback(kame::love2d::detail::physics::CollisionCallbackContact beginContact, kame::love2d::detail::physics::CollisionCallbackContact endContact, kame::love2d::detail::physics::CollisionCallbackContact preSolve, kame::love2d::detail::physics::CollisionCallbackContactPostResolve postSolve)
 {
     listener._beginContact = beginContact;
     listener._endContact = endContact;
+    listener._preSolve = preSolve;
+    listener._postSolve = postSolve;
     world->SetContactListener(&listener);
 }
 

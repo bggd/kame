@@ -69,38 +69,35 @@ struct Fixture {
 
     const kame::love2d::Shape* getShape();
 };
-} // namespace kame::love2d::detail::physics
-
-namespace kame::love2d {
-using Fixture = std::shared_ptr<kame::love2d::detail::physics::Fixture>;
-}
-
-namespace kame::love2d::detail::physics {
 
 struct Contact {
     b2Contact* contact = nullptr;
 };
 
-using CollisionCallbackContact = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, Contact)>;
+} // namespace kame::love2d::detail::physics
+
+namespace kame::love2d {
+using Fixture = std::shared_ptr<kame::love2d::detail::physics::Fixture>;
+using Contact = kame::love2d::detail::physics::Contact;
+} // namespace kame::love2d
+
+namespace kame::love2d::detail::physics {
+
+using CollisionCallbackContact = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, kame::love2d::Contact)>;
+using CollisionCallbackContactPostResolve = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, kame::love2d::Contact, const std::vector<std::pair<float, float>>&)>;
 
 struct ContactListener : b2ContactListener {
-    CollisionCallbackContact _beginContact;
-    CollisionCallbackContact _endContact;
+    kame::love2d::detail::physics::CollisionCallbackContact _beginContact;
+    kame::love2d::detail::physics::CollisionCallbackContact _endContact;
+    kame::love2d::detail::physics::CollisionCallbackContact _preSolve;
+    kame::love2d::detail::physics::CollisionCallbackContactPostResolve _postSolve;
 
     ~ContactListener() {}
 
     void BeginContact(b2Contact* contact) override;
     void EndContact(b2Contact* contact) override;
-    void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override
-    {
-        B2_NOT_USED(contact);
-        B2_NOT_USED(oldManifold);
-    }
-    void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override
-    {
-        B2_NOT_USED(contact);
-        B2_NOT_USED(impulse);
-    }
+    void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
+    void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
 };
 
 struct World {
@@ -111,7 +108,8 @@ struct World {
     bool release();
 
     void update(float dt, int velocityiterations = 8, int positioniterations = 3);
-    void setCallback(CollisionCallbackContact beginContact, CollisionCallbackContact endContact);
+    void setCallback(
+        kame::love2d::detail::physics::CollisionCallbackContact beginContact, kame::love2d::detail::physics::CollisionCallbackContact endContact = [](love2d::Fixture, love2d::Fixture, love2d::detail::physics::Contact) {}, kame::love2d::detail::physics::CollisionCallbackContact preSolve = [](love2d::Fixture, love2d::Fixture, love2d::detail::physics::Contact) {}, kame::love2d::detail::physics::CollisionCallbackContactPostResolve postSolve = [](love2d::Fixture, love2d::Fixture, love2d::detail::physics::Contact, const std::vector<std::pair<float, float>>&) {});
     void debugDraw();
 };
 
