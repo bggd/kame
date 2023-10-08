@@ -22,6 +22,7 @@ add_library(kame
     src/love2d/detail/renderer.cpp
     src/love2d/detail/physics.cpp
     src/love2d/detail/physics_debug_draw.cpp
+    src/love2d/detail/box2d.cpp
     src/love2d/graphics.cpp
     src/love2d/physics.cpp
     src/love2d/timer.cpp

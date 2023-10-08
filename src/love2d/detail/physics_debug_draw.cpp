@@ -1,6 +1,16 @@
 #include <all.hpp>
 
-void kame::love2d::detail::physics::DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+struct DebugDraw : b2Draw {
+    void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+    void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+    void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
+    void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
+    void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
+    void DrawTransform(const b2Transform& xf) override;
+    void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
+};
+
+void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
@@ -17,7 +27,7 @@ void kame::love2d::detail::physics::DebugDraw::DrawPolygon(const b2Vec2* vertice
     kame::love2d::graphics::polygon("line", vecs);
 }
 
-void kame::love2d::detail::physics::DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
+void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
@@ -38,7 +48,7 @@ void kame::love2d::detail::physics::DebugDraw::DrawSolidPolygon(const b2Vec2* ve
     kame::love2d::graphics::polygon("line", vecs);
 }
 
-void kame::love2d::detail::physics::DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
+void DebugDraw::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
@@ -50,7 +60,7 @@ void kame::love2d::detail::physics::DebugDraw::DrawCircle(const b2Vec2& center, 
     kame::love2d::graphics::circle("line", c.x, c.y, radius, 8);
 }
 
-void kame::love2d::detail::physics::DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
+void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
@@ -68,7 +78,7 @@ void kame::love2d::detail::physics::DebugDraw::DrawSolidCircle(const b2Vec2& cen
     kame::love2d::graphics::line(c.x, c.y, p.x, p.y);
 }
 
-void kame::love2d::detail::physics::DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
+void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
@@ -80,7 +90,7 @@ void kame::love2d::detail::physics::DebugDraw::DrawSegment(const b2Vec2& p1, con
     kame::love2d::graphics::line(v1.x, v1.y, v2.x, v2.y);
 }
 
-void kame::love2d::detail::physics::DebugDraw::DrawTransform(const b2Transform& xf)
+void DebugDraw::DrawTransform(const b2Transform& xf)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
@@ -101,7 +111,7 @@ void kame::love2d::detail::physics::DebugDraw::DrawTransform(const b2Transform& 
     kame::love2d::graphics::line(v1.x, v1.y, v2.x, v2.y);
 }
 
-void kame::love2d::detail::physics::DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
+void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 {
     (void)(size);
 

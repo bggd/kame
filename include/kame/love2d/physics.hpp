@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.hpp"
+#include <kame/love2d/types.hpp>
 
 namespace kame::love2d::physics {
 

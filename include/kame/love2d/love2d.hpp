@@ -35,3 +35,4 @@ void runApp(App& app, Config& conf);
 #include "physics.hpp"
 #include "timer.hpp"
 #include "mouse.hpp"
+#include "detail/box2d.hpp"

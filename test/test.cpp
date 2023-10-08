@@ -345,3 +345,74 @@ return Vector3.new(1.0) / Vector3.new(60.0)
 
     lua.shutdownLua();
 }
+
+#include <kame/love2d/love2d.hpp>
+
+TEST(Box2d, World)
+{
+    using namespace kame::love2d::detail::box2d;
+
+    EXPECT_NO_FATAL_FAILURE(newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f)));
+
+    auto fn1 = []() {
+        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+        auto body = newSPtrBox2dBody(world); };
+
+    EXPECT_NO_FATAL_FAILURE(fn1());
+
+    auto fn2 = []() {
+        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+        auto body = newSPtrBox2dBody(world);
+        world = nullptr; };
+
+    EXPECT_NO_FATAL_FAILURE(fn2());
+}
+
+TEST(Box2d, Body)
+{
+    using namespace kame::love2d::detail::box2d;
+
+    EXPECT_NO_FATAL_FAILURE(newSPtrBox2dBody(newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f))));
+
+    auto fn1 = []() {
+        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+        auto body = newSPtrBox2dBody(world); };
+
+    EXPECT_NO_FATAL_FAILURE(fn1());
+
+    auto fn2 = []() {
+        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+        auto body = newSPtrBox2dBody(world);
+        body = nullptr; };
+
+    EXPECT_NO_FATAL_FAILURE(fn2());
+}
+
+TEST(Box2d, Fixture)
+{
+    using namespace kame::love2d::detail::box2d;
+
+    Box2dCircleShape circle;
+    circle._circleShapeB2D = b2CircleShape();
+    Box2dShape shape = circle;
+
+    EXPECT_NO_FATAL_FAILURE(newSPtrBox2DFixture(newSPtrBox2dBody(newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f))), shape));
+
+    auto fn1 = [shape]() {
+        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+        auto body = newSPtrBox2dBody(world);
+        auto fixture = newSPtrBox2DFixture(body, shape); };
+
+    EXPECT_NO_FATAL_FAILURE(fn1());
+
+    auto fn2 = [shape]() {
+        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+        auto body = newSPtrBox2dBody(world);
+        auto fixture = newSPtrBox2DFixture(body, shape);
+        EXPECT_TRUE(!kame::love2d::detail::box2d::fixtureMap.empty());
+        body = nullptr; };
+
+    EXPECT_NO_FATAL_FAILURE(fn2());
+
+    EXPECT_TRUE(kame::love2d::detail::box2d::fixtureMap.empty());
+}
