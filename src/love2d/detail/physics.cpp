@@ -148,7 +148,7 @@ void kame::love2d::detail::physics::World::setCallback(kame::love2d::CollisionCa
     listener->_endContact = endContact;
     listener->_preSolve = preSolve;
     listener->_postSolve = postSolve;
-    _world->listener = listener;
+    _world->_listener = listener;
     _world->_worldB2D->SetContactListener(listener);
 }
 

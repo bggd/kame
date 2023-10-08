@@ -30,7 +30,7 @@ struct Box2dContact {
 
 struct Box2dWorld {
     b2World* _worldB2D = nullptr;
-    std::any listener;
+    std::any _listener;
 
     virtual ~Box2dWorld();
 
@@ -40,7 +40,7 @@ struct Box2dWorld {
 using SPtrBox2dWorld = std::shared_ptr<Box2dWorld>;
 
 struct Box2dBody {
-    SPtrBox2dWorld parentWorld;
+    SPtrBox2dWorld _parentWorld;
     b2Body* _bodyB2D = nullptr;
 
     virtual ~Box2dBody();
@@ -54,7 +54,7 @@ struct Box2dBody {
 using SPtrBox2dBody = std::shared_ptr<Box2dBody>;
 
 struct Box2dFixture {
-    SPtrBox2dBody parentBody;
+    SPtrBox2dBody _parentBody;
     b2Fixture* _fixtureB2D = nullptr;
 
     virtual ~Box2dFixture();

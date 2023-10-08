@@ -25,9 +25,9 @@ kame::love2d::detail::box2d::Box2dWorld::~Box2dWorld()
     _worldB2D->SetDebugDraw(nullptr);
     _worldB2D->SetContactListener(nullptr);
     _worldB2D->SetDestructionListener(nullptr);
-    auto* p = std::any_cast<kame::love2d::detail::physics::ContactListener*>(listener);
+    auto* p = std::any_cast<kame::love2d::detail::physics::ContactListener*>(_listener);
     delete p;
-    listener = nullptr;
+    _listener = nullptr;
     delete _worldB2D;
     _worldB2D = nullptr;
 }
@@ -35,7 +35,7 @@ kame::love2d::detail::box2d::Box2dWorld::~Box2dWorld()
 kame::love2d::detail::box2d::Box2dBody::~Box2dBody()
 {
     assert(_bodyB2D);
-    assert(!parentWorld->_worldB2D->IsLocked());
+    assert(!_parentWorld->_worldB2D->IsLocked());
     assert(_bodyB2D->GetFixtureList() == nullptr);
     _bodyB2D->GetWorld()->DestroyBody(_bodyB2D);
     _bodyB2D = nullptr;
@@ -44,7 +44,7 @@ kame::love2d::detail::box2d::Box2dBody::~Box2dBody()
 kame::love2d::detail::box2d::Box2dFixture::~Box2dFixture()
 {
     assert(_fixtureB2D);
-    assert(!parentBody->_bodyB2D->GetWorld()->IsLocked());
+    assert(!_parentBody->_bodyB2D->GetWorld()->IsLocked());
     assert(fixtureMap.contains(_fixtureB2D));
     assert(fixtureMap[_fixtureB2D].expired());
     // FIXME: write more safe code
@@ -52,7 +52,7 @@ kame::love2d::detail::box2d::Box2dFixture::~Box2dFixture()
         // legal?
         auto sptr = SPtrBox2dFixture(this, [](SPtrBox2dFixture::element_type*) {});
         fixtureMap[_fixtureB2D] = sptr;
-        parentBody->_bodyB2D->DestroyFixture(_fixtureB2D);
+        _parentBody->_bodyB2D->DestroyFixture(_fixtureB2D);
     }
     assert(fixtureMap[_fixtureB2D].expired());
     fixtureMap.erase(fixtureMap.find(_fixtureB2D));
@@ -129,7 +129,7 @@ kame::love2d::detail::box2d::SPtrBox2dBody kame::love2d::detail::box2d::newSPtrB
     b->_bodyB2D = w->_worldB2D->CreateBody(&def);
     assert(b->_bodyB2D);
 
-    b->parentWorld = w;
+    b->_parentWorld = w;
 
     return kame::love2d::detail::box2d::SPtrBox2dBody(b);
 }
@@ -156,7 +156,7 @@ kame::love2d::detail::box2d::SPtrBox2dFixture kame::love2d::detail::box2d::newSP
     f->_fixtureB2D = body->_bodyB2D->CreateFixture(&def);
     assert(f->_fixtureB2D);
 
-    f->parentBody = body;
+    f->_parentBody = body;
 
     auto sptr = kame::love2d::detail::box2d::SPtrBox2dFixture(f);
 
