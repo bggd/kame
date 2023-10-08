@@ -15,6 +15,9 @@ struct Box2dCircleShape {
 
 struct Box2dPolygonShape {
     b2PolygonShape _polygonShapeB2D;
+    std::vector<float> _points;
+
+    const std::vector<float>& getPoints();
 };
 
 using Box2dShape = std::variant<Box2dCircleShape, Box2dPolygonShape>;
@@ -32,6 +35,7 @@ struct Box2dWorld {
     virtual ~Box2dWorld();
 
     void update(float dt, int velocityiterations, int positioniterations);
+    void debugDraw();
 };
 using SPtrBox2dWorld = std::shared_ptr<Box2dWorld>;
 
@@ -43,6 +47,9 @@ struct Box2dBody {
 
     float getX();
     float getY();
+    std::pair<float, float> getPosition() { return {getX(), getY()}; }
+
+    std::vector<float> getWorldPoints(std::vector<float>& points);
 };
 using SPtrBox2dBody = std::shared_ptr<Box2dBody>;
 
@@ -61,5 +68,15 @@ SPtrBox2dWorld newSPtrBox2dWorld(b2Vec2 gravity, bool sleep = true);
 SPtrBox2dBody newSPtrBox2dBody(SPtrBox2dWorld w, float x = 0.0f, float y = 0.0f, b2BodyType type = b2BodyType::b2_staticBody);
 
 SPtrBox2dFixture newSPtrBox2DFixture(SPtrBox2dBody body, const Box2dShape& shape, float density = 1.0f);
+
+struct DebugDraw : b2Draw {
+    void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+    void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
+    void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
+    void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
+    void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
+    void DrawTransform(const b2Transform& xf) override;
+    void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
+};
 
 } // namespace kame::love2d::detail::box2d

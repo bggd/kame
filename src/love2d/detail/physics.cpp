@@ -229,13 +229,13 @@ kame::love2d::detail::box2d::Box2dPolygonShape kame::love2d::detail::physics::Ph
     kame::love2d::detail::box2d::Box2dPolygonShape ps;
     ps._polygonShapeB2D = b2PolygonShape();
 
-    std::vector<float> points = vertices;
-    for (auto& i : points)
+    ps._points = vertices;
+    for (auto& i : ps._points)
     {
         i = scaleDown(i);
     }
 
-    ps._polygonShapeB2D.Set((b2Vec2*)points.data(), vcount);
+    ps._polygonShapeB2D.Set((b2Vec2*)ps._points.data(), vcount);
 
     return ps;
 }
