@@ -44,13 +44,6 @@ kame::love2d::PolygonShape kame::love2d::physics::newPolygonShape(std::vector<fl
     return ctx.physics->newPolygonShape(vertices);
 }
 
-kame::love2d::PolygonShape kame::love2d::physics::newPolygonShape(std::vector<float> vertices)
-{
-    auto& ctx = kame::love2d::detail::Context::getInstance();
-    assert(ctx.isValid());
-    return ctx.physics->newPolygonShape(vertices);
-}
-
 kame::love2d::PolygonShape kame::love2d::physics::newRectangleShape(float width, float height)
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();

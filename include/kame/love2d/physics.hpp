@@ -11,11 +11,11 @@ World newWorld(float xg = 0.0f, float yg = 0.0f, bool sleep = true);
 Body newBody(World world, float x = 0.0f, float y = 0.0f, const char* type = "static");
 CircleShape newCircleShape(float radius);
 PolygonShape newPolygonShape(std::vector<float>& vertices);
-PolygonShape newPolygonShape(std::vector<float> vertices);
 template <typename... Args>
 PolygonShape newPolygonShape(Args... args)
 {
-    return newPolygonShape({args...});
+    std::vector<float> v{args...};
+    return newPolygonShape(v);
 }
 PolygonShape newRectangleShape(float width, float height);
 PolygonShape newRectangleShape(float x, float y, float width, float height, float angle = 0.0f);
