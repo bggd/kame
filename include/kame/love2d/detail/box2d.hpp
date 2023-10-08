@@ -26,6 +26,7 @@ struct Box2dContact {
 
 struct Box2dWorld {
     b2World* _worldB2D = nullptr;
+
     virtual ~Box2dWorld();
 
     void update(float dt, int velocityiterations, int positioniterations);
@@ -35,13 +36,18 @@ using SPtrBox2dWorld = std::shared_ptr<Box2dWorld>;
 struct Box2dBody {
     SPtrBox2dWorld parentWorld;
     b2Body* _bodyB2D = nullptr;
+
     virtual ~Box2dBody();
+
+    float getX();
+    float getY();
 };
 using SPtrBox2dBody = std::shared_ptr<Box2dBody>;
 
 struct Box2dFixture {
     SPtrBox2dBody parentBody;
     b2Fixture* _fixtureB2D = nullptr;
+
     virtual ~Box2dFixture();
 };
 using SPtrBox2dFixture = std::shared_ptr<Box2dFixture>;

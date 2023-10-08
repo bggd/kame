@@ -41,6 +41,8 @@ void kame::love2d::detail::physics::ContactListener::EndContact(b2Contact* conta
     kame::love2d::Contact c;
     c._contactB2D = contact;
 
+    kame::love2d::Fixture a;
+
     assert(!fixture_a.expired());
     if (kame::love2d::Fixture a = fixture_a.lock())
     {
@@ -113,6 +115,11 @@ void kame::love2d::detail::physics::ContactListener::PostSolve(b2Contact* contac
     }
 }
 
+void kame::love2d::detail::physics::World::update(float dt, int velocityiterations, int positioniterations)
+{
+    _world->_worldB2D->Step(dt, velocityiterations, positioniterations);
+}
+
 void kame::love2d::detail::physics::World::setCallback(kame::love2d::CollisionCallbackContact beginContact, kame::love2d::CollisionCallbackContact endContact, kame::love2d::CollisionCallbackContact preSolve, kame::love2d::CollisionCallbackContactPostResolve postSolve)
 {
     listener._beginContact = beginContact;
@@ -158,7 +165,7 @@ kame::love2d::detail::physics::SPtrWorld kame::love2d::detail::physics::Physics:
     auto* p = new kame::love2d::detail::physics::World();
     assert(p);
     SPtrWorld w = std::shared_ptr<World>(p);
-    w->_world = kame::love2d::detail::box2d::newSPtrBox2dWorld(b2Vec2(xg, yg), sleep);
+    w->_world = kame::love2d::detail::box2d::newSPtrBox2dWorld(scaleDown(b2Vec2(xg, yg)), sleep);
     return w;
 }
 
@@ -177,14 +184,14 @@ kame::love2d::detail::box2d::SPtrBox2dBody kame::love2d::detail::physics::Physic
         t = b2BodyType::b2_kinematicBody;
     }
 
-    return kame::love2d::detail::box2d::newSPtrBox2dBody(world, x, y, t);
+    return kame::love2d::detail::box2d::newSPtrBox2dBody(world, scaleDown(x), scaleDown(y), t);
 }
 
 kame::love2d::detail::box2d::Box2dCircleShape kame::love2d::detail::physics::Physics::newCircleShape(float radius)
 {
     kame::love2d::detail::box2d::Box2dCircleShape cs;
     cs._circleShapeB2D = b2CircleShape();
-    cs._circleShapeB2D.m_radius = radius;
+    cs._circleShapeB2D.m_radius = scaleDown(radius);
     return cs;
 }
 
@@ -235,7 +242,7 @@ kame::love2d::detail::box2d::SPtrBox2dFixture kame::love2d::detail::physics::Phy
     return kame::love2d::detail::box2d::newSPtrBox2DFixture(body, shape, density);
 }
 
-kame::love2d::detail::box2d::SPtrBox2dFixture newFixture(kame::love2d::detail::box2d::SPtrBox2dBody body, const kame::love2d::detail::box2d::Box2dPolygonShape& shape, float density)
+kame::love2d::detail::box2d::SPtrBox2dFixture kame::love2d::detail::physics::Physics::newFixture(kame::love2d::detail::box2d::SPtrBox2dBody body, const kame::love2d::detail::box2d::Box2dPolygonShape& shape, float density)
 {
     return kame::love2d::detail::box2d::newSPtrBox2DFixture(body, shape, density);
 }

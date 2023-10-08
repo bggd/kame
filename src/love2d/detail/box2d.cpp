@@ -8,6 +8,7 @@ kame::love2d::detail::box2d::Box2dWorld::~Box2dWorld()
     assert(!_worldB2D->IsLocked());
     assert(_worldB2D->GetBodyCount() == 0);
     _worldB2D->SetContactListener(nullptr);
+    _worldB2D->SetDestructionListener(nullptr);
     delete _worldB2D;
     _worldB2D = nullptr;
 }
@@ -21,14 +22,35 @@ kame::love2d::detail::box2d::Box2dBody::~Box2dBody()
     _bodyB2D = nullptr;
 }
 
+float kame::love2d::detail::box2d::Box2dBody::getX()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+    return ctx.physics->scaleUp(_bodyB2D->GetPosition().x);
+}
+
+float kame::love2d::detail::box2d::Box2dBody::getY()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+    return ctx.physics->scaleUp(_bodyB2D->GetPosition().y);
+}
+
 kame::love2d::detail::box2d::Box2dFixture::~Box2dFixture()
 {
     assert(_fixtureB2D);
     assert(!parentBody->_bodyB2D->GetWorld()->IsLocked());
     assert(fixtureMap.contains(_fixtureB2D));
     assert(fixtureMap[_fixtureB2D].expired());
+    // FIXME: write more safe code
+    {
+        // legal?
+        auto sptr = SPtrBox2dFixture(this, [](SPtrBox2dFixture::element_type*) {});
+        fixtureMap[_fixtureB2D] = sptr;
+        parentBody->_bodyB2D->DestroyFixture(_fixtureB2D);
+    }
+    assert(fixtureMap[_fixtureB2D].expired());
     fixtureMap.erase(fixtureMap.find(_fixtureB2D));
-    parentBody->_bodyB2D->DestroyFixture(_fixtureB2D);
     _fixtureB2D = nullptr;
 }
 

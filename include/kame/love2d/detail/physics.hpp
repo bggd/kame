@@ -30,6 +30,7 @@ struct ContactListener : b2ContactListener {
 struct World {
     kame::love2d::detail::box2d::SPtrBox2dWorld _world;
     ContactListener listener;
+    void update(float dt, int velocityiterations = 8, int positioniterations = 3);
     void setCallback(kame::love2d::CollisionCallbackContact beginContact, kame::love2d::CollisionCallbackContact endContact, kame::love2d::CollisionCallbackContact preSolve, kame::love2d::CollisionCallbackContactPostResolve postSolve);
 };
 using SPtrWorld = std::shared_ptr<World>;
