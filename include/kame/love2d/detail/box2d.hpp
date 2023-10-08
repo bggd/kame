@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <box2d/box2d.h>
 #include <memory>
 #include <variant>
@@ -26,6 +27,7 @@ struct Box2dContact {
 
 struct Box2dWorld {
     b2World* _worldB2D = nullptr;
+    std::any listener;
 
     virtual ~Box2dWorld();
 

@@ -9,6 +9,9 @@ kame::love2d::detail::box2d::Box2dWorld::~Box2dWorld()
     assert(_worldB2D->GetBodyCount() == 0);
     _worldB2D->SetContactListener(nullptr);
     _worldB2D->SetDestructionListener(nullptr);
+    auto* p = std::any_cast<kame::love2d::detail::physics::ContactListener*>(listener);
+    delete p;
+    listener = nullptr;
     delete _worldB2D;
     _worldB2D = nullptr;
 }

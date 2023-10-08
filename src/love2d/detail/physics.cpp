@@ -142,11 +142,14 @@ void kame::love2d::detail::physics::World::update(float dt, int velocityiteratio
 
 void kame::love2d::detail::physics::World::setCallback(kame::love2d::CollisionCallbackContact beginContact, kame::love2d::CollisionCallbackContact endContact, kame::love2d::CollisionCallbackContact preSolve, kame::love2d::CollisionCallbackContactPostResolve postSolve)
 {
-    listener._beginContact = beginContact;
-    listener._endContact = endContact;
-    listener._preSolve = preSolve;
-    listener._postSolve = postSolve;
-    _world->_worldB2D->SetContactListener(&listener);
+    ContactListener* listener = new ContactListener();
+    assert(listener);
+    listener->_beginContact = beginContact;
+    listener->_endContact = endContact;
+    listener->_preSolve = preSolve;
+    listener->_postSolve = postSolve;
+    _world->listener = listener;
+    _world->_worldB2D->SetContactListener(listener);
 }
 
 void kame::love2d::detail::physics::Physics::setMeter(float scale)
