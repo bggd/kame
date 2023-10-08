@@ -2,6 +2,11 @@
 
 void kame::love2d::detail::physics::ContactListener::BeginContact(b2Contact* contact)
 {
+    if (!kame::kameIsInit())
+    {
+        return;
+    }
+
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
 
@@ -28,6 +33,11 @@ void kame::love2d::detail::physics::ContactListener::BeginContact(b2Contact* con
 
 void kame::love2d::detail::physics::ContactListener::EndContact(b2Contact* contact)
 {
+    if (!kame::kameIsInit())
+    {
+        return;
+    }
+
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
 
@@ -58,6 +68,11 @@ void kame::love2d::detail::physics::ContactListener::PreSolve(b2Contact* contact
 {
     B2_NOT_USED(oldManifold);
 
+    if (!kame::kameIsInit())
+    {
+        return;
+    }
+
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
 
@@ -84,6 +99,11 @@ void kame::love2d::detail::physics::ContactListener::PreSolve(b2Contact* contact
 
 void kame::love2d::detail::physics::ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
 {
+    if (!kame::kameIsInit())
+    {
+        return;
+    }
+
     auto& ctx = kame::love2d::detail::Context::getInstance();
     assert(ctx.isValid());
 

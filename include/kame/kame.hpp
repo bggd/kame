@@ -4,6 +4,7 @@ namespace kame {
 
 void kameInit();
 void kameShutdown();
+bool kameIsInit();
 
 } // namespace kame
 
