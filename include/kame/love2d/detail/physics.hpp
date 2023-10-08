@@ -72,6 +72,8 @@ struct Fixture {
 
 struct Contact {
     b2Contact* contact = nullptr;
+
+    std::pair<float, float> getNormal() const;
 };
 
 } // namespace kame::love2d::detail::physics
@@ -83,8 +85,8 @@ using Contact = kame::love2d::detail::physics::Contact;
 
 namespace kame::love2d::detail::physics {
 
-using CollisionCallbackContact = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, kame::love2d::Contact)>;
-using CollisionCallbackContactPostResolve = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, kame::love2d::Contact, const std::vector<std::pair<float, float>>&)>;
+using CollisionCallbackContact = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, const kame::love2d::Contact*)>;
+using CollisionCallbackContactPostResolve = std::function<void(kame::love2d::Fixture, kame::love2d::Fixture, const kame::love2d::Contact*, const std::vector<std::pair<float, float>>&)>;
 
 struct ContactListener : b2ContactListener {
     kame::love2d::detail::physics::CollisionCallbackContact _beginContact;
@@ -109,7 +111,7 @@ struct World {
 
     void update(float dt, int velocityiterations = 8, int positioniterations = 3);
     void setCallback(
-        kame::love2d::detail::physics::CollisionCallbackContact beginContact, kame::love2d::detail::physics::CollisionCallbackContact endContact = [](love2d::Fixture, love2d::Fixture, love2d::detail::physics::Contact) {}, kame::love2d::detail::physics::CollisionCallbackContact preSolve = [](love2d::Fixture, love2d::Fixture, love2d::detail::physics::Contact) {}, kame::love2d::detail::physics::CollisionCallbackContactPostResolve postSolve = [](love2d::Fixture, love2d::Fixture, love2d::detail::physics::Contact, const std::vector<std::pair<float, float>>&) {});
+        kame::love2d::detail::physics::CollisionCallbackContact beginContact, kame::love2d::detail::physics::CollisionCallbackContact endContact = [](love2d::Fixture, love2d::Fixture, const love2d::detail::physics::Contact*) {}, kame::love2d::detail::physics::CollisionCallbackContact preSolve = [](love2d::Fixture, love2d::Fixture, const love2d::detail::physics::Contact*) {}, kame::love2d::detail::physics::CollisionCallbackContactPostResolve postSolve = [](love2d::Fixture, love2d::Fixture, const love2d::detail::physics::Contact*, const std::vector<std::pair<float, float>>&) {});
     void debugDraw();
 };
 

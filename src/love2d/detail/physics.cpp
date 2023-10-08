@@ -18,7 +18,7 @@ void kame::love2d::detail::physics::ContactListener::BeginContact(b2Contact* con
 
     kame::love2d::Fixture a = fixture_a.lock();
     kame::love2d::Fixture b = fixture_b.lock();
-    _beginContact(a, b, c);
+    _beginContact(a, b, &c);
 }
 
 void kame::love2d::detail::physics::ContactListener::EndContact(b2Contact* contact)
@@ -39,7 +39,7 @@ void kame::love2d::detail::physics::ContactListener::EndContact(b2Contact* conta
 
     kame::love2d::Fixture a = fixture_a.lock();
     kame::love2d::Fixture b = fixture_b.lock();
-    _endContact(a, b, c);
+    _endContact(a, b, &c);
 }
 
 void kame::love2d::detail::physics::ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
@@ -62,7 +62,7 @@ void kame::love2d::detail::physics::ContactListener::PreSolve(b2Contact* contact
 
     kame::love2d::Fixture a = fixture_a.lock();
     kame::love2d::Fixture b = fixture_b.lock();
-    _preSolve(a, b, c);
+    _preSolve(a, b, &c);
 }
 
 void kame::love2d::detail::physics::ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
@@ -91,7 +91,7 @@ void kame::love2d::detail::physics::ContactListener::PostSolve(b2Contact* contac
     {
         contactImpulse.emplace_back(impulse->normalImpulses[i], impulse->tangentImpulses[i]);
     }
-    _postSolve(a, b, c, contactImpulse);
+    _postSolve(a, b, &c, contactImpulse);
 }
 
 kame::love2d::detail::physics::World::~World()
@@ -305,6 +305,13 @@ const kame::love2d::Shape* kame::love2d::detail::physics::Fixture::getShape()
     }
 }
 
+std::pair<float, float> kame::love2d::detail::physics::Contact::getNormal() const
+{
+    b2WorldManifold manifold;
+    contact->GetWorldManifold(&manifold);
+    return {manifold.normal.x, manifold.normal.y};
+}
+
 void kame::love2d::detail::physics::Physics::setMeter(float scale)
 {
     assert(scale >= 1.0f);
@@ -338,15 +345,15 @@ float kame::love2d::detail::physics::Physics::scaleDown(float v)
 
 void kame::love2d::detail::physics::Physics::destroyQueues()
 {
-    // auto& ctx = kame::love2d::detail::Context::getInstance();
+    auto& ctx = kame::love2d::detail::Context::getInstance();
 
     for (auto* fixture : destroyQueueFixture)
     {
-        // if (ctx.isValid())
-        //{
-        //     assert(ctx.physics->fixtureMap.contains(fixture));
-        //     ctx.physics->fixtureMap.erase(ctx.physics->fixtureMap.find(fixture));
-        // }
+        if (ctx.isValid())
+        {
+            assert(ctx.physics->fixtureMap.contains(fixture));
+            ctx.physics->fixtureMap.erase(ctx.physics->fixtureMap.find(fixture));
+        }
         fixture->GetBody()->DestroyFixture(fixture);
         kame::love2d::detail::physics::Physics::deletedFixtureCount++;
     }
