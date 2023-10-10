@@ -225,7 +225,7 @@ Shader* createShader(const char* vert, const char* frag)
         {
             std::string infoLog(logLength, ' ');
             glGetShaderInfoLog(vs, logLength, NULL, &infoLog[0]);
-            SPDLOG_INFO("Vertex shader compilation failed: {0}", infoLog);
+            SPDLOG_CRITICAL("Vertex shader compilation failed: {0}", infoLog);
         }
     }
     assert(vsCompileStatus == GL_TRUE);
@@ -243,7 +243,7 @@ Shader* createShader(const char* vert, const char* frag)
         {
             std::string infoLog(logLength, ' ');
             glGetShaderInfoLog(fs, logLength, NULL, &infoLog[0]);
-            SPDLOG_INFO("Fragment shader compilation failed!\n{0}", infoLog);
+            SPDLOG_CRITICAL("Fragment shader compilation failed!\n{0}", infoLog);
         }
     }
     assert(fsCompileStatus == GL_TRUE);
@@ -263,7 +263,7 @@ Shader* createShader(const char* vert, const char* frag)
         {
             std::string infoLog(logLength, ' ');
             glGetProgramInfoLog(program, logLength, NULL, &infoLog[0]);
-            SPDLOG_INFO("Shader link failed!\n{0}", infoLog);
+            SPDLOG_CRITICAL("Shader link failed!\n{0}", infoLog);
         }
     }
     assert(programLinkStatus == GL_TRUE);
