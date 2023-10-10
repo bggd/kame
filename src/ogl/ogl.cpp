@@ -447,9 +447,13 @@ Texture2D* loadTexture2D(const char* path, bool flipY)
     int x, y, c;
     stbi_set_flip_vertically_on_load(flipY);
     unsigned char* data = stbi_load(path, &x, &y, &c, 0);
-    SPDLOG_INFO("loadTexture2D: {0}(width:{1}, height:{2}, channel:{3})", path, x, y, c);
+    if (!data)
+    {
+        SPDLOG_CRITICAL("loadTexture2D: \"{0}\" ({1})", path, stbi_failure_reason());
+    }
     assert(data);
     assert(c > 2 && c < 5);
+    SPDLOG_INFO("loadTexture2D: \"{0}\" (width:{1}, height:{2}, channel:{3})", path, x, y, c);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -485,9 +489,13 @@ Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY
     int x, y, c;
     stbi_set_flip_vertically_on_load(flipY);
     unsigned char* data = stbi_load_from_memory(src, len, &x, &y, &c, 0);
-    SPDLOG_INFO("loadTexture2DFromMemory: (width:{0}, height:{1}, channel:{2})", x, y, c);
+    if (!data)
+    {
+        SPDLOG_CRITICAL("loadTexture2D: ({0})", stbi_failure_reason());
+    }
     assert(data);
     assert(c > 2 && c < 5);
+    SPDLOG_INFO("loadTexture2D: (width:{0}, height:{1}, channel:{2})", x, y, c);
 
     GLuint tex;
     glGenTextures(1, &tex);
