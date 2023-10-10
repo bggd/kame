@@ -48,6 +48,7 @@ struct DoubleBufferPolygonVBO {
 
 struct Renderer {
 
+    kame::math::Vector4 backgroundColor = kame::math::Vector4(0.0f, 0.0f, 0.0f, 1.0f);
     kame::math::Vector4 color = kame::math::Vector4::one();
     kame::math::Matrix projectionMatrix = kame::math::Matrix::identity();
     kame::ogl::Shader* shaderImageDraw = nullptr;
@@ -63,6 +64,9 @@ struct Renderer {
     void setShaderImageDraw();
     void setShaderPolygonDraw();
     void setTexture(kame::ogl::Texture2D* tex);
+
+    std::tuple<float, float, float, float> getBackgroundColor();
+    void setBackgroundColor(float red, float green, float blue, float alpha = 1.0f);
 
     kame::love2d::detail::graphics::Image* newImage(const char* filename);
     kame::love2d::detail::graphics::Quad* newQuad(int x, int y, int width, int height, int sw, int sh);

@@ -42,6 +42,8 @@ void polygon(const char* mode, Args... args)
     polygon(mode, v);
 }
 
+void setBackgroundColor(float red, float green, float blue, float alpha = 1.0f);
+
 void setColor(float red, float green, float blue, float alpha = 1.0f);
 void setColor(std::vector<float>& rgba);
 template <typename... Args>

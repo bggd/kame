@@ -167,7 +167,7 @@ void kame::love2d::detail::Renderer::preDraw(int32_t drawableSizeX,
                                              int32_t drawableSizeY)
 {
     kame::ogl::setViewport(0, 0, drawableSizeX, drawableSizeY);
-    kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, kame::math::Vector4(0.5, 0.5, 0.5, 1));
+    kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, backgroundColor);
     kame::ogl::RasterizerState rasterState = kame::ogl::RasterizerStateBuilder().build();
     kame::ogl::setRasterizerState(rasterState);
     kame::ogl::BlendState blendState = kame::ogl::BlendStateBuilder()
@@ -208,6 +208,16 @@ void kame::love2d::detail::Renderer::setTexture(kame::ogl::Texture2D* tex)
         currentTexture = tex;
         kame::ogl::setTexture2D(0, currentTexture);
     }
+}
+
+std::tuple<float, float, float, float> kame::love2d::detail::Renderer::getBackgroundColor()
+{
+    return {backgroundColor.x, backgroundColor.y, backgroundColor.z, backgroundColor.w};
+}
+
+void kame::love2d::detail::Renderer::setBackgroundColor(float red, float green, float blue, float alpha)
+{
+    backgroundColor = kame::math::Vector4(red, green, blue, alpha);
 }
 
 kame::love2d::detail::graphics::Image* kame::love2d::detail::Renderer::newImage(const char* filename)

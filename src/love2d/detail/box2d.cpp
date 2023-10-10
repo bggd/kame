@@ -4,6 +4,14 @@ std::unordered_map<b2Fixture*, kame::love2d::detail::box2d::SPtrBox2dFixture::we
 
 namespace kame::love2d::detail::box2d {
 
+float Box2dCircleShape::getRadius()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    return ctx.physics->scaleUp(_circleShapeB2D.m_radius);
+}
+
 const std::vector<float>& Box2dPolygonShape::getPoints()
 {
     auto& ctx = kame::love2d::detail::Context::getInstance();
@@ -46,6 +54,77 @@ Box2dBody::~Box2dBody()
     _bodyB2D = nullptr;
 }
 
+void Box2dBody::applyForce(float fx, float fy)
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    _bodyB2D->ApplyForceToCenter(ctx.physics->scaleDown(b2Vec2(fx, fy)), true);
+}
+
+float Box2dBody::getAngle()
+{
+    return _bodyB2D->GetAngle();
+}
+
+float Box2dBody::getX()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+    return ctx.physics->scaleUp(_bodyB2D->GetPosition().x);
+}
+
+float Box2dBody::getY()
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+    return ctx.physics->scaleUp(_bodyB2D->GetPosition().y);
+}
+
+std::vector<float> Box2dBody::getWorldPoints(const std::vector<float>& points)
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    std::vector<float> vertices;
+    vertices.reserve(points.size());
+
+    for (size_t i = 0; i < points.size() / 2; ++i)
+    {
+        b2Vec2 v;
+        v.x = points[i * 2];
+        v.y = points[i * 2 + 1];
+        v = ctx.physics->scaleDown(v);
+        v = _bodyB2D->GetWorldPoint(v);
+        v = ctx.physics->scaleUp(v);
+        vertices.emplace_back(v.x);
+        vertices.emplace_back(v.y);
+    }
+
+    return vertices;
+}
+
+void Box2dBody::setAngle(float radius)
+{
+    _bodyB2D->SetTransform(_bodyB2D->GetPosition(), radius);
+}
+
+void Box2dBody::setLinearVelocity(float x, float y)
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    _bodyB2D->SetLinearVelocity(ctx.physics->scaleDown(b2Vec2(x, y)));
+}
+
+void Box2dBody::setPosition(float x, float y)
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    _bodyB2D->SetTransform(ctx.physics->scaleDown(b2Vec2(x, y)), getAngle());
+}
+
 Box2dFixture::~Box2dFixture()
 {
     assert(_fixtureB2D);
@@ -63,39 +142,15 @@ Box2dFixture::~Box2dFixture()
     fixtureMap.erase(fixtureMap.find(_fixtureB2D));
     _fixtureB2D = nullptr;
 }
-float Box2dBody::getX()
+
+float Box2dFixture::getRestitution()
 {
-    auto& ctx = kame::love2d::detail::Context::getInstance();
-    assert(ctx.isValid());
-    return ctx.physics->scaleUp(_bodyB2D->GetPosition().x);
+    return _fixtureB2D->GetRestitution();
 }
 
-float Box2dBody::getY()
+void Box2dFixture::setRestitution(float restitution)
 {
-    auto& ctx = kame::love2d::detail::Context::getInstance();
-    assert(ctx.isValid());
-    return ctx.physics->scaleUp(_bodyB2D->GetPosition().y);
-}
-
-std::vector<float> Box2dBody::getWorldPoints(std::vector<float>& points)
-{
-    auto& ctx = kame::love2d::detail::Context::getInstance();
-    assert(ctx.isValid());
-
-    std::vector<float> vertices(points);
-    for (size_t i = 0; i < points.size() * 2; i += 2)
-    {
-        b2Vec2 v;
-        v.x = points[i];
-        v.y = points[i + 1];
-        v = ctx.physics->scaleDown(v);
-        v = _bodyB2D->GetWorldPoint(v);
-        v = ctx.physics->scaleUp(v);
-        vertices[i] = v.x;
-        vertices[i + 1] = v.y;
-    }
-
-    return vertices;
+    _fixtureB2D->SetRestitution(restitution);
 }
 
 struct Box2dDestructionListener : b2DestructionListener {

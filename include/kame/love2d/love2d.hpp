@@ -36,3 +36,4 @@ void runApp(App& app, Config& conf);
 #include "timer.hpp"
 #include "mouse.hpp"
 #include "detail/box2d.hpp"
+#include "keyboard.hpp"

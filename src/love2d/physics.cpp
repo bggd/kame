@@ -69,3 +69,20 @@ kame::love2d::Fixture kame::love2d::physics::newFixture(kame::love2d::Body body,
     assert(ctx.isValid());
     return ctx.physics->newFixture(body, shape, density);
 }
+
+kame::love2d::Fixture kame::love2d::physics::newFixture(Body body, const Shape& shape, float density)
+{
+    auto& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+
+    assert(shape.index() > 0);
+
+    if (std::holds_alternative<kame::love2d::CircleShape>(shape))
+    {
+        return kame::love2d::physics::newFixture(body, std::get<kame::love2d::CircleShape>(shape), density);
+    }
+    else
+    {
+        return kame::love2d::physics::newFixture(body, std::get<kame::love2d::PolygonShape>(shape), density);
+    }
+}

@@ -91,6 +91,13 @@ void kame::love2d::graphics::polygon(const char* mode, std::vector<float>& verti
     ctx.renderer->polygon(mode, vertices);
 }
 
+void kame::love2d::graphics::setBackgroundColor(float red, float green, float blue, float alpha)
+{
+    kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();
+    assert(ctx.isValid());
+    ctx.renderer->setBackgroundColor(red, green, blue, alpha);
+}
+
 void kame::love2d::graphics::setColor(float red, float green, float blue, float alpha)
 {
     kame::love2d::detail::Context& ctx = kame::love2d::detail::Context::getInstance();

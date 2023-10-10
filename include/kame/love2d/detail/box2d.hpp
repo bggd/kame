@@ -11,6 +11,8 @@ namespace kame::love2d::detail::box2d {
 
 struct Box2dCircleShape {
     b2CircleShape _circleShapeB2D;
+
+    float getRadius();
 };
 
 struct Box2dPolygonShape {
@@ -20,7 +22,7 @@ struct Box2dPolygonShape {
     const std::vector<float>& getPoints();
 };
 
-using Box2dShape = std::variant<Box2dCircleShape, Box2dPolygonShape>;
+using Box2dShape = std::variant<std::monostate, Box2dCircleShape, Box2dPolygonShape>;
 
 struct Box2dContact {
     b2Contact* _contactB2D = nullptr;
@@ -45,11 +47,17 @@ struct Box2dBody {
 
     virtual ~Box2dBody();
 
+    void applyForce(float fx, float fy);
+
+    float getAngle();
     float getX();
     float getY();
     std::pair<float, float> getPosition() { return {getX(), getY()}; }
+    std::vector<float> getWorldPoints(const std::vector<float>& points);
 
-    std::vector<float> getWorldPoints(std::vector<float>& points);
+    void setAngle(float radius);
+    void setLinearVelocity(float x, float y);
+    void setPosition(float x, float y);
 };
 using SPtrBox2dBody = std::shared_ptr<Box2dBody>;
 
@@ -58,6 +66,9 @@ struct Box2dFixture {
     b2Fixture* _fixtureB2D = nullptr;
 
     virtual ~Box2dFixture();
+
+    float getRestitution();
+    void setRestitution(float restitution);
 };
 using SPtrBox2dFixture = std::shared_ptr<Box2dFixture>;
 

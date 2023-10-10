@@ -27,6 +27,7 @@ add_library(kame
     src/love2d/physics.cpp
     src/love2d/timer.cpp
     src/love2d/mouse.cpp
+    src/love2d/keyboard.cpp
 )
 
 if (MSVC)
