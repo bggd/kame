@@ -8,6 +8,8 @@ extern "C" {
 
 #include <string>
 #include <functional>
+#include <variant>
+#include <map>
 
 #include <kame/math/math.hpp>
 

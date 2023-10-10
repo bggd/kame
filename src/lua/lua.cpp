@@ -131,7 +131,10 @@ int Lua::getGlobal(const char* key)
         {
             if (!lua_istable(L, -1))
             {
-                SPDLOG_ERROR("'{}' is invalid access because '{}' is not table", key, prevName);
+                SPDLOG_DEBUG("'{}' is invalid access because '{}' is not table", key, prevName);
+                clearStack();
+                lua_pushnil(L);
+                break;
             }
             lua_getfield(L, -1, name.c_str());
             lua_remove(L, -2);

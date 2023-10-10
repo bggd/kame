@@ -228,6 +228,10 @@ r = { g = { b = { a = 'rgba' } } }
 )");
     EXPECT_EQ(lua.getStackSize(), 0);
 
+    EXPECT_TRUE(lua.getGlobal("invalid.name.field") == LUA_TNIL);
+    EXPECT_EQ(lua.getStackSize(), 1);
+    lua.pop();
+
     EXPECT_TRUE(lua.getGlobal("x") == LUA_TNUMBER);
     int isnum = 0;
     lua_Integer n = lua.popInteger(&isnum);
