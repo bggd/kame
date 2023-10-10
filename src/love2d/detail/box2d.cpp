@@ -27,9 +27,12 @@ Box2dWorld::~Box2dWorld()
     _worldB2D->SetDebugDraw(nullptr);
     _worldB2D->SetContactListener(nullptr);
     _worldB2D->SetDestructionListener(nullptr);
-    auto* p = std::any_cast<kame::love2d::detail::physics::ContactListener*>(_listener);
-    delete p;
-    _listener = nullptr;
+    if (_listener.has_value())
+    {
+        auto* p = std::any_cast<kame::love2d::detail::physics::ContactListener*>(_listener);
+        delete p;
+        _listener = nullptr;
+    }
     delete _worldB2D;
     _worldB2D = nullptr;
 }

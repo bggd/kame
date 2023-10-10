@@ -379,15 +379,15 @@ TEST(Box2d, Body)
     EXPECT_NO_FATAL_FAILURE(newSPtrBox2dBody(newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f))));
 
     auto fn1 = []() {
-        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
-        auto body = newSPtrBox2dBody(world); };
+         auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+         auto body = newSPtrBox2dBody(world); };
 
     EXPECT_NO_FATAL_FAILURE(fn1());
 
     auto fn2 = []() {
-        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
-        auto body = newSPtrBox2dBody(world);
-        body = nullptr; };
+         auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+         auto body = newSPtrBox2dBody(world);
+         body = nullptr; };
 
     EXPECT_NO_FATAL_FAILURE(fn2());
 }
@@ -403,18 +403,18 @@ TEST(Box2d, Fixture)
     EXPECT_NO_FATAL_FAILURE(newSPtrBox2DFixture(newSPtrBox2dBody(newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f))), shape));
 
     auto fn1 = [shape]() {
-        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
-        auto body = newSPtrBox2dBody(world);
-        auto fixture = newSPtrBox2DFixture(body, shape); };
+         auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+         auto body = newSPtrBox2dBody(world);
+         auto fixture = newSPtrBox2DFixture(body, shape); };
 
     EXPECT_NO_FATAL_FAILURE(fn1());
 
     auto fn2 = [shape]() {
-        auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
-        auto body = newSPtrBox2dBody(world);
-        auto fixture = newSPtrBox2DFixture(body, shape);
-        EXPECT_TRUE(!kame::love2d::detail::box2d::fixtureMap.empty());
-        body = nullptr; };
+         auto world = newSPtrBox2dWorld(b2Vec2(0.0f, 9.81f));
+         auto body = newSPtrBox2dBody(world);
+         auto fixture = newSPtrBox2DFixture(body, shape);
+         EXPECT_TRUE(!kame::love2d::detail::box2d::fixtureMap.empty());
+         body = nullptr; };
 
     EXPECT_NO_FATAL_FAILURE(fn2());
 
