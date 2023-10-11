@@ -24,6 +24,7 @@ bool kame::love2d::detail::graphics::Image::release()
         tex = nullptr;
         kame::ogl::deleteVertexBuffer(vbo);
         vbo = nullptr;
+        vao = kame::ogl::VertexArrayObject();
 
         return true;
     }
@@ -62,6 +63,7 @@ bool kame::love2d::detail::graphics::Quad::release()
     {
         kame::ogl::deleteVertexBuffer(vbo);
         vbo = nullptr;
+        vao = kame::ogl::VertexArrayObject();
         return true;
     }
     else

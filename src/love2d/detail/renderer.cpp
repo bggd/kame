@@ -20,7 +20,12 @@ void kame::love2d::detail::PolygonVBO::shutdown()
         kame::ogl::deleteVertexBuffer(i);
     }
     deleteQueue.clear();
-    kame::ogl::deleteVertexBuffer(vbo);
+    if (vbo)
+    {
+        kame::ogl::deleteVertexBuffer(vbo);
+        vbo = nullptr;
+    }
+    vao = kame::ogl::VertexArrayObject();
 }
 
 void kame::love2d::detail::PolygonVBO::clear()
