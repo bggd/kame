@@ -40,6 +40,7 @@
 tags
 .vs
 build
+build.luarocks
 CMakeSettings.json
 thirdparty/SDL/
 thirdparty/spdlog/

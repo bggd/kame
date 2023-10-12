@@ -27,7 +27,7 @@ void kame::love2d::graphics::circle(const char* mode, float x, float y, float ra
     static std::vector<float> vertices;
     vertices.reserve(segments * 2);
     vertices.clear();
-    float angle_step = 2 * M_PI / segments;
+    float angle_step = 2 * kame::math::helper::Pi / segments;
     float angle = 0.0;
 
     for (int i = 0; i < segments; ++i)

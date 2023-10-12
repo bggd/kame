@@ -1,7 +1,7 @@
-#include <all.hpp>
-
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
+#include <all.hpp>
 
 namespace kame::gltf {
 

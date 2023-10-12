@@ -7,7 +7,6 @@
 
 #if __GNUC__
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wlanguage-extension-token"
 #endif
 
 #if __clang__

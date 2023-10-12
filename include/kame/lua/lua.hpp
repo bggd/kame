@@ -15,9 +15,9 @@ extern "C" {
 
 namespace kame::lua {
 
-static const char* mtMatrixName = "kame.math.Matrix";
-static const char* mtVector3Name = "kame.math.Vector3";
-static const char* mtVector4Name = "kame.math.Vector4";
+static const char* const mtMatrixName = "kame.math.Matrix";
+static const char* const mtVector3Name = "kame.math.Vector3";
+static const char* const mtVector4Name = "kame.math.Vector4";
 
 struct Lua {
     lua_State* L = nullptr;
