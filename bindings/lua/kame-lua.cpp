@@ -23,4 +23,9 @@ KAME_LUA_API int luaopen_kame_math_Matrix(lua_State* L)
     return kame::lua::openKameMathMatrix(L);
 }
 
+KAME_LUA_API int luaopen_kame_love2d(lua_State* L)
+{
+    return kame::lua::openKameLove2d(L);
+}
+
 } // extern "C"

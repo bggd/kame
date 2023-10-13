@@ -6,7 +6,7 @@ void kame::love2d::runApp(kame::love2d::App& app, kame::love2d::Config& conf)
 
     kame::sdl::WindowOGL win;
     win.setOglDebugMode(true);
-    win.setGLVersions({{3, 3, false}});
+    win.setGLVersions({{3, 3, true}});
     win.openWindow(conf.window.title, conf.window.width, conf.window.height);
     win.setVsync(true);
 

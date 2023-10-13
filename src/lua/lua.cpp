@@ -4,6 +4,8 @@
 #include "math/vector4.hpp"
 #include "math/matrix.hpp"
 
+#include "love2d/love2d.hpp"
+
 // copy from lua.c
 /*
 ** Message handler used to run all chunks
@@ -42,6 +44,12 @@ void Lua::openKameMath()
     luaL_requiref(L, "kame.math.Matrix", openKameMathMatrix, 0);
     luaL_requiref(L, "kame.math.Vector3", openKameMathVector3, 0);
     luaL_requiref(L, "kame.math.Vector4", openKameMathVector4, 0);
+    clearStack();
+}
+
+void Lua::openKameLove()
+{
+    luaL_requiref(L, "kame.love2d", openKameLove2d, 0);
     clearStack();
 }
 
