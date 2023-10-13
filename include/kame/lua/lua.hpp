@@ -19,6 +19,10 @@ static const char* const mtMatrixName = "kame.math.Matrix";
 static const char* const mtVector3Name = "kame.math.Vector3";
 static const char* const mtVector4Name = "kame.math.Vector4";
 
+int openKameMathVector3(lua_State* L);
+int openKameMathVector4(lua_State* L);
+int openKameMathMatrix(lua_State* L);
+
 struct Lua {
     lua_State* L = nullptr;
 
