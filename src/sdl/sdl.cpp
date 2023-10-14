@@ -202,10 +202,7 @@ void WindowOGL::updateInput()
         }
     }
 
-    float mouseX, mouseY;
-    auto buttonState = SDL_GetMouseState(&mouseX, &mouseY);
-    state.mouseX = mouseX;
-    state.mouseY = mouseY;
+    auto buttonState = SDL_GetMouseState(&state.mouseX, &state.mouseY);
     state.isDownLMB = state.isDownMMB = state.isDownRMB = state.isDownX1 = state.isDownX2 = false;
     state.isDownLMB = buttonState & SDL_BUTTON_LMASK;
     state.isDownMMB = buttonState & SDL_BUTTON_MMASK;

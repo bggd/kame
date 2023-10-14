@@ -2,7 +2,7 @@
 
 namespace kame::love2d::mouse {
 
-int getX();
-int getY();
+float getX();
+float getY();
 
 } // namespace kame::love2d::mouse

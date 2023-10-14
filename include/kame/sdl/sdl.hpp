@@ -9,8 +9,8 @@ namespace kame::sdl {
 
 struct State {
     bool isCloseRequest = false;
-    int32_t mouseX = 0;
-    int32_t mouseY = 0;
+    float mouseX = 0.0f;
+    float mouseY = 0.0f;
     bool isDownLMB = false;
     bool isDownMMB = false;
     bool isDownRMB = false;
