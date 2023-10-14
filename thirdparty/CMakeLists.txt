@@ -101,7 +101,7 @@ FetchContent_Declare(stb
     GIT_TAG beebb24b945efdea3b9bba23affb8eb3ba8982e7
 )
 FetchContent_MakeAvailable(stb)
-add_library(stb INTERFACE ${stb_SOURCE_DIR}/stb_image.h)
+add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
 
 if(KAME_BUILD_TESTS)
