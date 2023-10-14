@@ -13,7 +13,9 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 #endif
     SDL_LogSetOutputFunction(spdlogSDL2, NULL);
 
-    SDL_Init(SDL_INIT_EVERYTHING);
+    // without audio
+    SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS |
+             SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMEPAD | SDL_INIT_SENSOR);
 
     std::vector<GLVersion> versions;
     if (this->glVersions.empty())
