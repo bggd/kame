@@ -1,7 +1,7 @@
 #include <all.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
 
 void atexit_handler()
 {

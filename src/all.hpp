@@ -13,8 +13,7 @@
 #pragma GCC disgnostic pop
 #endif
 
-
-#include "stb_image.h"
+#include <stb_image.h>
 
 #include <pystring.h>
 

@@ -95,6 +95,15 @@ set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(box2d)
 
+# Oct 12, 2023
+FetchContent_Declare(stb
+    GIT_REPOSITORY https://github.com/nothings/stb
+    GIT_TAG beebb24b945efdea3b9bba23affb8eb3ba8982e7
+)
+FetchContent_MakeAvailable(stb)
+add_library(stb INTERFACE ${stb_SOURCE_DIR}/stb_image.h)
+target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
+
 if(KAME_BUILD_TESTS)
     FetchContent_Declare(googletest
         URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz
