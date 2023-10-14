@@ -2,9 +2,12 @@ include(FetchContent)
 
 
 FetchContent_Declare(SDL
-    URL https://github.com/libsdl-org/SDL/releases/download/release-2.28.4/SDL2-2.28.4.tar.gz
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL
+    GIT_TAG 95a9271dbfb2d1348ba8350ba608d9e6ff915bc1
 )
+set(SDL_SHARED_DEFAULT OFF CACHE INTERNAL "")
 set(SDL_SHARED OFF CACHE INTERNAL "")
+set(SDL_STATIC ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(SDL)
 
 FetchContent_Declare(spdlog
@@ -76,14 +79,14 @@ add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui_tables.cpp
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
     ${imgui_SOURCE_DIR}/imgui_demo.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 target_include_directories(imgui PUBLIC
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
 )
-target_link_libraries(imgui PUBLIC SDL2::SDL2)
+target_link_libraries(imgui PUBLIC SDL3::SDL3)
 
 FetchContent_Declare(box2d
     URL https://github.com/erincatto/box2d/archive/refs/tags/v2.4.1.tar.gz

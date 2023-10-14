@@ -49,7 +49,7 @@ else()
     target_compile_options(kame-cpp PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-target_link_libraries(kame-cpp PUBLIC SDL2::SDL2main SDL2::SDL2 spdlog::spdlog nlohmann_json::nlohmann_json pystring box2d)
+target_link_libraries(kame-cpp PUBLIC SDL3::SDL3 spdlog::spdlog nlohmann_json::nlohmann_json pystring box2d)
 
 target_include_directories(kame-cpp
     PUBLIC

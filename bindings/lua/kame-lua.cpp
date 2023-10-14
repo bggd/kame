@@ -1,6 +1,6 @@
 #include <kame/lua/lua.hpp>
 
-#if _WIN32
+#if defined(_WIN32)
 #define KAME_LUA_API __declspec(dllexport)
 #else
 #define KAME_LUA_API

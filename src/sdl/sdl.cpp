@@ -39,7 +39,6 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         }
 
         window = SDL_CreateWindow(title,
-                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                   w, h,
                                   SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | windowFlags);
         if (!window)
@@ -71,7 +70,6 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         }
 
         window = SDL_CreateWindow(title,
-                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                   w, h,
                                   SDL_WINDOW_OPENGL | windowFlags);
         assert(window);
@@ -194,7 +192,7 @@ void WindowOGL::updateInput()
     {
         switch (ev.type)
         {
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
                 state.isCloseRequest = true;
                 break;
             default:
@@ -202,7 +200,10 @@ void WindowOGL::updateInput()
         }
     }
 
-    auto buttonState = SDL_GetMouseState(&state.mouseX, &state.mouseY);
+    float mouseX, mouseY;
+    auto buttonState = SDL_GetMouseState(&mouseX, &mouseY);
+    state.mouseX = mouseX;
+    state.mouseY = mouseY;
     state.isDownLMB = state.isDownMMB = state.isDownRMB = state.isDownX1 = state.isDownX2 = false;
     state.isDownLMB = buttonState & SDL_BUTTON_LMASK;
     state.isDownMMB = buttonState & SDL_BUTTON_MMASK;
@@ -222,7 +223,7 @@ void WindowOGL::updateInput()
         state.isDownScancode[i] = scancodeState[i] == 1;
     }
 
-    SDL_GL_GetDrawableSize(window, &state.drawableSizeX, &state.drawableSizeY);
+    SDL_GetWindowSizeInPixels(window, &state.drawableSizeX, &state.drawableSizeY);
 }
 
 const State& WindowOGL::getState()
