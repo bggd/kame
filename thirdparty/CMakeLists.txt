@@ -104,6 +104,73 @@ FetchContent_MakeAvailable(stb)
 add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
 
+FetchContent_Declare(soloud
+    URL https://github.com/jarikomppa/soloud/archive/refs/tags/RELEASE_20200207.tar.gz
+)
+FetchContent_MakeAvailable(soloud)
+add_library(soloud STATIC
+    ${soloud_SOURCE_DIR}/src/core/soloud.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_audiosource.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_bus.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_3d.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_basicops.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_faderops.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_filterops.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_getters.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_setters.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_voicegroup.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_core_voiceops.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_fader.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_fft.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_fft_lut.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_file.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_filter.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_misc.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_queue.cpp
+    ${soloud_SOURCE_DIR}/src/core/soloud_thread.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/monotone/soloud_monotone.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/noise/soloud_noise.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/openmpt/soloud_openmpt.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/openmpt/soloud_openmpt_dll.c
+
+    ${soloud_SOURCE_DIR}/src/audiosource/sfxr/soloud_sfxr.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/speech/darray.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/speech/klatt.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/speech/resonator.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/speech/soloud_speech.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/speech/tts.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/tedsid/sid.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/tedsid/soloud_tedsid.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/tedsid/ted.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/vic/soloud_vic.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/vizsn/soloud_vizsn.cpp
+
+    ${soloud_SOURCE_DIR}/src/audiosource/wav/dr_impl.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/wav/soloud_wav.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/wav/soloud_wavstream.cpp
+    ${soloud_SOURCE_DIR}/src/audiosource/wav/stb_vorbis.c
+
+    ${soloud_SOURCE_DIR}/src/backend/miniaudio/soloud_miniaudio.cpp
+)
+target_compile_definitions(soloud PRIVATE WITH_MINIAUDIO=1)
+target_include_directories(soloud
+    PUBLIC
+        ${soloud_SOURCE_DIR}/include
+    PRIVATE
+        ${soloud_SOURCE_DIR}/src/audiosource/speech
+        ${soloud_SOURCE_DIR}/src/audiosource/tedsid
+        ${soloud_SOURCE_DIR}/src/audiosource/wav
+
+        ${soloud_SOURCE_DIR}/src/backend/miniaudio
+)
+
 if(KAME_BUILD_TESTS)
     FetchContent_Declare(googletest
         URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz
