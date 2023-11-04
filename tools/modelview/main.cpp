@@ -10,7 +10,7 @@
 #include <cmath>
 
 #include <imgui.h>
-#include <imgui_impl_sdl2.h>
+#include <imgui_impl_sdl3.h>
 #include <imgui_impl_opengl3.h>
 
 #include <spdlog/spdlog.h>
@@ -125,8 +125,8 @@ int main(int argc, char** argv)
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsLight();
-    SDL_AddEventWatch([](void*, SDL_Event* e) -> int { ImGui_ImplSDL2_ProcessEvent(e); return 0; }, nullptr);
-    ImGui_ImplSDL2_InitForOpenGL(win.window, win.glc);
+    SDL_AddEventWatch([](void*, SDL_Event* e) -> int { ImGui_ImplSDL3_ProcessEvent(e); return 0; }, nullptr);
+    ImGui_ImplSDL3_InitForOpenGL(win.window, win.glc);
     ImGui_ImplOpenGL3_Init("#version 330");
 
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
         prevMouseY = state.mouseY;
 
         ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
         // ImGui::ShowDemoWindow();
 
