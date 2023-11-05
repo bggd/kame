@@ -62,7 +62,7 @@ void kame::love2d::detail::PolygonVBO::reserve(size_t newSize)
 
 void kame::love2d::detail::PolygonVBO::sendBufferAndDraw(GLenum mode, std::vector<PolygonVertex>& vertices)
 {
-    vbo->setBuffer(this->size() * 2 * sizeof(float), vertices.size() * 2 * sizeof(float), (const float*)vertices.data());
+    vbo->setBufferSubData(this->size() * 2 * sizeof(float), vertices.size() * 2 * sizeof(float), (const float*)vertices.data());
     vao.drawArrays(mode, this->size(), vertices.size());
     this->n += vertices.size();
 }

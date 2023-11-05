@@ -133,7 +133,7 @@ void setRasterizerState(RasterizerState state)
     }
 }
 
-void setShader(Shader* shader)
+void setShader(kame::ogl::Shader* shader)
 {
     glUseProgram(shader->id);
 }
@@ -389,7 +389,12 @@ void VertexBuffer::setBuffer(const float* vertices)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::setBuffer(GLintptr offset, GLsizeiptr size, const float* vertices)
+void VertexBuffer::setBuffer(const std::vector<kame::math::Vector3>& vertices)
+{
+    setBuffer((const float*)vertices.data());
+}
+
+void VertexBuffer::setBufferSubData(GLintptr offset, GLsizeiptr size, const float* vertices)
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, vertices);
@@ -437,6 +442,11 @@ void IndexBuffer::setBuffer(const unsigned int* vertices)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, numBytes, vertices);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void IndexBuffer::setBuffer(const std::vector<unsigned int>& vertices)
+{
+    setBuffer((const unsigned int*)vertices.data());
 }
 
 Texture2D* loadTexture2D(const char* path, bool flipY)

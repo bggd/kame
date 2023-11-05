@@ -78,30 +78,22 @@ void main() {
 }
 )";
 
-void drawModel(kame::ogl::Shader* shader, Model& model, GLenum mode)
-{
-    kame::ogl::setShader(shader);
-    GLint loc = shader->getAttribLocation("vPos");
-    for (auto& n : model.nodes)
-    {
-        if (n.meshID < 0)
-        {
-            continue;
-        }
-
-        shader->setMatrix("uModel", n.globalXForm);
-        auto& vbo = model.vboMeshes[n.meshID];
-
-        auto vao = kame::ogl::VertexArrayObjectBuilder()
-                       .bindAttribute(loc, vbo.vboPositions.getCurrentVBO(), 3, 3 * sizeof(float), 0)
-                       .bindIndexBuffer(vbo.iboIndices)
-                       .build();
-        vao.drawElements(mode, vbo.numIndex, GL_UNSIGNED_INT);
-    }
-}
+kame::ogl::VertexBuffer* gVBO = nullptr;
+kame::ogl::IndexBuffer* gIBO = nullptr;
+std::vector<kame::math::Vector3> gPositions;
+std::vector<unsigned int> gIndices;
 
 using namespace kame::math;
 using namespace kame::math::helper;
+
+void drawModel(kame::ogl::Shader* shader, Model* model)
+{
+    kame::ogl::VertexArrayObject vao = kame::ogl::VertexArrayObjectBuilder()
+                                           .bindAttribute(shader->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
+                                           .bindIndexBuffer(gIBO)
+                                           .build();
+    vao.drawElements(GL_TRIANGLES, gIndices.size(), GL_UNSIGNED_INT);
+}
 
 int main(int argc, char** argv)
 {
@@ -130,8 +122,39 @@ int main(int argc, char** argv)
     ImGui_ImplOpenGL3_Init("#version 330");
 
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
-    Model model = importModel(gltf);
+    Model* model = importModel(gltf);
     kame::gltf::deleteGLTF(gltf);
+
+    size_t numPos = 0;
+    size_t offset = 0;
+    size_t numIndex = 0;
+    for (auto& n : model->nodes)
+    {
+        if (n.meshID < 0)
+        {
+            continue;
+        }
+
+        Mesh& srcMesh = model->meshes[n.meshID];
+        numPos += srcMesh.getBytesOfPositions();
+        numIndex += srcMesh.getBytesOfIndices();
+
+        for (const auto& v : srcMesh.positions)
+        {
+            gPositions.push_back(v);
+        }
+        for (const auto& e : srcMesh.indices)
+        {
+            gIndices.push_back(offset + e);
+        }
+
+        offset += srcMesh.positions.size();
+    }
+
+    gVBO = kame::ogl::createVertexBuffer(numPos, GL_STATIC_DRAW);
+    gVBO->setBuffer(gPositions);
+    gIBO = kame::ogl::createIndexBuffer(numIndex, GL_STATIC_DRAW);
+    gIBO->setBuffer(gIndices);
 
     kame::ogl::Shader* shaderFrontFace = kame::ogl::createShader(vertGLSL, fragGLSL);
     kame::ogl::Shader* shaderDrawLines = kame::ogl::createShader(vertGLSL, drawLinesGLSL);
@@ -143,7 +166,21 @@ int main(int argc, char** argv)
     float rotX = 0.0f, rotY = 0.0f;
     float zoom = 0.0f;
 
-    float playTime = 0.0f;
+    std::vector<const char*> items;
+    items.reserve(model->clips.size());
+    for (auto& [_, clip] : model->clips)
+    {
+        items.emplace_back(clip.name.c_str());
+    }
+    int itemCurrent = 0;
+    int itemSelect = 0;
+    if (model->hasAnimation())
+    {
+        model->setAnimationClip(items[itemCurrent]);
+        model->playAnimation();
+    }
+
+    double prevTime = win.getElapsedTime();
 
     for (;;)
     {
@@ -178,36 +215,15 @@ int main(int argc, char** argv)
         ImGui::NewFrame();
         // ImGui::ShowDemoWindow();
 
-        static std::vector<const char*> items;
-        items.clear();
-        items.reserve(model.clips.size());
-        for (auto& clip : model.clips)
-        {
-            items.push_back(clip.name.c_str());
-        }
-        static int itemCurrent = 0;
-        static int itemSelect = 0;
         ImGui::ListBox(fmt::format("{} clips", items.size()).data(), &itemSelect, items.data(), items.size(), 10);
         if (itemCurrent != itemSelect)
         {
-            playTime = -(1.0 / 60.0f);
             itemCurrent = itemSelect;
+            model->setAnimationClip(items[itemCurrent]);
+            model->playAnimation();
         }
-        AnimationClip clipCurrent = model.clips[itemCurrent];
-
-        playTime += 1.0 / 60.0f;
-        if (playTime > clipCurrent.endTime)
-        {
-            playTime = clipCurrent.startTime + (clipCurrent.endTime - playTime);
-        }
-        updateAnimation(model, model.nodes, clipCurrent, playTime);
-        model.setGlobalXForm(modelMtx);
-        updateGlobalXForm(model);
-        updateSkinMatrices(model);
-        if (model.animationUpdated)
-        {
-            updateVBOMeshes(model);
-        }
+        model->updateAnimation(win.getElapsedTime() - prevTime);
+        prevTime = win.getElapsedTime();
 
         kame::ogl::setViewport(0, 0, state.drawableSizeX, state.drawableSizeY);
         glDepthMask(GL_TRUE);
@@ -235,12 +251,16 @@ int main(int argc, char** argv)
         kame::ogl::setShader(shaderFrontFace);
         shaderFrontFace->setMatrix("uView", view);
         shaderFrontFace->setMatrix("uProj", proj);
+        shaderFrontFace->setMatrix("uModel", modelMtx);
 
-        drawModel(shaderFrontFace, model, GL_TRIANGLES);
+        model->prepareDraw(gPositions);
+        gVBO->setBuffer(gPositions);
+        drawModel(shaderFrontFace, model);
 
         kame::ogl::setShader(shaderDrawLines);
         shaderDrawLines->setMatrix("uView", view);
         shaderDrawLines->setMatrix("uProj", proj);
+        shaderDrawLines->setMatrix("uModel", modelMtx);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDepthMask(GL_FALSE);
         glEnable(GL_POLYGON_OFFSET_LINE);
@@ -249,7 +269,7 @@ int main(int argc, char** argv)
                          .depthFunc(GL_LEQUAL)
                          .build();
         kame::ogl::setDepthStencilState(depthState);
-        drawModel(shaderDrawLines, model, GL_TRIANGLES);
+        drawModel(shaderDrawLines, model);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         ImGui::Render();

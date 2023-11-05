@@ -38,7 +38,8 @@ struct VertexBuffer {
 
     void setBuffer(const unsigned char* vertices);
     void setBuffer(const float* vertices);
-    void setBuffer(GLintptr offset, GLsizeiptr size, const float* vertices); // glBufferSubData
+    void setBuffer(const std::vector<kame::math::Vector3>& vertices);
+    void setBufferSubData(GLintptr offset, GLsizeiptr size, const float* vertices); // glBufferSubData
 };
 
 struct IndexBuffer {
@@ -49,6 +50,7 @@ struct IndexBuffer {
     void setBuffer(const unsigned char* vertices);
     void setBuffer(const unsigned short* vertices);
     void setBuffer(const unsigned int* vertices);
+    void setBuffer(const std::vector<unsigned int>& vertices);
 };
 
 struct VertexArrayObject {

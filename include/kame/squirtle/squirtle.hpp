@@ -3,6 +3,7 @@
 #include <kame/kame.hpp>
 #include <array>
 #include <cstdint>
+#include <unordered_map>
 
 namespace kame::squirtle {
 
@@ -15,33 +16,17 @@ struct Mesh {
     std::vector<u16Array4> joints;
     std::vector<kame::math::Vector4> weights;
     std::vector<unsigned int> indices;
+
+    size_t getBytesOfPositions() const
+    {
+        return sizeof(float) * 3 * positions.size();
+    }
+
+    size_t getBytesOfIndices() const
+    {
+        return sizeof(unsigned int) * indices.size();
+    }
 };
-
-struct VBODoubleBuffer {
-    int numBuffer = 2;
-    int currentBuffer = 0;
-    std::vector<kame::ogl::VertexBuffer*> buffers;
-
-    VBODoubleBuffer(int num_buffer = 2);
-
-    void initVBODoubleBuffer(GLsizeiptr numBytes, GLenum usage);
-    void setBuffer(const float* vertices);
-    kame::ogl::VertexBuffer* getCurrentVBO();
-    void shutDownVBODoubleBuffer();
-};
-
-struct VBOMesh {
-    VBODoubleBuffer vboPositions;
-    std::vector<kame::ogl::VertexBuffer*> vboUVSets;
-    kame::ogl::IndexBuffer* iboIndices = nullptr;
-    size_t numIndex = 0;
-
-    void initVBOMesh(const Mesh& mesh);
-
-    void shutdownVBOMesh();
-};
-
-void cleanupVBOMeshes(std::vector<VBOMesh>& vboMeshes);
 
 std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m);
 std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m);
@@ -103,22 +88,27 @@ struct Skin {
 
 struct Model {
     std::vector<Mesh> meshes;
-    std::vector<VBOMesh> vboMeshes;
     std::vector<Node> nodes;
     std::vector<Skin> skins;
-    std::vector<AnimationClip> clips;
-    bool animationUpdated = false;
+    std::unordered_map<std::string, AnimationClip> clips;
+    AnimationClip* activeClip = nullptr;
+    float playTime = 0.0f;
+    bool isPlay = false;
+    bool animationIsDirty = false;
 
-    void setGlobalXForm(kame::math::Matrix xform)
+    bool hasAnimation()
     {
-        nodes.back().globalXForm = xform;
+        return clips.empty() == false;
     }
+
+    void setAnimationClip(std::string name);
+    void setAnimationClip(const char* name) { setAnimationClip(std::string(name)); }
+    void playAnimation();
+    void updateAnimation(float dt);
+
+    void prepareDraw(std::vector<kame::math::Vector3>& positions);
 };
 
-Model importModel(const kame::gltf::Gltf* gltf);
-void updateAnimation(Model& model, std::vector<Node>& nodes, AnimationClip& clip, float time);
-void updateGlobalXForm(Model& model);
-void updateSkinMatrices(Model& model);
-void updateVBOMeshes(Model& model);
+Model* importModel(const kame::gltf::Gltf* gltf);
 
 } // namespace kame::squirtle

@@ -2,85 +2,6 @@
 
 namespace kame::squirtle {
 
-VBODoubleBuffer::VBODoubleBuffer(int num_buffer)
-{
-    assert(num_buffer > 0);
-    numBuffer = num_buffer;
-}
-
-void VBODoubleBuffer::initVBODoubleBuffer(GLsizeiptr numBytes, GLenum usage)
-{
-    buffers.reserve(numBuffer);
-
-    for (int i = 0; i < numBuffer; ++i)
-    {
-        kame::ogl::VertexBuffer* vbo = kame::ogl::createVertexBuffer(numBytes, usage);
-        buffers.push_back(vbo);
-    }
-}
-
-void VBODoubleBuffer::setBuffer(const float* vertices)
-{
-    kame::ogl::VertexBuffer* vbo = buffers[currentBuffer];
-    vbo->setBuffer(vertices);
-    currentBuffer++;
-    if (currentBuffer >= numBuffer)
-    {
-        currentBuffer = 0;
-    }
-}
-
-kame::ogl::VertexBuffer* VBODoubleBuffer::getCurrentVBO()
-{
-    return buffers[currentBuffer];
-}
-
-void VBODoubleBuffer::shutDownVBODoubleBuffer()
-{
-    for (int i = 0; i < numBuffer; ++i)
-    {
-        kame::ogl::VertexBuffer* vbo = buffers[i];
-        kame::ogl::deleteVertexBuffer(vbo);
-    }
-    buffers.clear();
-}
-
-void VBOMesh::initVBOMesh(const Mesh& mesh)
-{
-    vboPositions.initVBODoubleBuffer(mesh.positions.size() * 3 * sizeof(float), GL_STATIC_DRAW);
-    vboPositions.setBuffer((const float*)&mesh.positions[0]);
-
-    vboUVSets.reserve(mesh.uvSets.size());
-    for (const auto& uv : mesh.uvSets)
-    {
-        auto* vboTexcoords = kame::ogl::createVertexBuffer(uv.size() * 2 * sizeof(float), GL_STATIC_DRAW);
-        vboTexcoords->setBuffer((const float*)&uv[0]);
-        vboUVSets.push_back(vboTexcoords);
-    }
-
-    iboIndices = kame::ogl::createIndexBuffer(mesh.indices.size() * sizeof(unsigned int), GL_STATIC_DRAW);
-    iboIndices->setBuffer((const unsigned int*)&mesh.indices[0]);
-    numIndex = mesh.indices.size();
-}
-
-void VBOMesh::shutdownVBOMesh()
-{
-    kame::ogl::deleteIndexBuffer(iboIndices);
-    for (auto& uv : vboUVSets)
-    {
-        kame::ogl::deleteVertexBuffer(uv);
-    }
-    vboPositions.shutDownVBODoubleBuffer();
-}
-
-void cleanupVBOMeshes(std::vector<VBOMesh>& vboMeshes)
-{
-    for (auto& vbo : vboMeshes)
-    {
-        vbo.shutdownVBOMesh();
-    }
-}
-
 std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m)
 {
     std::vector<kame::math::Vector3> positions;
@@ -98,7 +19,7 @@ std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf,
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
                     auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    positions.push_back(v);
+                    positions.emplace_back(v);
                 }
             }
         }
@@ -131,17 +52,17 @@ std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::G
                     if (acc.componentType == GL_FLOAT)
                     {
                         auto v = ((kame::math::Vector2*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        uvSets[uvid].push_back(v);
+                        uvSets[uvid].emplace_back(v);
                     }
                     else if (acc.componentType == GL_UNSIGNED_BYTE)
                     {
                         auto e = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        uvSets[uvid].push_back(e / 255.0f);
+                        uvSets[uvid].emplace_back(e / 255.0f);
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
                         auto e = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        uvSets[uvid].push_back(e / 65535.0f);
+                        uvSets[uvid].emplace_back(e / 65535.0f);
                     }
                 }
             }
@@ -175,12 +96,12 @@ std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::
                         v[1] = e[1];
                         v[2] = e[2];
                         v[3] = e[3];
-                        joints.push_back(v);
+                        joints.emplace_back(v);
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
                         auto v = ((u16Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        joints.push_back(v);
+                        joints.emplace_back(v);
                     }
                 }
             }
@@ -209,7 +130,7 @@ std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, c
                     if (acc.componentType == GL_FLOAT)
                     {
                         auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        weights.push_back(v);
+                        weights.emplace_back(v);
                     }
                     else if (acc.componentType == GL_UNSIGNED_BYTE)
                     {
@@ -219,7 +140,7 @@ std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, c
                         v.y = e[1] / 255.0f;
                         v.z = e[2] / 255.0f;
                         v.w = e[3] / 255.0f;
-                        weights.push_back(v);
+                        weights.emplace_back(v);
                     }
                     else if (acc.componentType == GL_UNSIGNED_SHORT)
                     {
@@ -229,7 +150,7 @@ std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, c
                         v.y = e[1] / 65535.0f;
                         v.z = e[2] / 65535.0f;
                         v.w = e[3] / 65535.0f;
-                        weights.push_back(v);
+                        weights.emplace_back(v);
                     }
                 }
             }
@@ -256,17 +177,17 @@ std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const ka
                 if (acc.componentType == GL_UNSIGNED_BYTE)
                 {
                     auto e = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    indices.push_back(e);
+                    indices.emplace_back(e);
                 }
                 else if (acc.componentType == GL_UNSIGNED_SHORT)
                 {
                     auto e = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    indices.push_back(e);
+                    indices.emplace_back(e);
                 }
                 else if (acc.componentType == GL_UNSIGNED_INT)
                 {
                     auto e = ((unsigned int*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    indices.push_back(e);
+                    indices.emplace_back(e);
                 }
             }
         }
@@ -275,31 +196,27 @@ std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const ka
     return indices;
 }
 
-Model importModel(const kame::gltf::Gltf* gltf)
+Model* importModel(const kame::gltf::Gltf* gltf)
 {
-    Model model;
-    model.meshes.reserve(gltf->meshes.size());
-    model.vboMeshes.reserve(gltf->meshes.size());
+    Model* model = new Model();
+    assert(model);
+    model->meshes.reserve(gltf->meshes.size());
     for (auto& m : gltf->meshes)
     {
-        model.meshes.emplace_back();
-        auto& mesh = model.meshes.back();
+        model->meshes.emplace_back();
+        auto& mesh = model->meshes.back();
 
         mesh.positions = toVertexPositions(gltf, m);
         mesh.uvSets = toVertexUVSets(gltf, m);
         mesh.joints = toVertexJoints(gltf, m);
         mesh.weights = toVertexWeights(gltf, m);
         mesh.indices = toVertexIndices(gltf, m);
-
-        model.vboMeshes.emplace_back();
-        auto& vbo = model.vboMeshes.back();
-        vbo.initVBOMesh(mesh);
     }
-    model.nodes.resize(gltf->nodes.size() + 1);
+    model->nodes.resize(gltf->nodes.size());
     size_t nodeID = 0;
     for (auto& n : gltf->nodes)
     {
-        Node& node = model.nodes[nodeID];
+        Node& node = model->nodes[nodeID];
         if (n.hasMesh)
         {
             node.meshID = n.mesh;
@@ -330,30 +247,17 @@ Model importModel(const kame::gltf::Gltf* gltf)
         node.children.reserve(n.children.size());
         for (auto c : n.children)
         {
-            model.nodes[c].parent = nodeID;
+            model->nodes[c].parent = nodeID;
             node.children.push_back(c);
         }
         ++nodeID;
     }
-    nodeID = 0;
-    for (auto& node : model.nodes)
-    {
-        if (nodeID >= gltf->nodes.size())
-        {
-            break;
-        }
-        if (node.parent < 0)
-        {
-            auto& root = model.nodes.back();
-            root.children.push_back(nodeID);
-        }
-        ++nodeID;
-    }
-    model.clips.reserve(gltf->animations.size());
+
+    model->clips.reserve(gltf->animations.size());
     for (auto& a : gltf->animations)
     {
-        model.clips.emplace_back();
-        AnimationClip& clip = model.clips.back();
+        assert(model->clips.contains(a.name) == false);
+        AnimationClip& clip = model->clips[a.name];
         clip.name = a.name;
         clip.channels.reserve(a.channels.size());
         for (auto& c : a.channels)
@@ -405,7 +309,7 @@ Model importModel(const kame::gltf::Gltf* gltf)
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
                     auto v = ((float*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    smp.inputs.push_back(v);
+                    smp.inputs.emplace_back(v);
                     clip.startTime = std::min(clip.startTime, v);
                     clip.endTime = std::max(clip.endTime, v);
                 }
@@ -421,7 +325,7 @@ Model importModel(const kame::gltf::Gltf* gltf)
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
                         auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        smp.outputsVec4.push_back(kame::math::Vector4(v, 0.0f));
+                        smp.outputsVec4.emplace_back(kame::math::Vector4(v, 0.0f));
                     }
                 }
                 else if (acc.type == "VEC4")
@@ -429,17 +333,18 @@ Model importModel(const kame::gltf::Gltf* gltf)
                     for (unsigned int i = 0; i < acc.count; ++i)
                     {
                         auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        smp.outputsVec4.push_back(v);
+                        smp.outputsVec4.emplace_back(v);
                     }
                 }
             }
         }
     }
-    model.skins.reserve(gltf->skins.size());
+
+    model->skins.reserve(gltf->skins.size());
     for (auto& s : gltf->skins)
     {
-        model.skins.emplace_back();
-        auto& skin = model.skins.back();
+        model->skins.emplace_back();
+        auto& skin = model->skins.back();
         assert(s.hasInverseBindMatrices);
         auto& acc = gltf->accessors[s.inverseBindMatrices];
         auto& bv = gltf->bufferViews[acc.bufferView];
@@ -448,12 +353,12 @@ Model importModel(const kame::gltf::Gltf* gltf)
         for (unsigned int i = 0; i < acc.count; ++i)
         {
             auto v = ((kame::math::Matrix*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-            skin.inverseBindMatrices.push_back(v);
+            skin.inverseBindMatrices.emplace_back(v);
         }
         skin.joints.reserve(s.joints.size());
         for (auto& jID : s.joints)
         {
-            skin.joints.push_back(jID);
+            skin.joints.emplace_back(jID);
         }
         skin.matrices.resize(s.joints.size());
     }
@@ -461,8 +366,133 @@ Model importModel(const kame::gltf::Gltf* gltf)
     return model;
 }
 
-void updateAnimation(Model& model, std::vector<Node>& nodes, AnimationClip& clip, float time)
+void updateGlobalXForm(Model* model, int id)
 {
+    Node& node = model->nodes[id];
+    auto local = node.updateLocalXForm();
+    auto global = kame::math::Matrix::identity();
+    if (node.parent >= 0)
+    {
+        global = model->nodes[node.parent].globalXForm;
+    }
+
+    node.globalXForm = local * global;
+    for (auto c : node.children)
+    {
+        updateGlobalXForm(model, c);
+    }
+}
+
+void updateSkinMatrices(Model* model)
+{
+    for (auto& skin : model->skins)
+    {
+        for (uint32_t i = 0; i < skin.joints.size(); ++i)
+        {
+            Node& joint = model->nodes[skin.joints[i]];
+            skin.matrices[i] = skin.inverseBindMatrices[i] * joint.globalXForm;
+        }
+    }
+}
+
+void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions)
+{
+    size_t offset = 0;
+    for (auto& n : model->nodes)
+    {
+        if (n.meshID < 0)
+        {
+            continue;
+        }
+
+        auto invertMtx = kame::math::Matrix::invert(n.globalXForm);
+        if (n.skinID >= 0 && model->animationIsDirty)
+        {
+            Skin& s = model->skins[n.skinID];
+            static std::vector<kame::math::Matrix> skinMatrices;
+            skinMatrices.resize(s.matrices.size());
+            for (size_t i = 0; i < s.matrices.size(); ++i)
+            {
+                skinMatrices[i] = s.matrices[i] * invertMtx;
+            }
+
+            Mesh& srcMesh = model->meshes[n.meshID];
+            for (auto i : srcMesh.indices)
+            {
+                auto vPos = srcMesh.positions[i];
+                auto vJoint = srcMesh.joints[i];
+                auto vWeight = srcMesh.weights[i];
+
+                // clang-format off
+                auto skinMtx =
+                      skinMatrices[vJoint[0]] * vWeight.x
+                    + skinMatrices[vJoint[1]] * vWeight.y
+                    + skinMatrices[vJoint[2]] * vWeight.z
+                    + skinMatrices[vJoint[3]] * vWeight.w;
+                // clang-format on
+
+                positions[offset + i] = kame::math::Vector3::transform(vPos, skinMtx);
+            }
+            offset += srcMesh.positions.size();
+        }
+    }
+
+    model->animationIsDirty = false;
+}
+
+void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions)
+{
+    size_t offset = 0;
+    for (auto& n : model->nodes)
+    {
+        if (n.meshID < 0)
+        {
+            continue;
+        }
+
+        Mesh& srcMesh = model->meshes[n.meshID];
+        for (auto i : srcMesh.indices)
+        {
+            auto vPos = srcMesh.positions[i];
+            positions[offset + i] = kame::math::Vector3::transform(vPos, n.globalXForm);
+        }
+
+        offset += srcMesh.positions.size();
+    }
+}
+
+void Model::setAnimationClip(std::string name)
+{
+    auto it = clips.find(name);
+    assert(it != clips.end());
+    activeClip = &it->second;
+
+    playTime = activeClip->startTime;
+    isPlay = false;
+}
+
+void Model::playAnimation()
+{
+    assert(activeClip);
+    isPlay = true;
+}
+
+void Model::updateAnimation(float dt)
+{
+    if (!activeClip || !isPlay)
+    {
+        return;
+    }
+
+    playTime += dt;
+    if (playTime > activeClip->endTime)
+    {
+        playTime = activeClip->startTime + (activeClip->endTime - playTime);
+    }
+
+    AnimationClip& clip = *activeClip;
+    float time = playTime;
+
     for (auto& c : clip.channels)
     {
         if (c.targetID < 0)
@@ -504,99 +534,37 @@ void updateAnimation(Model& model, std::vector<Node>& nodes, AnimationClip& clip
                             break;
                         }
                     }
-                    model.animationUpdated = true;
+                    animationIsDirty = true;
                 }
             }
         }
     }
 }
 
-void updateGlobalXForm(Model& model, int id)
+void Model::prepareDraw(std::vector<kame::math::Vector3>& positions)
 {
-    Node& node = model.nodes[id];
-    auto local = node.updateLocalXForm();
-    auto global = kame::math::Matrix::identity();
-    if (node.parent >= 0)
+    if (!nodes.empty())
     {
-        global = model.nodes[node.parent].globalXForm;
+        int i = 0;
+        for (auto& n : nodes)
+        {
+            if (n.parent < 0)
+            {
+                updateGlobalXForm(this, i);
+            }
+            ++i;
+        }
+    }
+
+    if (hasAnimation() && animationIsDirty)
+    {
+        updateSkinMatrices(this);
+        updateSkinnedMesh(this, positions);
     }
     else
     {
-        global = model.nodes.back().globalXForm;
+        updateMesh(this, positions);
     }
-    node.globalXForm = local * global;
-    for (auto c : node.children)
-    {
-        updateGlobalXForm(model, c);
-    }
-}
-
-void updateGlobalXForm(Model& model)
-{
-    if (model.nodes.empty())
-        return;
-    updateGlobalXForm(model, model.nodes.size() - 1);
-}
-
-void updateSkinMatrices(Model& model)
-{
-    for (auto& skin : model.skins)
-    {
-        for (uint32_t i = 0; i < skin.joints.size(); ++i)
-        {
-            Node& joint = model.nodes[skin.joints[i]];
-            skin.matrices[i] = skin.inverseBindMatrices[i] * joint.globalXForm;
-        }
-    }
-}
-
-void updateVBOMeshes(Model& model)
-{
-    for (auto& n : model.nodes)
-    {
-        if (n.meshID < 0)
-        {
-            continue;
-        }
-
-        auto& vbo = model.vboMeshes[n.meshID];
-
-        auto invertMtx = kame::math::Matrix::invert(n.globalXForm);
-        if (n.skinID >= 0 && model.animationUpdated)
-        {
-            Skin& s = model.skins[n.skinID];
-            static std::vector<kame::math::Matrix> skinMatrices;
-            skinMatrices.resize(s.matrices.size());
-            for (size_t i = 0; i < s.matrices.size(); ++i)
-            {
-                skinMatrices[i] = s.matrices[i] * invertMtx;
-            }
-
-            Mesh& srcMesh = model.meshes[n.meshID];
-            static Mesh dstMesh;
-            dstMesh.positions.clear();
-            dstMesh.positions.resize(srcMesh.positions.size());
-            for (auto i : srcMesh.indices)
-            {
-                auto vPos = srcMesh.positions[i];
-                auto vJoint = srcMesh.joints[i];
-                auto vWeight = srcMesh.weights[i];
-
-                // clang-format off
-                auto skinMtx =
-                      skinMatrices[vJoint[0]] * vWeight.x
-                    + skinMatrices[vJoint[1]] * vWeight.y
-                    + skinMatrices[vJoint[2]] * vWeight.z
-                    + skinMatrices[vJoint[3]] * vWeight.w;
-                // clang-format on
-
-                dstMesh.positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
-            }
-            vbo.vboPositions.setBuffer((const float*)&dstMesh.positions[0]);
-        }
-    }
-
-    model.animationUpdated = false;
 }
 
 } // namespace kame::squirtle

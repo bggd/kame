@@ -128,6 +128,11 @@ void loadBuffers(Gltf* gltf, json& j)
                     buffer.binaryData = decodeBase64(buffer.uri, std::string("data:application/octet-stream;base64,").size());
                     assert(buffer.binaryData.size() == buffer.byteLength);
                 }
+                else if (pystring::endswith(buffer.uri, ".bin"))
+                {
+                    SPDLOG_CRITICAL("[Gltf] external .bin is't supportted");
+                    abort();
+                }
             }
             gltf->buffers.push_back(buffer);
         }
@@ -325,9 +330,11 @@ Gltf* loadGLTF(const char* path)
     Gltf* gltf = new Gltf();
     assert(gltf);
 
+    SPDLOG_DEBUG("[Gltf] loading: {0}", path);
     std::fstream f(path);
-    json j = json::parse(f, nullptr, false);
+    json j = json::parse(f, nullptr); //, false);
     assert(!j.is_discarded());
+    gltf->path = std::string(path);
 
     if (j.contains("scene"))
     {
@@ -343,6 +350,8 @@ Gltf* loadGLTF(const char* path)
     loadMeshes(gltf, j);
     loadAnimations(gltf, j);
     loadSkins(gltf, j);
+
+    SPDLOG_DEBUG("[Gltf] loaded: {0}", path);
 
     return gltf;
 }
