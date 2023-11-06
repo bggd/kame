@@ -50,7 +50,7 @@ struct Node {
 
     kame::math::Matrix updateLocalXForm()
     {
-        localXForm = kame::math::Matrix::createScale(scale) * kame::math::Matrix::CreateFromQuaternion(rotation) * kame::math::Matrix::createTranslation(position);
+        localXForm = kame::math::Matrix::createScale(scale) * kame::math::Matrix::createFromQuaternion(rotation) * kame::math::Matrix::createTranslation(position);
         return localXForm;
     }
 };
@@ -94,11 +94,16 @@ struct Model {
     AnimationClip* activeClip = nullptr;
     float playTime = 0.0f;
     bool isPlay = false;
-    bool animationIsDirty = false;
+    bool _isSkinnedMesh = false;
 
     bool hasAnimation()
     {
         return clips.empty() == false;
+    }
+
+    bool isSkinnedMesh()
+    {
+        return _isSkinnedMesh;
     }
 
     void setAnimationClip(std::string name);

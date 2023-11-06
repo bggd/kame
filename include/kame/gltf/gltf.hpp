@@ -133,6 +133,7 @@ struct Gltf {
     std::vector<Animation> animations;
     std::vector<Skin> skins;
     std::string path;
+    std::string basePath;
 };
 
 Gltf* loadGLTF(const char* path);

@@ -16,6 +16,7 @@ std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf,
                 auto& bv = gltf->bufferViews[acc.bufferView];
                 auto& b = gltf->buffers[bv.buffer];
                 positions.reserve(acc.count);
+                assert(acc.componentType == GL_FLOAT);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
                     auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
@@ -47,6 +48,7 @@ std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::G
                 auto& bv = gltf->bufferViews[acc.bufferView];
                 auto& b = gltf->buffers[bv.buffer];
                 uvSets[uvid].reserve(acc.count);
+                assert(acc.componentType == GL_FLOAT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
                     if (acc.componentType == GL_FLOAT)
@@ -86,6 +88,7 @@ std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::
                 auto& bv = gltf->bufferViews[acc.bufferView];
                 auto& b = gltf->buffers[bv.buffer];
                 joints.reserve(acc.count);
+                assert(acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
                     if (acc.componentType == GL_UNSIGNED_BYTE)
@@ -125,6 +128,7 @@ std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, c
                 auto& bv = gltf->bufferViews[acc.bufferView];
                 auto& b = gltf->buffers[bv.buffer];
                 weights.reserve(acc.count);
+                assert(acc.componentType == GL_FLOAT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
                     if (acc.componentType == GL_FLOAT)
@@ -172,6 +176,7 @@ std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const ka
             auto& bv = gltf->bufferViews[acc.bufferView];
             auto& b = gltf->buffers[bv.buffer];
             indices.reserve(acc.count);
+            assert(acc.componentType == GL_UNSIGNED_INT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
             for (unsigned int i = 0; i < acc.count; ++i)
             {
                 if (acc.componentType == GL_UNSIGNED_BYTE)
@@ -224,6 +229,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
         if (n.hasSkin)
         {
             node.skinID = n.skin;
+            model->_isSkinnedMesh = true;
         }
         if (n.hasTranslation)
         {
@@ -243,6 +249,94 @@ Model* importModel(const kame::gltf::Gltf* gltf)
             node.scale.x = n.scale[0];
             node.scale.y = n.scale[1];
             node.scale.z = n.scale[2];
+        }
+        if (n.hasMatrix)
+        {
+            // decompose a Matrix to TRS. code from https://github.com/toji/gl-matrix and https://github.com/donmccurdy/glTF-Transform
+            kame::math::Matrix srcMat;
+            std::memcpy(&srcMat, n.matrix, sizeof(kame::math::Matrix));
+            float sx = kame::math::Vector3::length(kame::math::Vector3(srcMat.m11, srcMat.m12, srcMat.m13));
+            float sy = kame::math::Vector3::length(kame::math::Vector3(srcMat.m21, srcMat.m22, srcMat.m23));
+            float sz = kame::math::Vector3::length(kame::math::Vector3(srcMat.m31, srcMat.m32, srcMat.m33));
+
+            if (srcMat.determinant() < 0.0f)
+            {
+                sx = -sx;
+            }
+
+            node.position.x = srcMat.m41;
+            node.position.y = srcMat.m42;
+            node.position.z = srcMat.m43;
+
+            float invSX = 1.0f / sx;
+            float invSY = 1.0f / sy;
+            float invSZ = 1.0f / sz;
+
+            srcMat.m11 *= invSX;
+            srcMat.m12 *= invSX;
+            srcMat.m13 *= invSX;
+
+            srcMat.m21 *= invSY;
+            srcMat.m22 *= invSY;
+            srcMat.m23 *= invSY;
+
+            srcMat.m31 *= invSZ;
+            srcMat.m32 *= invSZ;
+            srcMat.m33 *= invSZ;
+
+            float is1 = 1.0f / sx;
+            float is2 = 1.0f / sy;
+            float is3 = 1.0f / sz;
+
+            float sm11 = srcMat.m11 * is1;
+            float sm12 = srcMat.m12 * is2;
+            float sm13 = srcMat.m13 * is3;
+            float sm21 = srcMat.m21 * is1;
+            float sm22 = srcMat.m22 * is2;
+            float sm23 = srcMat.m23 * is3;
+            float sm31 = srcMat.m31 * is1;
+            float sm32 = srcMat.m32 * is2;
+            float sm33 = srcMat.m33 * is3;
+
+            float trace = sm11 + sm22 + sm33;
+            float S = 0;
+
+            if (trace > 0)
+            {
+                S = sqrtf(trace + 1.0) * 2;
+                node.rotation.w = 0.25 * S;
+                node.rotation.x = (sm23 - sm32) / S;
+                node.rotation.y = (sm31 - sm13) / S;
+                node.rotation.z = (sm12 - sm21) / S;
+            }
+            else if (sm11 > sm22 && sm11 > sm33)
+            {
+                S = sqrtf(1.0 + sm11 - sm22 - sm33) * 2;
+                node.rotation.w = (sm23 - sm32) / S;
+                node.rotation.x = 0.25 * S;
+                node.rotation.y = (sm12 + sm21) / S;
+                node.rotation.z = (sm31 + sm13) / S;
+            }
+            else if (sm22 > sm33)
+            {
+                S = sqrtf(1.0 + sm22 - sm11 - sm33) * 2;
+                node.rotation.w = (sm31 - sm13) / S;
+                node.rotation.x = (sm12 + sm21) / S;
+                node.rotation.y = 0.25 * S;
+                node.rotation.z = (sm23 + sm32) / S;
+            }
+            else
+            {
+                S = sqrtf(1.0 + sm33 - sm11 - sm22) * 2;
+                node.rotation.w = (sm12 - sm21) / S;
+                node.rotation.x = (sm31 + sm13) / S;
+                node.rotation.y = (sm23 + sm32) / S;
+                node.rotation.z = 0.25 * S;
+            }
+
+            node.scale.x = sx;
+            node.scale.y = sy;
+            node.scale.z = sz;
         }
         node.children.reserve(n.children.size());
         for (auto c : n.children)
@@ -350,6 +444,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
         auto& bv = gltf->bufferViews[acc.bufferView];
         auto& b = gltf->buffers[bv.buffer];
         skin.inverseBindMatrices.reserve(acc.count);
+        assert(acc.componentType == GL_FLOAT);
         for (unsigned int i = 0; i < acc.count; ++i)
         {
             auto v = ((kame::math::Matrix*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
@@ -371,7 +466,8 @@ void updateGlobalXForm(Model* model, int id)
     Node& node = model->nodes[id];
     auto local = node.updateLocalXForm();
     auto global = kame::math::Matrix::identity();
-    if (node.parent >= 0)
+
+    if (node.parent >= 0 && node.skinID < 0)
     {
         global = model->nodes[node.parent].globalXForm;
     }
@@ -406,7 +502,7 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
         }
 
         auto invertMtx = kame::math::Matrix::invert(n.globalXForm);
-        if (n.skinID >= 0 && model->animationIsDirty)
+        if (n.skinID >= 0)
         {
             Skin& s = model->skins[n.skinID];
             static std::vector<kame::math::Matrix> skinMatrices;
@@ -436,8 +532,6 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
             offset += srcMesh.positions.size();
         }
     }
-
-    model->animationIsDirty = false;
 }
 
 void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions)
@@ -534,7 +628,6 @@ void Model::updateAnimation(float dt)
                             break;
                         }
                     }
-                    animationIsDirty = true;
                 }
             }
         }
@@ -556,7 +649,7 @@ void Model::prepareDraw(std::vector<kame::math::Vector3>& positions)
         }
     }
 
-    if (hasAnimation() && animationIsDirty)
+    if (isSkinnedMesh())
     {
         updateSkinMatrices(this);
         updateSkinnedMesh(this, positions);

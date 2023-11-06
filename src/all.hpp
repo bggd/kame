@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 
 #include <array>
 #include <string>
@@ -29,6 +30,7 @@
 #include <fstream>
 #include <tuple>
 #include <span>
+#include <filesystem>
 
 // assert is enabled on release build
 #ifdef NDEBUG

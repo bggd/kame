@@ -40,6 +40,35 @@ struct Matrix {
         this->m44 = m44;
     }
 
+    float determinant()
+    {
+        // clang-format off
+        float num22 = this->m11;
+        float num21 = this->m12;
+        float num20 = this->m13;
+        float num19 = this->m14;
+        float num12 = this->m21;
+        float num11 = this->m22;
+        float num10 = this->m23;
+        float num9  = this->m24;
+        float num8  = this->m31;
+        float num7  = this->m32;
+        float num6  = this->m33;
+        float num5  = this->m34;
+        float num4  = this->m41;
+        float num3  = this->m42;
+        float num2  = this->m43;
+        float num   = this->m44;
+        float num18 = (num6 * num)  - (num5 * num2);
+        float num17 = (num7 * num)  - (num5 * num3);
+        float num16 = (num7 * num2) - (num6 * num3);
+        float num15 = (num8 * num)  - (num5 * num4);
+        float num14 = (num8 * num2) - (num6 * num4);
+        float num13 = (num8 * num3) - (num7 * num4);
+        return ((((num22 * (((num11 * num18) - (num10 * num17)) + (num9 * num16))) - (num21 * (((num12 * num18) - (num10 * num15)) + (num9 * num14)))) + (num20 * (((num12 * num17) - (num11 * num15)) + (num9 * num13)))) - (num19 * (((num12 * num16) - (num11 * num14)) + (num10 * num13))));
+        // clang-format on
+    }
+
     static Matrix zero()
     {
         return Matrix(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -178,7 +207,7 @@ struct Matrix {
         return createScale(Vector3(x, y, z));
     }
 
-    static Matrix CreateFromQuaternion(Quaternion q)
+    static Matrix createFromQuaternion(Quaternion q)
     {
         Vector3 r = Vector3::transform(Vector3(1.0f, 0.0f, 0.0f), q);
         Vector3 u = Vector3::transform(Vector3(0.0f, 1.0f, 0.0f), q);

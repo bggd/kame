@@ -130,8 +130,27 @@ void loadBuffers(Gltf* gltf, json& j)
                 }
                 else if (pystring::endswith(buffer.uri, ".bin"))
                 {
-                    SPDLOG_CRITICAL("[Gltf] external .bin is't supportted");
-                    abort();
+                    std::filesystem::path path(gltf->basePath);
+                    path /= buffer.uri;
+                    SDL_RWops* fp = SDL_RWFromFile(path.string().c_str(), "rb");
+                    assert(fp);
+                    Sint64 len = SDL_RWsize(fp);
+                    assert(len >= 0);
+                    assert(kame::gltf::integer(len) == buffer.byteLength);
+                    buffer.binaryData.resize(len + 1);
+
+                    Sint64 nb_read_total = 0, nb_read = 1;
+                    auto* buf = buffer.binaryData.data();
+                    while (nb_read_total < len && nb_read != 0)
+                    {
+                        nb_read = SDL_RWread(fp, buf, (len - nb_read_total));
+                        nb_read_total += nb_read;
+                        buf += nb_read;
+                    }
+                    SDL_RWclose(fp);
+                    assert(nb_read_total == len);
+
+                    buffer.binaryData.back() = '\0';
                 }
             }
             gltf->buffers.push_back(buffer);
@@ -335,6 +354,7 @@ Gltf* loadGLTF(const char* path)
     json j = json::parse(f, nullptr); //, false);
     assert(!j.is_discarded());
     gltf->path = std::string(path);
+    gltf->basePath = std::filesystem::path(gltf->path).parent_path().string();
 
     if (j.contains("scene"))
     {

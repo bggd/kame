@@ -139,10 +139,7 @@ int main(int argc, char** argv)
         numPos += srcMesh.getBytesOfPositions();
         numIndex += srcMesh.getBytesOfIndices();
 
-        for (const auto& v : srcMesh.positions)
-        {
-            gPositions.push_back(v);
-        }
+        gPositions.resize(gPositions.size() + srcMesh.positions.size());
         for (const auto& e : srcMesh.indices)
         {
             gIndices.push_back(offset + e);
