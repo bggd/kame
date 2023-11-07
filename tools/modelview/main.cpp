@@ -161,6 +161,7 @@ int main(int argc, char** argv)
     int prevMouseX = 0, prevMouseY = 0;
     float sensitivity = 0.4f; // degree
     float rotX = 0.0f, rotY = 0.0f;
+    float panX = 0.0f, panY = 0.0f;
     float zoom = 0.0f;
 
     std::vector<const char*> items;
@@ -194,14 +195,24 @@ int main(int argc, char** argv)
             rotX += sensitivity * float(relMouseY) * -1.0f;
             rotY += sensitivity * float(relMouseX) * -1.0f;
             modelMtx = Matrix::createRotationY(toRadians(rotY)) * Matrix::createRotationX(toRadians(rotX));
+            modelMtx = modelMtx * Matrix::createTranslation(panX, panY, 0.0f);
         }
-        else if (state.isDownRMB)
+
+        if (state.wheelY != 0)
         {
-            zoom += 0.05f * float(relMouseX);
+            zoom += float(state.wheelY) * -1.0f;
             if (zoom < 0.0f)
             {
                 zoom = 0.0f;
             }
+        }
+
+        if (state.isDownRMB)
+        {
+            panX += (1.0f + zoom) * 0.5f * 0.005f * float(relMouseX) * -1.0f;
+            panY += (1.0f + zoom) * 0.5f * 0.005f * float(relMouseY);
+            modelMtx = Matrix::createRotationY(toRadians(rotY)) * Matrix::createRotationX(toRadians(rotX));
+            modelMtx = modelMtx * Matrix::createTranslation(panX, panY, 0.0f);
         }
 
         prevMouseX = state.mouseX;

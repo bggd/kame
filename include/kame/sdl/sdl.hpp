@@ -11,6 +11,8 @@ struct State {
     bool isCloseRequest = false;
     float mouseX = 0.0f;
     float mouseY = 0.0f;
+    int32_t wheelX = 0;
+    int32_t wheelY = 0;
     bool isDownLMB = false;
     bool isDownMMB = false;
     bool isDownRMB = false;

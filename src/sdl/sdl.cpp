@@ -189,6 +189,9 @@ void WindowOGL::setVsync(bool vsync)
 
 void WindowOGL::updateInput()
 {
+    state.wheelX = 0;
+    state.wheelY = 0;
+
     SDL_Event ev;
     while (SDL_PollEvent(&ev) != 0)
     {
@@ -196,6 +199,15 @@ void WindowOGL::updateInput()
         {
             case SDL_EVENT_QUIT:
                 state.isCloseRequest = true;
+                break;
+            case SDL_EVENT_MOUSE_WHEEL:
+                state.wheelX = ev.wheel.x;
+                state.wheelY = ev.wheel.y;
+                if (ev.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
+                {
+                    state.wheelX *= -1;
+                    state.wheelY *= -1;
+                }
                 break;
             default:
                 break;
