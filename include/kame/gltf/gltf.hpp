@@ -6,6 +6,8 @@
 #include <string>
 #include <utility>
 
+#include "gltf_material.hpp"
+
 namespace kame::gltf {
 
 using integer = uint64_t;
@@ -132,6 +134,9 @@ struct Gltf {
     std::vector<Mesh> meshes;
     std::vector<Animation> animations;
     std::vector<Skin> skins;
+    std::vector<Texture> textures;
+    std::vector<Image> images;
+    std::vector<Sampler> samplers;
     std::string path;
     std::string basePath;
 };

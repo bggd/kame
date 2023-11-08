@@ -7,6 +7,10 @@ namespace kame::gltf {
 
 std::vector<uint8_t> decodeBase64(const std::string& str, integer start);
 
+extern void loadTextures(Gltf* gltf, json& j);
+extern void loadImages(Gltf* gltf, json& j);
+extern void loadSamplers(Gltf* gltf, json& j);
+
 void loadScenes(Gltf* gltf, json& j)
 {
     if (j.contains("scenes"))
@@ -351,7 +355,7 @@ Gltf* loadGLTF(const char* path)
 
     SPDLOG_DEBUG("[Gltf] loading: {0}", path);
     std::fstream f(path);
-    json j = json::parse(f, nullptr); //, false);
+    json j = json::parse(f, nullptr);
     assert(!j.is_discarded());
     gltf->path = std::string(path);
     gltf->basePath = std::filesystem::path(gltf->path).parent_path().string();
@@ -370,6 +374,9 @@ Gltf* loadGLTF(const char* path)
     loadMeshes(gltf, j);
     loadAnimations(gltf, j);
     loadSkins(gltf, j);
+    loadTextures(gltf, j);
+    loadImages(gltf, j);
+    loadSamplers(gltf, j);
 
     SPDLOG_DEBUG("[Gltf] loaded: {0}", path);
 
@@ -381,7 +388,7 @@ Gltf* loadGLTFFromMemory(const unsigned char* src, unsigned int len)
     Gltf* gltf = new Gltf();
     assert(gltf);
 
-    json j = json::parse(src, src + len, nullptr, false);
+    json j = json::parse(src, src + len, nullptr);
     assert(!j.is_discarded());
 
     if (j.contains("scene"))
@@ -398,6 +405,9 @@ Gltf* loadGLTFFromMemory(const unsigned char* src, unsigned int len)
     loadMeshes(gltf, j);
     loadAnimations(gltf, j);
     loadSkins(gltf, j);
+    loadTextures(gltf, j);
+    loadImages(gltf, j);
+    loadSamplers(gltf, j);
 
     return gltf;
 }
