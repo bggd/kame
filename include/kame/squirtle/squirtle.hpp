@@ -10,7 +10,7 @@ namespace kame::squirtle {
 using u16Array4 = std::array<uint16_t, 4>;
 using u8Array4 = std::array<uint8_t, 4>;
 
-struct Mesh {
+struct Primitive {
     std::vector<kame::math::Vector3> positions;
     std::vector<std::vector<kame::math::Vector2>> uvSets;
     std::vector<u16Array4> joints;
@@ -26,6 +26,10 @@ struct Mesh {
     {
         return sizeof(unsigned int) * indices.size();
     }
+};
+
+struct Mesh {
+    std::vector<Primitive> primitives;
 };
 
 std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m);

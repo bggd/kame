@@ -2,26 +2,23 @@
 
 namespace kame::squirtle {
 
-std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m)
+std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
 {
     std::vector<kame::math::Vector3> positions;
 
-    for (auto& pri : m.primitives)
+    for (auto& item : pri.attributes)
     {
-        for (auto& item : pri.attributes)
+        if (item.first == "POSITION")
         {
-            if (item.first == "POSITION")
+            auto& acc = gltf->accessors[item.second];
+            auto& bv = gltf->bufferViews[acc.bufferView];
+            auto& b = gltf->buffers[bv.buffer];
+            positions.reserve(acc.count);
+            assert(acc.componentType == GL_FLOAT);
+            for (unsigned int i = 0; i < acc.count; ++i)
             {
-                auto& acc = gltf->accessors[item.second];
-                auto& bv = gltf->bufferViews[acc.bufferView];
-                auto& b = gltf->buffers[bv.buffer];
-                positions.reserve(acc.count);
-                assert(acc.componentType == GL_FLOAT);
-                for (unsigned int i = 0; i < acc.count; ++i)
-                {
-                    auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    positions.emplace_back(v);
-                }
+                auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                positions.emplace_back(v);
             }
         }
     }
@@ -29,43 +26,42 @@ std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf,
     return positions;
 }
 
-std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m)
+std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
 {
     std::vector<std::vector<kame::math::Vector2>> uvSets;
 
-    for (auto& pri : m.primitives)
+    for (auto& item : pri.attributes)
     {
-        for (auto& item : pri.attributes)
+        if (pystring::startswith(item.first, "TEXCOORD"))
         {
-            if (pystring::startswith(item.first, "TEXCOORD"))
-            {
-                uvSets.emplace_back();
-                int uvid = stoi(pystring::lstrip(item.first, "TEXCOORD_"));
-                assert(uvid >= 0);
-                assert(size_t(uvid) < uvSets.size());
+            uvSets.emplace_back();
+            int uvid = stoi(pystring::lstrip(item.first, "TEXCOORD_"));
+            assert(uvid >= 0);
+            assert(size_t(uvid) < uvSets.size());
 
-                auto& acc = gltf->accessors[item.second];
-                auto& bv = gltf->bufferViews[acc.bufferView];
-                auto& b = gltf->buffers[bv.buffer];
-                uvSets[uvid].reserve(acc.count);
-                assert(acc.componentType == GL_FLOAT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
-                for (unsigned int i = 0; i < acc.count; ++i)
+            auto& acc = gltf->accessors[item.second];
+            auto& bv = gltf->bufferViews[acc.bufferView];
+            auto& b = gltf->buffers[bv.buffer];
+            uvSets[uvid].reserve(acc.count);
+            assert(acc.componentType == GL_FLOAT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
+            for (unsigned int i = 0; i < acc.count; ++i)
+            {
+                if (acc.componentType == GL_FLOAT)
                 {
-                    if (acc.componentType == GL_FLOAT)
-                    {
-                        auto v = ((kame::math::Vector2*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        uvSets[uvid].emplace_back(v);
-                    }
-                    else if (acc.componentType == GL_UNSIGNED_BYTE)
-                    {
-                        auto e = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        uvSets[uvid].emplace_back(e / 255.0f);
-                    }
-                    else if (acc.componentType == GL_UNSIGNED_SHORT)
-                    {
-                        auto e = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        uvSets[uvid].emplace_back(e / 65535.0f);
-                    }
+                    auto v = ((kame::math::Vector2*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    uvSets[uvid].emplace_back(v);
+                }
+                else if (acc.componentType == GL_UNSIGNED_BYTE)
+                {
+                    auto s = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto t = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[++i];
+                    uvSets[uvid].emplace_back(s / 255.0f, t / 255.0f);
+                }
+                else if (acc.componentType == GL_UNSIGNED_SHORT)
+                {
+                    auto s = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto t = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[++i];
+                    uvSets[uvid].emplace_back(s / 65535.0f, t / 65535.0f);
                 }
             }
         }
@@ -74,38 +70,35 @@ std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::G
     return uvSets;
 }
 
-std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m)
+std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
 {
     std::vector<std::array<uint16_t, 4>> joints;
 
-    for (auto& pri : m.primitives)
+    for (auto& item : pri.attributes)
     {
-        for (auto& item : pri.attributes)
+        if (item.first == "JOINTS_0")
         {
-            if (item.first == "JOINTS_0")
+            auto& acc = gltf->accessors[item.second];
+            auto& bv = gltf->bufferViews[acc.bufferView];
+            auto& b = gltf->buffers[bv.buffer];
+            joints.reserve(acc.count);
+            assert(acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
+            for (unsigned int i = 0; i < acc.count; ++i)
             {
-                auto& acc = gltf->accessors[item.second];
-                auto& bv = gltf->bufferViews[acc.bufferView];
-                auto& b = gltf->buffers[bv.buffer];
-                joints.reserve(acc.count);
-                assert(acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
-                for (unsigned int i = 0; i < acc.count; ++i)
+                if (acc.componentType == GL_UNSIGNED_BYTE)
                 {
-                    if (acc.componentType == GL_UNSIGNED_BYTE)
-                    {
-                        auto e = ((u8Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        u16Array4 v;
-                        v[0] = e[0];
-                        v[1] = e[1];
-                        v[2] = e[2];
-                        v[3] = e[3];
-                        joints.emplace_back(v);
-                    }
-                    else if (acc.componentType == GL_UNSIGNED_SHORT)
-                    {
-                        auto v = ((u16Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        joints.emplace_back(v);
-                    }
+                    auto e = ((u8Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    u16Array4 v;
+                    v[0] = e[0];
+                    v[1] = e[1];
+                    v[2] = e[2];
+                    v[3] = e[3];
+                    joints.emplace_back(v);
+                }
+                else if (acc.componentType == GL_UNSIGNED_SHORT)
+                {
+                    auto v = ((u16Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    joints.emplace_back(v);
                 }
             }
         }
@@ -114,48 +107,45 @@ std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::
     return joints;
 }
 
-std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m)
+std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
 {
     std::vector<kame::math::Vector4> weights;
 
-    for (auto& pri : m.primitives)
+    for (auto& item : pri.attributes)
     {
-        for (auto& item : pri.attributes)
+        if (item.first == "WEIGHTS_0")
         {
-            if (item.first == "WEIGHTS_0")
+            auto& acc = gltf->accessors[item.second];
+            auto& bv = gltf->bufferViews[acc.bufferView];
+            auto& b = gltf->buffers[bv.buffer];
+            weights.reserve(acc.count);
+            assert(acc.componentType == GL_FLOAT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
+            for (unsigned int i = 0; i < acc.count; ++i)
             {
-                auto& acc = gltf->accessors[item.second];
-                auto& bv = gltf->bufferViews[acc.bufferView];
-                auto& b = gltf->buffers[bv.buffer];
-                weights.reserve(acc.count);
-                assert(acc.componentType == GL_FLOAT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
-                for (unsigned int i = 0; i < acc.count; ++i)
+                if (acc.componentType == GL_FLOAT)
                 {
-                    if (acc.componentType == GL_FLOAT)
-                    {
-                        auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        weights.emplace_back(v);
-                    }
-                    else if (acc.componentType == GL_UNSIGNED_BYTE)
-                    {
-                        auto e = ((u8Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        kame::math::Vector4 v;
-                        v.x = e[0] / 255.0f;
-                        v.y = e[1] / 255.0f;
-                        v.z = e[2] / 255.0f;
-                        v.w = e[3] / 255.0f;
-                        weights.emplace_back(v);
-                    }
-                    else if (acc.componentType == GL_UNSIGNED_SHORT)
-                    {
-                        auto e = ((u16Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        kame::math::Vector4 v;
-                        v.x = e[0] / 65535.0f;
-                        v.y = e[1] / 65535.0f;
-                        v.z = e[2] / 65535.0f;
-                        v.w = e[3] / 65535.0f;
-                        weights.emplace_back(v);
-                    }
+                    auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    weights.emplace_back(v);
+                }
+                else if (acc.componentType == GL_UNSIGNED_BYTE)
+                {
+                    auto e = ((u8Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    kame::math::Vector4 v;
+                    v.x = e[0] / 255.0f;
+                    v.y = e[1] / 255.0f;
+                    v.z = e[2] / 255.0f;
+                    v.w = e[3] / 255.0f;
+                    weights.emplace_back(v);
+                }
+                else if (acc.componentType == GL_UNSIGNED_SHORT)
+                {
+                    auto e = ((u16Array4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    kame::math::Vector4 v;
+                    v.x = e[0] / 65535.0f;
+                    v.y = e[1] / 65535.0f;
+                    v.z = e[2] / 65535.0f;
+                    v.w = e[3] / 65535.0f;
+                    weights.emplace_back(v);
                 }
             }
         }
@@ -164,36 +154,33 @@ std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, c
     return weights;
 }
 
-std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m)
+std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
 {
     std::vector<unsigned int> indices;
 
-    for (auto& pri : m.primitives)
+    if (pri.hasIndices)
     {
-        if (pri.hasIndices)
+        auto& acc = gltf->accessors[pri.indices];
+        auto& bv = gltf->bufferViews[acc.bufferView];
+        auto& b = gltf->buffers[bv.buffer];
+        indices.reserve(acc.count);
+        assert(acc.componentType == GL_UNSIGNED_INT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
+        for (unsigned int i = 0; i < acc.count; ++i)
         {
-            auto& acc = gltf->accessors[pri.indices];
-            auto& bv = gltf->bufferViews[acc.bufferView];
-            auto& b = gltf->buffers[bv.buffer];
-            indices.reserve(acc.count);
-            assert(acc.componentType == GL_UNSIGNED_INT || acc.componentType == GL_UNSIGNED_BYTE || acc.componentType == GL_UNSIGNED_SHORT);
-            for (unsigned int i = 0; i < acc.count; ++i)
+            if (acc.componentType == GL_UNSIGNED_BYTE)
             {
-                if (acc.componentType == GL_UNSIGNED_BYTE)
-                {
-                    auto e = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    indices.emplace_back(e);
-                }
-                else if (acc.componentType == GL_UNSIGNED_SHORT)
-                {
-                    auto e = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    indices.emplace_back(e);
-                }
-                else if (acc.componentType == GL_UNSIGNED_INT)
-                {
-                    auto e = ((unsigned int*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    indices.emplace_back(e);
-                }
+                auto e = ((unsigned char*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                indices.emplace_back(e);
+            }
+            else if (acc.componentType == GL_UNSIGNED_SHORT)
+            {
+                auto e = ((unsigned short*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                indices.emplace_back(e);
+            }
+            else if (acc.componentType == GL_UNSIGNED_INT)
+            {
+                auto e = ((unsigned int*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                indices.emplace_back(e);
             }
         }
     }
@@ -211,12 +198,19 @@ Model* importModel(const kame::gltf::Gltf* gltf)
         model->meshes.emplace_back();
         auto& mesh = model->meshes.back();
 
-        mesh.positions = toVertexPositions(gltf, m);
-        mesh.uvSets = toVertexUVSets(gltf, m);
-        mesh.joints = toVertexJoints(gltf, m);
-        mesh.weights = toVertexWeights(gltf, m);
-        mesh.indices = toVertexIndices(gltf, m);
+        mesh.primitives.reserve(m.primitives.size());
+        for (auto& p : m.primitives)
+        {
+            mesh.primitives.emplace_back();
+            auto& pri = mesh.primitives.back();
+            pri.positions = toVertexPositions(gltf, p);
+            pri.uvSets = toVertexUVSets(gltf, p);
+            pri.joints = toVertexJoints(gltf, p);
+            pri.weights = toVertexWeights(gltf, p);
+            pri.indices = toVertexIndices(gltf, p);
+        }
     }
+
     model->nodes.resize(gltf->nodes.size());
     size_t nodeID = 0;
     for (auto& n : gltf->nodes)
@@ -513,23 +507,26 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
             }
 
             Mesh& srcMesh = model->meshes[n.meshID];
-            for (auto i : srcMesh.indices)
+            for (Primitive& pri : srcMesh.primitives)
             {
-                auto vPos = srcMesh.positions[i];
-                auto vJoint = srcMesh.joints[i];
-                auto vWeight = srcMesh.weights[i];
+                for (auto i : pri.indices)
+                {
+                    auto vPos = pri.positions[i];
+                    auto vJoint = pri.joints[i];
+                    auto vWeight = pri.weights[i];
 
-                // clang-format off
+                    // clang-format off
                 auto skinMtx =
                       skinMatrices[vJoint[0]] * vWeight.x
                     + skinMatrices[vJoint[1]] * vWeight.y
                     + skinMatrices[vJoint[2]] * vWeight.z
                     + skinMatrices[vJoint[3]] * vWeight.w;
-                // clang-format on
+                    // clang-format on
 
-                positions[offset + i] = kame::math::Vector3::transform(vPos, skinMtx);
+                    positions[offset + i] = kame::math::Vector3::transform(vPos, skinMtx);
+                }
+                offset += pri.positions.size();
             }
-            offset += srcMesh.positions.size();
         }
     }
 }
@@ -545,13 +542,16 @@ void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions)
         }
 
         Mesh& srcMesh = model->meshes[n.meshID];
-        for (auto i : srcMesh.indices)
+        for (Primitive& pri : srcMesh.primitives)
         {
-            auto vPos = srcMesh.positions[i];
-            positions[offset + i] = kame::math::Vector3::transform(vPos, n.globalXForm);
-        }
+            for (auto i : pri.indices)
+            {
+                auto vPos = pri.positions[i];
+                positions[offset + i] = kame::math::Vector3::transform(vPos, n.globalXForm);
+            }
 
-        offset += srcMesh.positions.size();
+            offset += pri.positions.size();
+        }
     }
 }
 

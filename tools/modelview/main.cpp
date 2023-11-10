@@ -136,16 +136,19 @@ int main(int argc, char** argv)
         }
 
         Mesh& srcMesh = model->meshes[n.meshID];
-        numPos += srcMesh.getBytesOfPositions();
-        numIndex += srcMesh.getBytesOfIndices();
-
-        gPositions.resize(gPositions.size() + srcMesh.positions.size());
-        for (const auto& e : srcMesh.indices)
+        for (Primitive& pri : srcMesh.primitives)
         {
-            gIndices.push_back(offset + e);
-        }
+            numPos += pri.getBytesOfPositions();
+            numIndex += pri.getBytesOfIndices();
 
-        offset += srcMesh.positions.size();
+            gPositions.resize(gPositions.size() + pri.positions.size());
+            for (const auto& e : pri.indices)
+            {
+                gIndices.push_back(offset + e);
+            }
+
+            offset += pri.positions.size();
+        }
     }
 
     gVBO = kame::ogl::createVertexBuffer(numPos, GL_STATIC_DRAW);
