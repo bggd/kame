@@ -60,12 +60,12 @@ void loadImages(Gltf* gltf, json& j)
 
 void loadSamplers(Gltf* gltf, json& j)
 {
-    if (!j.contains("sampler"))
+    if (!j.contains("samplers"))
     {
         return;
     }
 
-    for (auto& e : j["sampler"])
+    for (auto& e : j["samplers"])
     {
         Sampler sampler;
         if (e.contains("magFilter"))
