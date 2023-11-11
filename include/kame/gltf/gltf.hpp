@@ -137,6 +137,7 @@ struct Gltf {
     std::vector<Texture> textures;
     std::vector<Image> images;
     std::vector<Sampler> samplers;
+    std::vector<Material> materials;
     std::string path;
     std::string basePath;
 };

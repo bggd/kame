@@ -84,4 +84,67 @@ void loadSamplers(Gltf* gltf, json& j)
     }
 }
 
+void loadMaterials(Gltf* gltf, json& j)
+{
+    if (j.contains("materials"))
+    {
+        for (auto& e : j["materials"])
+        {
+            Material material;
+            if (e.contains("pbrMetallicRoughness"))
+            {
+                auto& pbr = e["pbrMetallicRoughness"];
+                if (pbr.contains("baseColor"))
+                {
+                    int i = 0;
+                    for (auto& n : pbr["baseColor"])
+                    {
+                        material.pbrMetallicRoughness.baseColor[i] = n.get<float>();
+                        ++i;
+                    }
+                }
+                if (pbr.contains("textureInfo"))
+                {
+                    auto& ti = pbr["textureInfo"];
+                    assert(ti.contains("index"));
+                    material.pbrMetallicRoughness.textureInfo.index = ti["index"].get<integer>();
+
+                    if (ti.contains("texCoord"))
+                    {
+                        material.pbrMetallicRoughness.textureInfo.texCoord = ti["texCoord"].get<integer>();
+                    }
+                }
+
+                if (pbr.contains("metallicFactor"))
+                {
+                    material.pbrMetallicRoughness.metallicFactor = pbr["metallicFactor"].get<float>();
+                }
+
+                if (pbr.contains("roughnessFactor"))
+                {
+                    material.pbrMetallicRoughness.roughnessFactor = pbr["roughnessFactor"].get<float>();
+                }
+
+                if (pbr.contains("metallicRoughnessTexture"))
+                {
+                    auto& ti = pbr["metallicRoughnessTexture"];
+                    assert(ti.contains("index"));
+                    material.pbrMetallicRoughness.metallicRoughnessTexture.index = ti["index"].get<integer>();
+
+                    if (ti.contains("texCoord"))
+                    {
+                        material.pbrMetallicRoughness.metallicRoughnessTexture.texCoord = ti["texCoord"].get<integer>();
+                        material.pbrMetallicRoughness.hasMetallicRoughnessTexture = true;
+                    }
+                }
+            }
+            if (e.contains("doubleSided"))
+            {
+                material.doubleSided = e["doubleSided"].get<bool>();
+            }
+            gltf->materials.push_back(material);
+        }
+    }
+}
+
 } // namespace kame::gltf

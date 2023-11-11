@@ -10,6 +10,7 @@ std::vector<uint8_t> decodeBase64(const std::string& str, integer start);
 extern void loadTextures(Gltf* gltf, json& j);
 extern void loadImages(Gltf* gltf, json& j);
 extern void loadSamplers(Gltf* gltf, json& j);
+extern void loadMaterials(Gltf* gltf, json& j);
 
 void loadScenes(Gltf* gltf, json& j)
 {
@@ -377,6 +378,7 @@ Gltf* loadGLTF(const char* path)
     loadTextures(gltf, j);
     loadImages(gltf, j);
     loadSamplers(gltf, j);
+    loadMaterials(gltf, j);
 
     SPDLOG_DEBUG("[Gltf] loaded: {0}", path);
 
@@ -408,6 +410,7 @@ Gltf* loadGLTFFromMemory(const unsigned char* src, unsigned int len)
     loadTextures(gltf, j);
     loadImages(gltf, j);
     loadSamplers(gltf, j);
+    loadMaterials(gltf, j);
 
     return gltf;
 }

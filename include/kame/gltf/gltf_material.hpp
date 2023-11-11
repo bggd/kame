@@ -35,4 +35,23 @@ struct Sampler {
     bool hasMinFilter = false;
 };
 
+struct Material {
+    struct TextureInfo {
+        integer index;
+        integer texCoord = 0;
+    };
+
+    struct PBRMetallicRoughness {
+        float baseColor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+        TextureInfo textureInfo;
+        float metallicFactor = 1.0f;
+        float roughnessFactor = 1.0f;
+        TextureInfo metallicRoughnessTexture;
+        bool hasMetallicRoughnessTexture = false;
+    };
+
+    PBRMetallicRoughness pbrMetallicRoughness;
+    bool doubleSided = false;
+};
+
 } // namespace kame::gltf
