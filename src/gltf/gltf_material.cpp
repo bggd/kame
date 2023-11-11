@@ -103,24 +103,24 @@ void loadMaterials(Gltf* gltf, json& j)
         if (e.contains("pbrMetallicRoughness"))
         {
             auto& pbr = e["pbrMetallicRoughness"];
-            if (pbr.contains("baseColor"))
+            if (pbr.contains("baseColorFactor"))
             {
                 int i = 0;
-                for (auto& n : pbr["baseColor"])
+                for (auto& n : pbr["baseColorFactor"])
                 {
-                    material.pbrMetallicRoughness.baseColor[i] = n.get<float>();
+                    material.pbrMetallicRoughness.baseColorFactor[i] = n.get<float>();
                     ++i;
                 }
             }
-            if (pbr.contains("textureInfo"))
+            if (pbr.contains("baseColorTexture"))
             {
-                auto& ti = pbr["textureInfo"];
+                auto& ti = pbr["baseColorTexture"];
                 assert(ti.contains("index"));
-                material.pbrMetallicRoughness.textureInfo.index = ti["index"].get<integer>();
+                material.pbrMetallicRoughness.baseColorTexture.index = ti["index"].get<integer>();
 
                 if (ti.contains("texCoord"))
                 {
-                    material.pbrMetallicRoughness.textureInfo.texCoord = ti["texCoord"].get<integer>();
+                    material.pbrMetallicRoughness.baseColorTexture.texCoord = ti["texCoord"].get<integer>();
                 }
             }
 

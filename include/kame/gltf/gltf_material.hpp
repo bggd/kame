@@ -42,8 +42,8 @@ struct Material {
     };
 
     struct PBRMetallicRoughness {
-        float baseColor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-        TextureInfo textureInfo;
+        float baseColorFactor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+        TextureInfo baseColorTexture;
         float metallicFactor = 1.0f;
         float roughnessFactor = 1.0f;
         TextureInfo metallicRoughnessTexture;
