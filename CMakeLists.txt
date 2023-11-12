@@ -20,6 +20,7 @@ add_library(kame-cpp
     src/gltf/gltf.cpp
     src/gltf/gltf_material.cpp
     src/squirtle/squirtle.cpp
+    src/squirtle/material.cpp
     src/lua/lua.cpp
     src/love2d/love2d.cpp
     src/love2d/detail/context.cpp

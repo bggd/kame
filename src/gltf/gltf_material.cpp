@@ -122,6 +122,8 @@ void loadMaterials(Gltf* gltf, json& j)
                 {
                     material.pbrMetallicRoughness.baseColorTexture.texCoord = ti["texCoord"].get<integer>();
                 }
+
+                material.pbrMetallicRoughness.hasBaseColorTexture = true;
             }
 
             if (pbr.contains("metallicFactor"))

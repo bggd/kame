@@ -54,9 +54,11 @@ struct Mesh {
     struct Primitive {
         std::vector<std::pair<std::string, integer>> attributes;
         integer indices;
+        integer material;
         integer mode = 4;
-        bool hasIndices;
-        bool hasMode;
+        bool hasIndices = false;
+        bool hasMaterial = false;
+        bool hasMode = false;
     };
 
     std::string name;

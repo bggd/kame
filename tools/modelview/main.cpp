@@ -71,6 +71,30 @@ void main() {
 }
 )";
 
+const char* vertTexGLSL = R"(#version 330
+in vec3 vPos;
+in vec2 vUV;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProj;
+out vec2 pUV;
+void main() {
+    mat4 MVP = uProj * uView * uModel;
+    gl_Position = MVP * vec4(vPos, 1.0);
+    pUV = vUV;
+}
+)";
+
+const char* fragTexGLSL = R"(#version 330
+in vec2 pUV;
+uniform vec4 uBaseColorFactor;
+uniform sampler2D uTex;
+out vec4 fragColor;
+void main() {
+    fragColor = texture(uTex, pUV) * uBaseColorFactor;
+}
+)";
+
 const char* drawLinesGLSL = R"(#version 330
 out vec4 fragColor;
 void main() {
@@ -79,20 +103,75 @@ void main() {
 )";
 
 kame::ogl::VertexBuffer* gVBO = nullptr;
+kame::ogl::VertexBuffer* gVBOTexCoord = nullptr;
 kame::ogl::IndexBuffer* gIBO = nullptr;
 std::vector<kame::math::Vector3> gPositions;
+std::vector<kame::math::Vector2> gUV;
 std::vector<unsigned int> gIndices;
+
+kame::ogl::Shader* gShaderFrontFace = nullptr;
+kame::ogl::Shader* gShaderTexture = nullptr;
+kame::ogl::Shader* gShaderDrawLines = nullptr;
+bool isEdgeLines = false;
 
 using namespace kame::math;
 using namespace kame::math::helper;
 
-void drawModel(kame::ogl::Shader* shader, Model* model)
+void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, const kame::squirtle::Model& model, const kame::squirtle::Primitive& pri)
 {
+    assert(pri.material < model.materials.size());
+    kame::squirtle::Material mat = model.materials[pri.material];
+    gShaderTexture->setVector4("uBaseColorFactor", mat.baseColorFactor);
+
+    assert(mat.baseColorTexture >= 0 && mat.baseColorTexture < model.textures.size());
+    assert(model.textures[mat.baseColorTexture].gpuTex);
+    kame::ogl::setTexture2D(0, model.textures[mat.baseColorTexture].gpuTex);
+
+    gVBO->setBuffer(positions);
+
+    assert(mat.baseColorTexCoord >= 0 && mat.baseColorTexCoord < pri.uvSets.size());
+    auto& uvSet = pri.uvSets[mat.baseColorTexCoord];
+    std::copy(uvSet.begin(), uvSet.end(), gUV.begin());
+    gVBOTexCoord->setBuffer(gUV);
+
+    std::copy(pri.indices.begin(), pri.indices.end(), gIndices.begin());
+    gIBO->setBuffer(gIndices);
+
     kame::ogl::VertexArrayObject vao = kame::ogl::VertexArrayObjectBuilder()
-                                           .bindAttribute(shader->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
+                                           .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
+                                           .bindAttribute(gShaderTexture->getAttribLocation("vUV"), gVBOTexCoord, 2, 2 * sizeof(float), 0)
                                            .bindIndexBuffer(gIBO)
                                            .build();
-    vao.drawElements(GL_TRIANGLES, gIndices.size(), GL_UNSIGNED_INT);
+    vao.drawElements(pri.mode, pri.indices.size(), GL_UNSIGNED_INT);
+}
+
+void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::squirtle::Model& model, const kame::squirtle::Primitive& pri)
+{
+    if (!isEdgeLines && pri.material >= 0 && model.materials[pri.material].baseColorTexture >= 0)
+    {
+        kame::ogl::setShader(gShaderTexture);
+        drawModelWithTexture(positions, model, pri);
+        return;
+    }
+
+    if (isEdgeLines)
+    {
+        kame::ogl::setShader(gShaderDrawLines);
+    }
+    else
+    {
+        kame::ogl::setShader(gShaderFrontFace);
+    }
+
+    std::copy(pri.indices.begin(), pri.indices.end(), gIndices.begin());
+
+    gVBO->setBuffer(positions);
+    gIBO->setBuffer(gIndices);
+    kame::ogl::VertexArrayObject vao = kame::ogl::VertexArrayObjectBuilder()
+                                           .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
+                                           .bindIndexBuffer(gIBO)
+                                           .build();
+    vao.drawElements(pri.mode, pri.indices.size(), GL_UNSIGNED_INT);
 }
 
 int main(int argc, char** argv)
@@ -123,10 +202,11 @@ int main(int argc, char** argv)
 
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
     Model* model = importModel(gltf);
+    importMaterial(model, gltf);
     kame::gltf::deleteGLTF(gltf);
 
     size_t numPos = 0;
-    size_t offset = 0;
+    size_t numUV = 0;
     size_t numIndex = 0;
     for (auto& n : model->nodes)
     {
@@ -138,26 +218,34 @@ int main(int argc, char** argv)
         Mesh& srcMesh = model->meshes[n.meshID];
         for (Primitive& pri : srcMesh.primitives)
         {
-            numPos += pri.getBytesOfPositions();
-            numIndex += pri.getBytesOfIndices();
-
-            gPositions.resize(gPositions.size() + pri.positions.size());
-            for (const auto& e : pri.indices)
+            numPos = std::max(numPos, pri.getBytesOfPositions());
+            if (!pri.uvSets.empty())
             {
-                gIndices.push_back(offset + e);
+                numUV = std::max(numUV, pri.getBytesOfUV(0));
             }
-
-            offset += pri.positions.size();
+            numIndex = std::max(numIndex, pri.getBytesOfIndices());
+            if (gPositions.size() < pri.positions.size())
+            {
+                gPositions.resize(pri.positions.size());
+            }
+            if (!pri.uvSets.empty() && gUV.size() < pri.uvSets[0].size())
+            {
+                gUV.resize(pri.uvSets[0].size());
+            }
+            if (gIndices.size() < pri.indices.size())
+            {
+                gIndices.resize(pri.indices.size());
+            }
         }
     }
 
-    gVBO = kame::ogl::createVertexBuffer(numPos, GL_STATIC_DRAW);
-    gVBO->setBuffer(gPositions);
-    gIBO = kame::ogl::createIndexBuffer(numIndex, GL_STATIC_DRAW);
-    gIBO->setBuffer(gIndices);
+    gVBO = kame::ogl::createVertexBuffer(numPos, GL_STREAM_DRAW);
+    gVBOTexCoord = kame::ogl::createVertexBuffer(numUV, GL_STREAM_DRAW);
+    gIBO = kame::ogl::createIndexBuffer(numIndex, GL_STREAM_DRAW);
 
-    kame::ogl::Shader* shaderFrontFace = kame::ogl::createShader(vertGLSL, fragGLSL);
-    kame::ogl::Shader* shaderDrawLines = kame::ogl::createShader(vertGLSL, drawLinesGLSL);
+    gShaderFrontFace = kame::ogl::createShader(vertGLSL, fragGLSL);
+    gShaderTexture = kame::ogl::createShader(vertTexGLSL, fragTexGLSL);
+    gShaderDrawLines = kame::ogl::createShader(vertGLSL, drawLinesGLSL);
 
     // for turntable rotation
     Matrix modelMtx = Matrix::identity();
@@ -261,19 +349,22 @@ int main(int argc, char** argv)
         Matrix view = Matrix::createLookAt(Vector3(0.0f, 0.0f, 2.5f + zoom), Vector3::zero(), Vector3(0.0f, 1.0f, 0.0f));
         Matrix proj = Matrix::createPerspectiveFieldOfView_NO(verticalFov, float(state.drawableSizeX) / float(state.drawableSizeY), 1.0f, 1000.0f);
 
-        kame::ogl::setShader(shaderFrontFace);
-        shaderFrontFace->setMatrix("uView", view);
-        shaderFrontFace->setMatrix("uProj", proj);
-        shaderFrontFace->setMatrix("uModel", modelMtx);
+        kame::ogl::setShader(gShaderFrontFace);
+        gShaderFrontFace->setMatrix("uView", view);
+        gShaderFrontFace->setMatrix("uProj", proj);
+        gShaderFrontFace->setMatrix("uModel", modelMtx);
+        kame::ogl::setShader(gShaderTexture);
+        gShaderTexture->setMatrix("uView", view);
+        gShaderTexture->setMatrix("uProj", proj);
+        gShaderTexture->setMatrix("uModel", modelMtx);
+        kame::ogl::setShader(gShaderDrawLines);
+        gShaderDrawLines->setMatrix("uView", view);
+        gShaderDrawLines->setMatrix("uProj", proj);
+        gShaderDrawLines->setMatrix("uModel", modelMtx);
 
-        model->prepareDraw(gPositions);
-        gVBO->setBuffer(gPositions);
-        drawModel(shaderFrontFace, model);
+        isEdgeLines = false;
+        model->draw(gPositions, drawModel);
 
-        kame::ogl::setShader(shaderDrawLines);
-        shaderDrawLines->setMatrix("uView", view);
-        shaderDrawLines->setMatrix("uProj", proj);
-        shaderDrawLines->setMatrix("uModel", modelMtx);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDepthMask(GL_FALSE);
         glEnable(GL_POLYGON_OFFSET_LINE);
@@ -282,7 +373,8 @@ int main(int argc, char** argv)
                          .depthFunc(GL_LEQUAL)
                          .build();
         kame::ogl::setDepthStencilState(depthState);
-        drawModel(shaderDrawLines, model);
+        isEdgeLines = true;
+        model->draw(gPositions, drawModel);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         ImGui::Render();
@@ -291,8 +383,9 @@ int main(int argc, char** argv)
         win.swapWindow();
     }
 
-    kame::ogl::deleteShader(shaderDrawLines);
-    kame::ogl::deleteShader(shaderFrontFace);
+    kame::ogl::deleteShader(gShaderDrawLines);
+    kame::ogl::deleteShader(gShaderTexture);
+    kame::ogl::deleteShader(gShaderFrontFace);
     win.closeWindow();
     kame::kameShutdown();
     return 0;

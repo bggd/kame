@@ -39,6 +39,7 @@ struct VertexBuffer {
     void setBuffer(const unsigned char* vertices);
     void setBuffer(const float* vertices);
     void setBuffer(const std::vector<kame::math::Vector3>& vertices);
+    void setBuffer(const std::vector<kame::math::Vector2>& vertices);
     void setBufferSubData(GLintptr offset, GLsizeiptr size, const float* vertices); // glBufferSubData
 };
 
@@ -100,6 +101,7 @@ struct Texture2D {
     int numChannel;
     void setTexParameteri(GLenum pname, GLint param);
     void setTexParameterfv(GLenum pname, const GLfloat* param);
+    void generateMipmap();
 };
 
 struct FrameBuffer {

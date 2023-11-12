@@ -47,6 +47,7 @@ struct Material {
         float metallicFactor = 1.0f;
         float roughnessFactor = 1.0f;
         TextureInfo metallicRoughnessTexture;
+        bool hasBaseColorTexture = false;
         bool hasMetallicRoughnessTexture = false;
     };
 

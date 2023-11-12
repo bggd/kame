@@ -31,6 +31,7 @@
 #include <tuple>
 #include <span>
 #include <filesystem>
+#include <functional>
 
 // assert is enabled on release build
 #ifdef NDEBUG

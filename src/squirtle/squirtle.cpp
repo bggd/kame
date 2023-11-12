@@ -208,6 +208,13 @@ Model* importModel(const kame::gltf::Gltf* gltf)
             pri.joints = toVertexJoints(gltf, p);
             pri.weights = toVertexWeights(gltf, p);
             pri.indices = toVertexIndices(gltf, p);
+            if (p.hasMaterial)
+            {
+                assert(p.material >= 0);
+                pri.material = p.material;
+            }
+            assert(p.mode == GL_POINTS || p.mode == GL_LINES || p.mode == GL_LINE_LOOP || p.mode == GL_LINE_STRIP || p.mode == GL_TRIANGLES || p.mode == GL_TRIANGLE_STRIP || p.mode == GL_TRIANGLE_FAN);
+            pri.mode = p.mode;
         }
     }
 
@@ -485,9 +492,8 @@ void updateSkinMatrices(Model* model)
     }
 }
 
-void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions)
+void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawCB& fn)
 {
-    size_t offset = 0;
     for (auto& n : model->nodes)
     {
         if (n.meshID < 0)
@@ -509,6 +515,7 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
             Mesh& srcMesh = model->meshes[n.meshID];
             for (Primitive& pri : srcMesh.primitives)
             {
+                positions.resize(pri.positions.size());
                 for (auto i : pri.indices)
                 {
                     auto vPos = pri.positions[i];
@@ -523,17 +530,16 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
                     + skinMatrices[vJoint[3]] * vWeight.w;
                     // clang-format on
 
-                    positions[offset + i] = kame::math::Vector3::transform(vPos, skinMtx);
+                    positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
                 }
-                offset += pri.positions.size();
+                fn(positions, *model, pri);
             }
         }
     }
 }
 
-void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions)
+void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawCB& fn)
 {
-    size_t offset = 0;
     for (auto& n : model->nodes)
     {
         if (n.meshID < 0)
@@ -544,13 +550,13 @@ void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions)
         Mesh& srcMesh = model->meshes[n.meshID];
         for (Primitive& pri : srcMesh.primitives)
         {
+            positions.resize(pri.positions.size());
             for (auto i : pri.indices)
             {
                 auto vPos = pri.positions[i];
-                positions[offset + i] = kame::math::Vector3::transform(vPos, n.globalXForm);
+                positions[i] = kame::math::Vector3::transform(vPos, n.globalXForm);
             }
-
-            offset += pri.positions.size();
+            fn(positions, *model, pri);
         }
     }
 }
@@ -634,7 +640,7 @@ void Model::updateAnimation(float dt)
     }
 }
 
-void Model::prepareDraw(std::vector<kame::math::Vector3>& positions)
+void Model::draw(std::vector<kame::math::Vector3>& positions, DrawCB fn)
 {
     if (!nodes.empty())
     {
@@ -652,11 +658,11 @@ void Model::prepareDraw(std::vector<kame::math::Vector3>& positions)
     if (isSkinnedMesh())
     {
         updateSkinMatrices(this);
-        updateSkinnedMesh(this, positions);
+        updateSkinnedMesh(this, positions, fn);
     }
     else
     {
-        updateMesh(this, positions);
+        updateMesh(this, positions, fn);
     }
 }
 

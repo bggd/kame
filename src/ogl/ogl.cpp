@@ -394,6 +394,11 @@ void VertexBuffer::setBuffer(const std::vector<kame::math::Vector3>& vertices)
     setBuffer((const float*)vertices.data());
 }
 
+void VertexBuffer::setBuffer(const std::vector<kame::math::Vector2>& vertices)
+{
+    setBuffer((const float*)vertices.data());
+}
+
 void VertexBuffer::setBufferSubData(GLintptr offset, GLsizeiptr size, const float* vertices)
 {
     glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -584,6 +589,13 @@ void Texture2D::setTexParameterfv(GLenum pname, const GLfloat* param)
 {
     glBindTexture(GL_TEXTURE_2D, id);
     glTexParameterfv(GL_TEXTURE_2D, pname, param);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::generateMipmap()
+{
+    glBindTexture(GL_TEXTURE_2D, id);
+    glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 

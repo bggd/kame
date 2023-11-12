@@ -4,6 +4,9 @@
 #include <array>
 #include <cstdint>
 #include <unordered_map>
+#include <functional>
+
+#include "material.hpp"
 
 namespace kame::squirtle {
 
@@ -16,10 +19,17 @@ struct Primitive {
     std::vector<u16Array4> joints;
     std::vector<kame::math::Vector4> weights;
     std::vector<unsigned int> indices;
+    int material = -1;
+    GLenum mode = GL_TRIANGLES;
 
     size_t getBytesOfPositions() const
     {
         return sizeof(float) * 3 * positions.size();
+    }
+
+    size_t getBytesOfUV(size_t i)
+    {
+        return sizeof(float) * 2 * uvSets[i].size();
     }
 
     size_t getBytesOfIndices() const
@@ -90,10 +100,14 @@ struct Skin {
     std::vector<kame::math::Matrix> matrices;
 };
 
+using DrawCB = std::function<void(const std::vector<kame::math::Vector3>& positions, const Model&, const Primitive&)>;
+
 struct Model {
     std::vector<Mesh> meshes;
     std::vector<Node> nodes;
     std::vector<Skin> skins;
+    std::vector<Texture> textures;
+    std::vector<Material> materials;
     std::unordered_map<std::string, AnimationClip> clips;
     AnimationClip* activeClip = nullptr;
     float playTime = 0.0f;
@@ -115,7 +129,7 @@ struct Model {
     void playAnimation();
     void updateAnimation(float dt);
 
-    void prepareDraw(std::vector<kame::math::Vector3>& positions);
+    void draw(std::vector<kame::math::Vector3>& positions, DrawCB fn);
 };
 
 Model* importModel(const kame::gltf::Gltf* gltf);

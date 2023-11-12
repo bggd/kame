@@ -277,6 +277,11 @@ void loadMeshes(Gltf* gltf, json& j)
                 primitive.indices = p["indices"].get<integer>();
                 primitive.hasIndices = true;
             }
+            if (p.contains("material"))
+            {
+                primitive.material = p["material"].get<integer>();
+                primitive.hasMaterial = true;
+            }
             if (p.contains("mode"))
             {
                 primitive.mode = p["mode"].get<integer>();
