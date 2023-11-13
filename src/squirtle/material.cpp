@@ -35,10 +35,27 @@ void importMaterial(Model* model, const kame::gltf::Gltf* gltf)
             if (sampler.hasMinFilter)
             {
                 assert(sampler.minFilter == GL_NEAREST || sampler.minFilter == GL_LINEAR || sampler.minFilter == GL_NEAREST_MIPMAP_NEAREST || sampler.minFilter == GL_LINEAR_MIPMAP_NEAREST || sampler.minFilter == GL_NEAREST_MIPMAP_LINEAR || sampler.minFilter == GL_LINEAR_MIPMAP_LINEAR);
-                tex.gpuTex->setTexParameteri(GL_TEXTURE_MIN_FILTER, sampler.minFilter);
-                if (sampler.minFilter == GL_NEAREST_MIPMAP_NEAREST || sampler.minFilter == GL_LINEAR_MIPMAP_NEAREST || sampler.minFilter == GL_NEAREST_MIPMAP_LINEAR || sampler.minFilter == GL_LINEAR_MIPMAP_LINEAR)
+                if (kame::ogl::Context::getInstance().capability.ext_framebuffer_object)
                 {
-                    tex.gpuTex->generateMipmap();
+
+                    tex.gpuTex->setTexParameteri(GL_TEXTURE_MIN_FILTER, sampler.minFilter);
+                    if (sampler.minFilter == GL_NEAREST_MIPMAP_NEAREST || sampler.minFilter == GL_LINEAR_MIPMAP_NEAREST || sampler.minFilter == GL_NEAREST_MIPMAP_LINEAR || sampler.minFilter == GL_LINEAR_MIPMAP_LINEAR)
+                    {
+                        tex.gpuTex->generateMipmap();
+                    }
+                }
+                else
+                {
+                    GLenum minFilter = sampler.minFilter;
+                    if (minFilter == GL_NEAREST_MIPMAP_NEAREST || minFilter == GL_NEAREST_MIPMAP_LINEAR)
+                    {
+                        minFilter = GL_NEAREST;
+                    }
+                    else if (minFilter == GL_LINEAR_MIPMAP_NEAREST || minFilter == GL_LINEAR_MIPMAP_LINEAR)
+                    {
+                        minFilter = GL_LINEAR;
+                    }
+                    tex.gpuTex->setTexParameteri(GL_TEXTURE_MIN_FILTER, minFilter);
                 }
             }
             assert(sampler.wrapS == GL_CLAMP_TO_EDGE || sampler.wrapS == GL_MIRRORED_REPEAT || sampler.wrapS == GL_REPEAT);

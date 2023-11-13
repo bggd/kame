@@ -131,6 +131,10 @@ void WindowOGL::openWindow(const char* title, int w, int h)
         glEnable(GL_TEXTURE_2D);
     }
 
+    if (GLAD_GL_EXT_framebuffer_object || GLAD_GL_ARB_framebuffer_object)
+    {
+        kame::ogl::Context::getInstance().capability.ext_framebuffer_object = true;
+    }
     if (GLAD_GL_ARB_texture_float)
     {
         kame::ogl::Context::getInstance().capability.arb_texture_float = true;

@@ -12,6 +12,7 @@ namespace kame::ogl {
 
 struct Context {
     struct Capability {
+        bool ext_framebuffer_object = false;
         bool arb_texture_float = false;
         bool arb_draw_instanced = false;
     };
