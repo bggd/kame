@@ -23,7 +23,7 @@ struct CameraOrbit {
 
     CameraOrbit(float horizontalFov, float width, float height);
 
-    void update(kame::sdl::State& state, bool isActiveViewport);
+    void update(kame::sdl::State& state);
 
     const kame::math::Matrix& getModelMatrix() const { return modelMtx; };
     const kame::math::Matrix& getViewMatrix() const { return viewMtx; };

@@ -289,7 +289,10 @@ int main(int argc, char** argv)
         prevTime = win.getElapsedTime();
 
         bool isHover = ImGui::IsItemHovered() || ImGui::IsWindowHovered();
-        orbitCamera.update(state, !isHover);
+        if (!isHover)
+        {
+            orbitCamera.update(state);
+        }
 
         kame::ogl::setViewport(0, 0, state.drawableSizeX, state.drawableSizeY);
         glDepthMask(GL_TRUE);

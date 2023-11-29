@@ -21,12 +21,12 @@ CameraOrbit::CameraOrbit(float horizontalFov, float width, float height)
     projMtx = kame::math::Matrix::identity();
 }
 
-void CameraOrbit::update(kame::sdl::State& state, bool isActiveViewport)
+void CameraOrbit::update(kame::sdl::State& state)
 {
     int relMouseX = prevMouseX - state.mouseX;
     int relMouseY = prevMouseY - state.mouseY;
 
-    if (isActiveViewport && state.isDownLMB)
+    if (state.isDownLMB)
     {
         rot.x += sensitivity * float(relMouseY) * -1.0f;
         rot.y += sensitivity * float(relMouseX) * -1.0f;
@@ -34,7 +34,7 @@ void CameraOrbit::update(kame::sdl::State& state, bool isActiveViewport)
         modelMtx = modelMtx * kame::math::Matrix::createTranslation(pan.x, pan.y, 0.0f);
     }
 
-    if (isActiveViewport && state.wheelY != 0)
+    if (state.wheelY != 0)
     {
         zoom += float(state.wheelY) * -1.0f;
         if (zoom < 0.0f)
@@ -43,7 +43,7 @@ void CameraOrbit::update(kame::sdl::State& state, bool isActiveViewport)
         }
     }
 
-    if (isActiveViewport && state.isDownRMB)
+    if (state.isDownRMB)
     {
         pan.x += (1.0f - zoom) * 0.5f * 0.005f * float(relMouseX) * -1.0f;
         pan.y += (1.0f - zoom) * 0.5f * 0.005f * float(relMouseY);
