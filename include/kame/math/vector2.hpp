@@ -13,6 +13,16 @@ struct Vector2 {
     {
         return Vector2(-x, -y);
     }
+
+    static Vector2 zero()
+    {
+        return {0.0f, 0.0f};
+    }
+
+    static Vector2 one()
+    {
+        return {1.0f, 1.0f};
+    }
 };
 
 static inline Vector2 operator+(Vector2 a, Vector2 b)

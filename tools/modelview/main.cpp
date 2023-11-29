@@ -248,12 +248,7 @@ int main(int argc, char** argv)
     gShaderDrawLines = kame::ogl::createShader(vertGLSL, drawLinesGLSL);
 
     // for turntable rotation
-    Matrix modelMtx = Matrix::identity();
-    int prevMouseX = 0, prevMouseY = 0;
-    float sensitivity = 0.4f; // degree
-    float rotX = 0.0f, rotY = 0.0f;
-    float panX = 0.0f, panY = 0.0f;
-    float zoom = 0.0f;
+    kame::squirtle::CameraOrbit orbitCamera(90.0f, 1280.0f, 720.0f);
 
     std::vector<const char*> items;
     items.reserve(model->clips.size());
@@ -293,38 +288,8 @@ int main(int argc, char** argv)
         model->updateAnimation(win.getElapsedTime() - prevTime);
         prevTime = win.getElapsedTime();
 
-        int relMouseX = prevMouseX - state.mouseX;
-        int relMouseY = prevMouseY - state.mouseY;
-
         bool isHover = ImGui::IsItemHovered() || ImGui::IsWindowHovered();
-
-        if (!isHover && state.isDownLMB)
-        {
-            rotX += sensitivity * float(relMouseY) * -1.0f;
-            rotY += sensitivity * float(relMouseX) * -1.0f;
-            modelMtx = Matrix::createRotationY(toRadians(rotY)) * Matrix::createRotationX(toRadians(rotX));
-            modelMtx = modelMtx * Matrix::createTranslation(panX, panY, 0.0f);
-        }
-
-        if (!isHover && state.wheelY != 0)
-        {
-            zoom += float(state.wheelY) * -1.0f;
-            if (zoom < 0.0f)
-            {
-                zoom = 0.0f;
-            }
-        }
-
-        if (!isHover && state.isDownRMB)
-        {
-            panX += (1.0f + zoom) * 0.5f * 0.005f * float(relMouseX) * -1.0f;
-            panY += (1.0f + zoom) * 0.5f * 0.005f * float(relMouseY);
-            modelMtx = Matrix::createRotationY(toRadians(rotY)) * Matrix::createRotationX(toRadians(rotX));
-            modelMtx = modelMtx * Matrix::createTranslation(panX, panY, 0.0f);
-        }
-
-        prevMouseX = state.mouseX;
-        prevMouseY = state.mouseY;
+        orbitCamera.update(state, !isHover);
 
         kame::ogl::setViewport(0, 0, state.drawableSizeX, state.drawableSizeY);
         glDepthMask(GL_TRUE);
@@ -341,26 +306,18 @@ int main(int argc, char** argv)
         kame::ogl::setBlendState(blendState);
         kame::ogl::setDepthStencilState(depthState);
 
-        // hor+
-        float targetHorizontalFov = toRadians(90.0f);
-        float targetWidth = 1280.0f;
-        float targetHeight = 720.0f;
-        float verticalFov = fov::H2V(targetHorizontalFov, targetWidth, targetHeight);
-        Matrix view = Matrix::createLookAt(Vector3(0.0f, 0.0f, 2.5f + zoom), Vector3::zero(), Vector3(0.0f, 1.0f, 0.0f));
-        Matrix proj = Matrix::createPerspectiveFieldOfView_NO(verticalFov, float(state.drawableSizeX) / float(state.drawableSizeY), 1.0f, 1000.0f);
-
         kame::ogl::setShader(gShaderFrontFace);
-        gShaderFrontFace->setMatrix("uView", view);
-        gShaderFrontFace->setMatrix("uProj", proj);
-        gShaderFrontFace->setMatrix("uModel", modelMtx);
+        gShaderFrontFace->setMatrix("uView", orbitCamera.getViewMatrix());
+        gShaderFrontFace->setMatrix("uProj", orbitCamera.getProjectionMatrix());
+        gShaderFrontFace->setMatrix("uModel", orbitCamera.getModelMatrix());
         kame::ogl::setShader(gShaderTexture);
-        gShaderTexture->setMatrix("uView", view);
-        gShaderTexture->setMatrix("uProj", proj);
-        gShaderTexture->setMatrix("uModel", modelMtx);
+        gShaderTexture->setMatrix("uView", orbitCamera.getViewMatrix());
+        gShaderTexture->setMatrix("uProj", orbitCamera.getProjectionMatrix());
+        gShaderTexture->setMatrix("uModel", orbitCamera.getModelMatrix());
         kame::ogl::setShader(gShaderDrawLines);
-        gShaderDrawLines->setMatrix("uView", view);
-        gShaderDrawLines->setMatrix("uProj", proj);
-        gShaderDrawLines->setMatrix("uModel", modelMtx);
+        gShaderDrawLines->setMatrix("uView", orbitCamera.getViewMatrix());
+        gShaderDrawLines->setMatrix("uProj", orbitCamera.getProjectionMatrix());
+        gShaderDrawLines->setMatrix("uModel", orbitCamera.getModelMatrix());
 
         isEdgeLines = false;
         model->draw(gPositions, drawModel);

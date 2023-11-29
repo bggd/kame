@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <functional>
 
+#include "camera.hpp"
 #include "material.hpp"
 
 namespace kame::squirtle {
