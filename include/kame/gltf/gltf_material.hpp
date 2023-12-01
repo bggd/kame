@@ -52,6 +52,8 @@ struct Material {
     };
 
     PBRMetallicRoughness pbrMetallicRoughness;
+    std::string alphaMode = "OPAQUE";
+    float alphaCutoff = 0.5f;
     bool doubleSided = false;
 };
 

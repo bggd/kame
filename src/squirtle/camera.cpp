@@ -45,8 +45,16 @@ void CameraOrbit::update(kame::sdl::State& state)
 
     if (state.isDownRMB)
     {
-        pan.x += (1.0f - zoom) * 0.5f * 0.005f * float(relMouseX) * -1.0f;
-        pan.y += (1.0f - zoom) * 0.5f * 0.005f * float(relMouseY);
+        if (zoom > 0.0f)
+        {
+            pan.x += zoom * 0.5f * 0.005f * float(relMouseX) * -1.0f;
+            pan.y += zoom * 0.5f * 0.005f * float(relMouseY);
+        }
+        else
+        {
+            pan.x += 0.5f * 0.005f * float(relMouseX) * -1.0f;
+            pan.y += 0.5f * 0.005f * float(relMouseY);
+        }
         modelMtx = kame::math::Matrix::createRotationY(kame::math::helper::toRadians(rot.y)) * kame::math::Matrix::createRotationX(kame::math::helper::toRadians(rot.x));
         modelMtx = modelMtx * kame::math::Matrix::createTranslation(pan.x, pan.y, 0.0f);
     }

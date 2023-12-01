@@ -149,6 +149,14 @@ void loadMaterials(Gltf* gltf, json& j)
                 }
             }
         }
+        if (e.contains("alphaMode"))
+        {
+            material.alphaMode = e["alphaMode"].get<std::string>();
+        }
+        if (e.contains("alphaCutoff"))
+        {
+            material.alphaCutoff = e["alphaCutoff"].get<float>();
+        }
         if (e.contains("doubleSided"))
         {
             material.doubleSided = e["doubleSided"].get<bool>();

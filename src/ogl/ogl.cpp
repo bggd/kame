@@ -406,6 +406,11 @@ void VertexBuffer::setBufferSubData(GLintptr offset, GLsizeiptr size, const floa
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void VertexBuffer::setBufferSubData(GLintptr offset, GLsizeiptr size, const std::vector<kame::math::Vector3>& vertices)
+{
+    setBufferSubData(offset, size, (const float*)vertices.data());
+}
+
 IndexBuffer* createIndexBuffer(GLsizeiptr numBytes, GLenum usage)
 {
     IndexBuffer* ibo = new IndexBuffer();

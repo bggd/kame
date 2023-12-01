@@ -71,6 +71,15 @@ void importMaterial(Model* model, const kame::gltf::Gltf* gltf)
     for (auto& m : gltf->materials)
     {
         Material mat;
+        if (m.alphaMode == "MASK")
+        {
+            mat.alphaMode = kALPHA_MODE_MASK;
+        }
+        else if (m.alphaMode == "BLEND")
+        {
+            mat.alphaMode = kALPHA_MODE_BLEND;
+        }
+        mat.alphaCutoff = m.alphaCutoff;
         mat.doubleSided = m.doubleSided;
         mat.baseColorFactor.x = m.pbrMetallicRoughness.baseColorFactor[0];
         mat.baseColorFactor.y = m.pbrMetallicRoughness.baseColorFactor[1];

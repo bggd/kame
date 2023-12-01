@@ -192,6 +192,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
 {
     Model* model = new Model();
     assert(model);
+    int primIdx = 0;
     model->meshes.reserve(gltf->meshes.size());
     for (auto& m : gltf->meshes)
     {
@@ -215,6 +216,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
             }
             assert(p.mode == GL_POINTS || p.mode == GL_LINES || p.mode == GL_LINE_LOOP || p.mode == GL_LINE_STRIP || p.mode == GL_TRIANGLES || p.mode == GL_TRIANGLE_STRIP || p.mode == GL_TRIANGLE_FAN);
             pri.mode = p.mode;
+            pri.id = primIdx++;
         }
     }
 
@@ -515,7 +517,10 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
             Mesh& srcMesh = model->meshes[n.meshID];
             for (Primitive& pri : srcMesh.primitives)
             {
-                positions.resize(pri.positions.size());
+                if (positions.size() < pri.positions.size())
+                {
+                    positions.resize(pri.positions.size());
+                }
                 for (auto i : pri.indices)
                 {
                     auto vPos = pri.positions[i];

@@ -22,6 +22,7 @@ struct Primitive {
     std::vector<unsigned int> indices;
     int material = -1;
     GLenum mode = GL_TRIANGLES;
+    int id = -1;
 
     size_t getBytesOfPositions() const
     {
