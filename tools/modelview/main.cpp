@@ -203,6 +203,10 @@ int main(int argc, char** argv)
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
     Model* model = importModel(gltf);
     importMaterial(model, gltf);
+    std::unordered_map<std::string, kame::squirtle::AnimationClip> clips;
+    kame::squirtle::AnimationClip* activeClip = nullptr;
+    float playTime = 0.0f;
+    clips = importAnimation(gltf);
     kame::gltf::deleteGLTF(gltf);
 
     size_t numPos = 0;
@@ -251,17 +255,16 @@ int main(int argc, char** argv)
     kame::squirtle::CameraOrbit orbitCamera(90.0f, 1280.0f, 720.0f);
 
     std::vector<const char*> items;
-    items.reserve(model->clips.size());
-    for (auto& [_, clip] : model->clips)
+    items.reserve(clips.size());
+    for (auto& [_, clip] : clips)
     {
         items.emplace_back(clip.name.c_str());
     }
     int itemCurrent = 0;
     int itemSelect = 0;
-    if (model->hasAnimation())
+    if (model->isSkinnedMesh() && !clips.empty())
     {
-        model->setAnimationClip(items[itemCurrent]);
-        model->playAnimation();
+        activeClip = &clips[items[itemCurrent]];
     }
 
     double prevTime = win.getElapsedTime();
@@ -282,11 +285,17 @@ int main(int argc, char** argv)
         if (itemCurrent != itemSelect)
         {
             itemCurrent = itemSelect;
-            model->setAnimationClip(items[itemCurrent]);
-            model->playAnimation();
+            activeClip = &clips[items[itemCurrent]];
+            playTime = 0.0f;
         }
-        model->updateAnimation(win.getElapsedTime() - prevTime);
+        float dt = win.getElapsedTime() - prevTime;
         prevTime = win.getElapsedTime();
+
+        if (activeClip)
+        {
+            playTime += dt;
+            playTime = kame::squirtle::animate(*activeClip, model->nodes, playTime);
+        }
 
         bool isHover = ImGui::IsItemHovered() || ImGui::IsWindowHovered();
         if (!isHover)

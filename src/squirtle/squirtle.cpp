@@ -350,93 +350,6 @@ Model* importModel(const kame::gltf::Gltf* gltf)
         ++nodeID;
     }
 
-    model->clips.reserve(gltf->animations.size());
-    for (auto& a : gltf->animations)
-    {
-        assert(model->clips.contains(a.name) == false);
-        AnimationClip& clip = model->clips[a.name];
-        clip.name = a.name;
-        clip.channels.reserve(a.channels.size());
-        for (auto& c : a.channels)
-        {
-            clip.channels.emplace_back();
-            AnimationClip::Channel& chan = clip.channels.back();
-            chan.samplerID = c.sampler;
-            if (c.target.hasNode)
-            {
-                chan.targetID = c.target.node;
-            }
-            if (c.target.path == "translation")
-            {
-                chan.path = AnimationClip::Channel::PathType::TRANSLATION;
-            }
-            else if (c.target.path == "rotation")
-            {
-                chan.path = AnimationClip::Channel::PathType::ROTATION;
-            }
-            else if (c.target.path == "scale")
-            {
-                chan.path = AnimationClip::Channel::PathType::SCALE;
-            }
-        }
-        clip.samplers.reserve(a.samplers.size());
-        for (auto& s : a.samplers)
-        {
-            clip.samplers.emplace_back();
-            AnimationClip::Sampler& smp = clip.samplers.back();
-            if (s.interpolation == "LINEAR")
-            {
-                smp.interpolation = AnimationClip::Sampler::InterpolationType::LINEAR;
-            }
-            else if (s.interpolation == "STEP")
-            {
-                smp.interpolation = AnimationClip::Sampler::InterpolationType::STEP;
-            }
-            else if (s.interpolation == "CUBICSPLINE")
-            {
-                smp.interpolation = AnimationClip::Sampler::InterpolationType::CUBICSPLINE;
-            }
-
-            {
-                auto& acc = gltf->accessors[s.input];
-                auto& bv = gltf->bufferViews[acc.bufferView];
-                auto& b = gltf->buffers[bv.buffer];
-                smp.inputs.reserve(acc.count);
-                assert(acc.componentType == GL_FLOAT);
-                for (unsigned int i = 0; i < acc.count; ++i)
-                {
-                    auto v = ((float*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                    smp.inputs.emplace_back(v);
-                    clip.startTime = std::min(clip.startTime, v);
-                    clip.endTime = std::max(clip.endTime, v);
-                }
-            }
-            {
-                auto& acc = gltf->accessors[s.output];
-                auto& bv = gltf->bufferViews[acc.bufferView];
-                auto& b = gltf->buffers[bv.buffer];
-                smp.outputsVec4.reserve(acc.count);
-                assert(acc.componentType == GL_FLOAT);
-                if (acc.type == "VEC3")
-                {
-                    for (unsigned int i = 0; i < acc.count; ++i)
-                    {
-                        auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        smp.outputsVec4.emplace_back(kame::math::Vector4(v, 0.0f));
-                    }
-                }
-                else if (acc.type == "VEC4")
-                {
-                    for (unsigned int i = 0; i < acc.count; ++i)
-                    {
-                        auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
-                        smp.outputsVec4.emplace_back(v);
-                    }
-                }
-            }
-        }
-    }
-
     model->skins.reserve(gltf->skins.size());
     for (auto& s : gltf->skins)
     {
@@ -566,36 +479,14 @@ void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawC
     }
 }
 
-void Model::setAnimationClip(std::string name)
+float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime)
 {
-    auto it = clips.find(name);
-    assert(it != clips.end());
-    activeClip = &it->second;
 
-    playTime = activeClip->startTime;
-    isPlay = false;
-}
-
-void Model::playAnimation()
-{
-    assert(activeClip);
-    isPlay = true;
-}
-
-void Model::updateAnimation(float dt)
-{
-    if (!activeClip || !isPlay)
+    if (playTime > clip.endTime)
     {
-        return;
+        playTime = clip.startTime + (clip.endTime - playTime);
     }
 
-    playTime += dt;
-    if (playTime > activeClip->endTime)
-    {
-        playTime = activeClip->startTime + (activeClip->endTime - playTime);
-    }
-
-    AnimationClip& clip = *activeClip;
     float time = playTime;
 
     for (auto& c : clip.channels)
@@ -623,17 +514,17 @@ void Model::updateAnimation(float dt)
                     // TODO: STEP and CUBICSPLINE interp
                     switch (c.path)
                     {
-                        case AnimationClip::Channel::PathType::TRANSLATION: {
+                        case AnimationClip::Channel::PathType::kTRANSLATION: {
                             auto trans = kame::math::Vector4::lerp(s.outputsVec4[i], s.outputsVec4[i + 1], u);
                             node.position = kame::math::Vector3(trans.x, trans.y, trans.z);
                             break;
                         }
-                        case AnimationClip::Channel::PathType::SCALE: {
+                        case AnimationClip::Channel::PathType::kSCALE: {
                             auto scale = kame::math::Vector4::lerp(s.outputsVec4[i], s.outputsVec4[i + 1], u);
                             node.scale = kame::math::Vector3(scale.x, scale.y, scale.z);
                             break;
                         }
-                        case AnimationClip::Channel::PathType::ROTATION: {
+                        case AnimationClip::Channel::PathType::kROTATION: {
                             auto rot = kame::math::Quaternion::slerp(s.outputsVec4[i], s.outputsVec4[i + 1], u);
                             node.rotation = kame::math::Quaternion::normalize(rot);
                             break;
@@ -643,6 +534,8 @@ void Model::updateAnimation(float dt)
             }
         }
     }
+
+    return time;
 }
 
 void Model::draw(std::vector<kame::math::Vector3>& positions, DrawCB fn)

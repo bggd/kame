@@ -8,6 +8,7 @@
 
 #include "camera.hpp"
 #include "material.hpp"
+#include "animation.hpp"
 
 namespace kame::squirtle {
 
@@ -71,31 +72,6 @@ struct Node {
     }
 };
 
-struct AnimationClip {
-    struct Channel {
-        int targetID = -1;
-        enum PathType { TRANSLATION,
-                        ROTATION,
-                        SCALE };
-        PathType path;
-        uint32_t samplerID;
-    };
-    struct Sampler {
-        enum InterpolationType { LINEAR,
-                                 STEP,
-                                 CUBICSPLINE };
-        InterpolationType interpolation;
-        std::vector<float> inputs;
-        std::vector<kame::math::Vector4> outputsVec4;
-    };
-
-    std::string name;
-    std::vector<Channel> channels;
-    std::vector<Sampler> samplers;
-    float startTime = std::numeric_limits<float>::max();
-    float endTime = std::numeric_limits<float>::min();
-};
-
 struct Skin {
     std::vector<kame::math::Matrix> inverseBindMatrices;
     std::vector<int> joints;
@@ -110,30 +86,17 @@ struct Model {
     std::vector<Skin> skins;
     std::vector<Texture> textures;
     std::vector<Material> materials;
-    std::unordered_map<std::string, AnimationClip> clips;
-    AnimationClip* activeClip = nullptr;
-    float playTime = 0.0f;
-    bool isPlay = false;
     bool _isSkinnedMesh = false;
-
-    bool hasAnimation()
-    {
-        return clips.empty() == false;
-    }
 
     bool isSkinnedMesh()
     {
         return _isSkinnedMesh;
     }
 
-    void setAnimationClip(std::string name);
-    void setAnimationClip(const char* name) { setAnimationClip(std::string(name)); }
-    void playAnimation();
-    void updateAnimation(float dt);
-
     void draw(std::vector<kame::math::Vector3>& positions, DrawCB fn);
 };
 
 Model* importModel(const kame::gltf::Gltf* gltf);
+float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime);
 
 } // namespace kame::squirtle
