@@ -68,18 +68,16 @@ struct VertexArrayObject {
     };
     std::vector<VertexArrayObject::Attribute> attributes;
     GLuint ibo_id = 0;
+    bool inSetAttributes = false;
+
+    VertexArrayObject& begin();
+    VertexArrayObject& bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset);
+    VertexArrayObject& bindIndexBuffer(const IndexBuffer* ibo);
+    void end();
 
     void drawArrays(GLenum mode, GLint first, GLsizei count);
     void drawElements(GLenum mode, GLsizei count, GLenum type);
     void drawElements(GLenum mode, GLsizei count, GLenum type, GLsizei primCount);
-};
-
-struct VertexArrayObjectBuilder {
-    VertexArrayObject vao;
-
-    VertexArrayObjectBuilder& bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset);
-    VertexArrayObjectBuilder& bindIndexBuffer(const IndexBuffer* ibo);
-    VertexArrayObject build() { return vao; }
 };
 
 struct Shader {

@@ -192,18 +192,59 @@ void drawElementsInstanced(const VertexArrayObject& vao, GLenum mode, GLsizei co
     glDrawElementsInstanced(mode, count, type, NULL, primCount);
 }
 
+VertexArrayObject& VertexArrayObject::begin()
+{
+    inSetAttributes = true;
+    attributes.clear();
+    return *this;
+}
+
+VertexArrayObject& VertexArrayObject::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
+{
+    assert(inSetAttributes);
+    assert(componentSize >= 1 || componentSize <= 4);
+
+    VertexArrayObject::Attribute attr;
+    attr.location = location;
+    attr.vbo_id = vbo->id;
+    attr.componentSize = componentSize;
+    attr.type = GL_FLOAT;
+    attr.normalized = GL_FALSE;
+    attr.stride = stride;
+    attr.offset = offset;
+
+    attributes.push_back(attr);
+
+    return *this;
+}
+
+VertexArrayObject& VertexArrayObject::bindIndexBuffer(const IndexBuffer* ibo)
+{
+    assert(inSetAttributes);
+    ibo_id = ibo->id;
+    return *this;
+}
+
+void VertexArrayObject::end()
+{
+    inSetAttributes = false;
+}
+
 void VertexArrayObject::drawArrays(GLenum mode, GLint first, GLsizei count)
 {
+    assert(!inSetAttributes);
     kame::ogl::drawArrays(*this, mode, first, count);
 }
 
 void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type)
 {
+    assert(!inSetAttributes);
     kame::ogl::drawElements(*this, mode, count, type);
 }
 
 void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type, GLsizei primCount)
 {
+    assert(!inSetAttributes);
     kame::ogl::drawElementsInstanced(*this, mode, count, type, primCount);
 }
 
@@ -326,30 +367,6 @@ void Shader::setFloat(const char* name, float x)
 void Shader::setInt(const char* name, int x)
 {
     glUniform1iv(getUniformLocation(name), 1, (const GLint*)&x);
-}
-
-VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
-{
-    assert(componentSize >= 1 || componentSize <= 4);
-
-    VertexArrayObject::Attribute attr;
-    attr.location = location;
-    attr.vbo_id = vbo->id;
-    attr.componentSize = componentSize;
-    attr.type = GL_FLOAT;
-    attr.normalized = GL_FALSE;
-    attr.stride = stride;
-    attr.offset = offset;
-
-    vao.attributes.push_back(attr);
-
-    return *this;
-}
-
-VertexArrayObjectBuilder& VertexArrayObjectBuilder::bindIndexBuffer(const IndexBuffer* ibo)
-{
-    vao.ibo_id = ibo->id;
-    return *this;
 }
 
 VertexBuffer* createVertexBuffer(GLsizeiptr numBytes, GLenum usage)

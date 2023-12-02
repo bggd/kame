@@ -172,11 +172,12 @@ int main(int argc, char** argv)
         auto S = kame::math::Matrix::createScale(0.5f);
         shader->setMatrix("uModel", S * R);
 
-        auto vao = kame::ogl::VertexArrayObjectBuilder()
-                       .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
-                       .bindAttribute(shader->getAttribLocation("vUV"), vboTexcoords, 2, 2 * sizeof(float), 0)
-                       .bindIndexBuffer(iboIndices)
-                       .build();
+        kame::ogl::VertexArrayObject vao;
+        vao.begin()
+            .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
+            .bindAttribute(shader->getAttribLocation("vUV"), vboTexcoords, 2, 2 * sizeof(float), 0)
+            .bindIndexBuffer(iboIndices)
+            .end();
         vao.drawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT);
 
         win.swapWindow();

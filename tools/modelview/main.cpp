@@ -137,11 +137,12 @@ void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, con
     std::copy(pri.getIndices().begin(), pri.getIndices().end(), gIndices.begin());
     gIBO->setBuffer(gIndices);
 
-    kame::ogl::VertexArrayObject vao = kame::ogl::VertexArrayObjectBuilder()
-                                           .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
-                                           .bindAttribute(gShaderTexture->getAttribLocation("vUV"), gVBOTexCoord, 2, 2 * sizeof(float), 0)
-                                           .bindIndexBuffer(gIBO)
-                                           .build();
+    kame::ogl::VertexArrayObject vao;
+    vao.begin()
+        .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
+        .bindAttribute(gShaderTexture->getAttribLocation("vUV"), gVBOTexCoord, 2, 2 * sizeof(float), 0)
+        .bindIndexBuffer(gIBO)
+        .end();
     vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
 }
 
@@ -167,10 +168,11 @@ void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::sq
 
     gVBO->setBuffer(positions);
     gIBO->setBuffer(gIndices);
-    kame::ogl::VertexArrayObject vao = kame::ogl::VertexArrayObjectBuilder()
-                                           .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
-                                           .bindIndexBuffer(gIBO)
-                                           .build();
+    kame::ogl::VertexArrayObject vao;
+    vao.begin()
+        .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
+        .bindIndexBuffer(gIBO)
+        .end();
     vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
 }
 

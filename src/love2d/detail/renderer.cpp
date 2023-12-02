@@ -8,9 +8,9 @@ void kame::love2d::detail::PolygonVBO::init()
     ctx.renderer->setShaderPolygonDraw();
 
     vbo = kame::ogl::createVertexBuffer(sizeof(PolygonVertex) * numVertex, GL_DYNAMIC_DRAW);
-    vao = kame::ogl::VertexArrayObjectBuilder()
-              .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
-              .build();
+    vao.begin()
+        .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
+        .end();
 }
 
 void kame::love2d::detail::PolygonVBO::shutdown()
@@ -53,9 +53,9 @@ void kame::love2d::detail::PolygonVBO::reserve(size_t newSize)
     ctx.renderer->setShaderPolygonDraw();
 
     vbo = kame::ogl::createVertexBuffer(sizeof(PolygonVertex) * numVertex, GL_DYNAMIC_DRAW);
-    vao = kame::ogl::VertexArrayObjectBuilder()
-              .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
-              .build();
+    vao.begin()
+        .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
+        .end();
 
     n = 0;
 }
@@ -248,10 +248,10 @@ kame::love2d::detail::graphics::Image* kame::love2d::detail::Renderer::newImage(
     img->vbo = kame::ogl::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
     img->vbo->setBuffer(vtx);
 
-    img->vao = kame::ogl::VertexArrayObjectBuilder()
-                   .bindAttribute(shaderImageDraw->getAttribLocation("vPos"), img->vbo, 2, 4 * sizeof(float), 0)
-                   .bindAttribute(shaderImageDraw->getAttribLocation("vUV"), img->vbo, 2, 4 * sizeof(float), 2 * sizeof(float))
-                   .build();
+    img->vao.begin()
+        .bindAttribute(shaderImageDraw->getAttribLocation("vPos"), img->vbo, 2, 4 * sizeof(float), 0)
+        .bindAttribute(shaderImageDraw->getAttribLocation("vUV"), img->vbo, 2, 4 * sizeof(float), 2 * sizeof(float))
+        .end();
 
     return img;
 }
@@ -285,10 +285,10 @@ kame::love2d::detail::graphics::Quad* kame::love2d::detail::Renderer::newQuad(in
     quad->vbo = kame::ogl::createVertexBuffer(sizeof(vtx), GL_STATIC_DRAW);
     quad->vbo->setBuffer(vtx);
 
-    quad->vao = kame::ogl::VertexArrayObjectBuilder()
-                    .bindAttribute(shaderImageDraw->getAttribLocation("vPos"), quad->vbo, 2, 4 * sizeof(float), 0)
-                    .bindAttribute(shaderImageDraw->getAttribLocation("vUV"), quad->vbo, 2, 4 * sizeof(float), 2 * sizeof(float))
-                    .build();
+    quad->vao.begin()
+        .bindAttribute(shaderImageDraw->getAttribLocation("vPos"), quad->vbo, 2, 4 * sizeof(float), 0)
+        .bindAttribute(shaderImageDraw->getAttribLocation("vUV"), quad->vbo, 2, 4 * sizeof(float), 2 * sizeof(float))
+        .end();
 
     return quad;
 }

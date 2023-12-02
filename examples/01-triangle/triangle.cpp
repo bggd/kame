@@ -59,9 +59,10 @@ int main(int argc, char** argv)
         kame::ogl::setViewport(0, 0, 640, 480);
         kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4(0, 0, 0, 1));
         kame::ogl::setShader(shader);
-        auto vao = kame::ogl::VertexArrayObjectBuilder()
-                       .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 3 * sizeof(float), 0)
-                       .build();
+        kame::ogl::VertexArrayObject vao;
+        vao.begin()
+            .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 3 * sizeof(float), 0)
+            .end();
         vao.drawArrays(GL_TRIANGLES, 0, 3);
         win.swapWindow();
     }

@@ -87,10 +87,11 @@ int main(int argc, char** argv)
         kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT, Vector4(0, 0, 0, 1));
         kame::ogl::setShader(shader);
         kame::ogl::setTexture2D(0, tex);
-        auto vao = kame::ogl::VertexArrayObjectBuilder()
-                       .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 5 * sizeof(float), 0)
-                       .bindAttribute(shader->getAttribLocation("aTexCoord"), vbo, 2, 5 * sizeof(float), 3 * sizeof(float))
-                       .build();
+        kame::ogl::VertexArrayObject vao;
+        vao.begin()
+            .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 5 * sizeof(float), 0)
+            .bindAttribute(shader->getAttribLocation("aTexCoord"), vbo, 2, 5 * sizeof(float), 3 * sizeof(float))
+            .end();
         vao.drawArrays(GL_TRIANGLES, 0, 6);
         win.swapWindow();
     }
