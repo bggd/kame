@@ -2,6 +2,46 @@
 
 namespace kame::squirtle {
 
+const std::vector<kame::math::Vector3>& Primitive::getPositions() const
+{
+    return positions;
+}
+
+const std::vector<std::vector<kame::math::Vector2>>& Primitive::getUvSets() const
+{
+    return uvSets;
+}
+
+const std::vector<u16Array4>& Primitive::getJoints() const
+{
+    return joints;
+}
+
+const std::vector<kame::math::Vector4>& Primitive::getWeights() const
+{
+    return weights;
+}
+
+const std::vector<unsigned int>& Primitive::getIndices() const
+{
+    return indices;
+}
+
+size_t Primitive::getBytesOfPositions() const
+{
+    return sizeof(float) * 3 * positions.size();
+}
+
+size_t Primitive::getBytesOfUV(size_t i)
+{
+    return sizeof(float) * 2 * uvSets[i].size();
+}
+
+size_t Primitive::getBytesOfIndices() const
+{
+    return sizeof(unsigned int) * indices.size();
+}
+
 std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
 {
     std::vector<kame::math::Vector3> positions;
@@ -430,15 +470,18 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
             Mesh& srcMesh = model->meshes[n.meshID];
             for (Primitive& pri : srcMesh.primitives)
             {
-                if (positions.size() < pri.positions.size())
+                const auto& priPositions = pri.getPositions();
+                const auto& priJoints = pri.getJoints();
+                const auto& priWeights = pri.getWeights();
+                if (positions.size() < priPositions.size())
                 {
-                    positions.resize(pri.positions.size());
+                    positions.resize(priPositions.size());
                 }
-                for (auto i : pri.indices)
+                for (auto i : pri.getIndices())
                 {
-                    auto vPos = pri.positions[i];
-                    auto vJoint = pri.joints[i];
-                    auto vWeight = pri.weights[i];
+                    auto vPos = priPositions[i];
+                    auto vJoint = priJoints[i];
+                    auto vWeight = priWeights[i];
 
                     // clang-format off
                 auto skinMtx =
@@ -468,10 +511,11 @@ void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawC
         Mesh& srcMesh = model->meshes[n.meshID];
         for (Primitive& pri : srcMesh.primitives)
         {
-            positions.resize(pri.positions.size());
-            for (auto i : pri.indices)
+            const auto& priPositions = pri.getPositions();
+            positions.resize(priPositions.size());
+            for (auto i : pri.getIndices())
             {
-                auto vPos = pri.positions[i];
+                auto vPos = priPositions[i];
                 positions[i] = kame::math::Vector3::transform(vPos, n.globalXForm);
             }
             fn(positions, *model, pri);

@@ -130,11 +130,11 @@ void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, con
     gVBO->setBuffer(positions);
 
     assert(mat.baseColorTexCoord >= 0 && mat.baseColorTexCoord < pri.uvSets.size());
-    auto& uvSet = pri.uvSets[mat.baseColorTexCoord];
+    auto& uvSet = pri.getUvSets()[mat.baseColorTexCoord];
     std::copy(uvSet.begin(), uvSet.end(), gUV.begin());
     gVBOTexCoord->setBuffer(gUV);
 
-    std::copy(pri.indices.begin(), pri.indices.end(), gIndices.begin());
+    std::copy(pri.getIndices().begin(), pri.getIndices().end(), gIndices.begin());
     gIBO->setBuffer(gIndices);
 
     kame::ogl::VertexArrayObject vao = kame::ogl::VertexArrayObjectBuilder()
@@ -142,7 +142,7 @@ void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, con
                                            .bindAttribute(gShaderTexture->getAttribLocation("vUV"), gVBOTexCoord, 2, 2 * sizeof(float), 0)
                                            .bindIndexBuffer(gIBO)
                                            .build();
-    vao.drawElements(pri.mode, pri.indices.size(), GL_UNSIGNED_INT);
+    vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
 }
 
 void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::squirtle::Model& model, const kame::squirtle::Primitive& pri)
@@ -163,7 +163,7 @@ void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::sq
         kame::ogl::setShader(gShaderFrontFace);
     }
 
-    std::copy(pri.indices.begin(), pri.indices.end(), gIndices.begin());
+    std::copy(pri.getIndices().begin(), pri.getIndices().end(), gIndices.begin());
 
     gVBO->setBuffer(positions);
     gIBO->setBuffer(gIndices);
@@ -171,7 +171,7 @@ void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::sq
                                            .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
                                            .bindIndexBuffer(gIBO)
                                            .build();
-    vao.drawElements(pri.mode, pri.indices.size(), GL_UNSIGNED_INT);
+    vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
 }
 
 int main(int argc, char** argv)
@@ -228,17 +228,17 @@ int main(int argc, char** argv)
                 numUV = std::max(numUV, pri.getBytesOfUV(0));
             }
             numIndex = std::max(numIndex, pri.getBytesOfIndices());
-            if (gPositions.size() < pri.positions.size())
+            if (gPositions.size() < pri.getPositions().size())
             {
-                gPositions.resize(pri.positions.size());
+                gPositions.resize(pri.getPositions().size());
             }
-            if (!pri.uvSets.empty() && gUV.size() < pri.uvSets[0].size())
+            if (!pri.uvSets.empty() && gUV.size() < pri.getUvSets()[0].size())
             {
-                gUV.resize(pri.uvSets[0].size());
+                gUV.resize(pri.getUvSets()[0].size());
             }
-            if (gIndices.size() < pri.indices.size())
+            if (gIndices.size() < pri.getIndices().size())
             {
-                gIndices.resize(pri.indices.size());
+                gIndices.resize(pri.getIndices().size());
             }
         }
     }

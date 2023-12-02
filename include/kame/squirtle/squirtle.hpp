@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <unordered_map>
 #include <functional>
+#include <variant>
 
 #include "camera.hpp"
 #include "material.hpp"
@@ -25,20 +26,15 @@ struct Primitive {
     GLenum mode = GL_TRIANGLES;
     int id = -1;
 
-    size_t getBytesOfPositions() const
-    {
-        return sizeof(float) * 3 * positions.size();
-    }
+    const std::vector<kame::math::Vector3>& getPositions() const;
+    const std::vector<std::vector<kame::math::Vector2>>& getUvSets() const;
+    const std::vector<u16Array4>& getJoints() const;
+    const std::vector<kame::math::Vector4>& getWeights() const;
+    const std::vector<unsigned int>& getIndices() const;
 
-    size_t getBytesOfUV(size_t i)
-    {
-        return sizeof(float) * 2 * uvSets[i].size();
-    }
-
-    size_t getBytesOfIndices() const
-    {
-        return sizeof(unsigned int) * indices.size();
-    }
+    size_t getBytesOfPositions() const;
+    size_t getBytesOfUV(size_t i);
+    size_t getBytesOfIndices() const;
 };
 
 struct Mesh {
