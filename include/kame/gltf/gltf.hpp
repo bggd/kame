@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include "gltf_ext.hpp"
 #include "gltf_material.hpp"
 
 namespace kame::gltf {
@@ -78,12 +79,14 @@ struct Node {
     float translation[3] = {0.0f, 0.0f, 0.0f};
     float rotation[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     float scale[3] = {1.0f, 1.0f, 1.0f};
+    Ext* extensions = nullptr;
     bool hasSkin = false;
     bool hasMesh = false;
     bool hasMatrix = false;
     bool hasTranslation = false;
     bool hasRotation = false;
     bool hasScale = false;
+    bool hasExtensions = false;
 };
 
 struct Scene {

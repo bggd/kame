@@ -41,6 +41,7 @@ struct VertexBuffer {
     void setBuffer(const float* vertices);
     void setBuffer(const std::vector<kame::math::Vector3>& vertices);
     void setBuffer(const std::vector<kame::math::Vector2>& vertices);
+    void setBuffer(const std::vector<kame::math::Matrix>& vertices);
     void setBufferSubData(GLintptr offset, GLsizeiptr size, const float* vertices); // glBufferSubData
     void setBufferSubData(GLintptr offset, GLsizeiptr size, const std::vector<kame::math::Vector3>& vertices);
 };
@@ -65,19 +66,20 @@ struct VertexArrayObject {
         GLboolean normalized;
         GLsizei stride;
         uintptr_t offset;
+        GLuint divisor;
     };
     std::vector<VertexArrayObject::Attribute> attributes;
     GLuint ibo_id = 0;
     bool inSetAttributes = false;
 
     VertexArrayObject& begin();
-    VertexArrayObject& bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset);
+    VertexArrayObject& bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset, GLuint divisor = 0);
     VertexArrayObject& bindIndexBuffer(const IndexBuffer* ibo);
     void end();
 
     void drawArrays(GLenum mode, GLint first, GLsizei count);
     void drawElements(GLenum mode, GLsizei count, GLenum type);
-    void drawElements(GLenum mode, GLsizei count, GLenum type, GLsizei primCount);
+    void drawElementsInstanced(GLenum mode, GLsizei count, GLenum type, GLsizei primCount);
 };
 
 struct Shader {

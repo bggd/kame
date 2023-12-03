@@ -10,6 +10,7 @@
 #include "camera.hpp"
 #include "material.hpp"
 #include "animation.hpp"
+#include "instance.hpp"
 
 namespace kame::squirtle {
 

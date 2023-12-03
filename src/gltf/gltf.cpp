@@ -12,6 +12,8 @@ extern void loadImages(Gltf* gltf, json& j);
 extern void loadSamplers(Gltf* gltf, json& j);
 extern void loadMaterials(Gltf* gltf, json& j);
 
+extern void loadExtensionsForNode(Node& node, json& j);
+
 void loadScenes(Gltf* gltf, json& j)
 {
     if (!j.contains("scenes"))
@@ -111,6 +113,10 @@ void loadNodes(Gltf* gltf, json& j)
                 ++i;
             }
             node.hasScale = true;
+        }
+        if (e.contains("extensions"))
+        {
+            loadExtensionsForNode(node, e["extensions"]);
         }
         gltf->nodes.push_back(node);
     }
@@ -438,6 +444,19 @@ Gltf* loadGLTFFromMemory(const unsigned char* src, unsigned int len)
 
 void deleteGLTF(Gltf* gltf)
 {
+    for (auto& node : gltf->nodes)
+    {
+        if (node.hasExtensions)
+        {
+            assert(node.extensions);
+            if (node.extensions->hasEXT_mesh_gpu_instancing)
+            {
+                assert(node.extensions->EXT_mesh_gpu_instancing);
+                delete node.extensions->EXT_mesh_gpu_instancing;
+            }
+            delete node.extensions;
+        }
+    }
     delete gltf;
 }
 

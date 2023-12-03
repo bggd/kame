@@ -133,15 +133,30 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 
     if (GLAD_GL_EXT_framebuffer_object || GLAD_GL_ARB_framebuffer_object)
     {
+        SPDLOG_INFO("GL_EXT_framebuffer_object is avaliable");
         kame::ogl::Context::getInstance().capability.ext_framebuffer_object = true;
+    }
+    else
+    {
+        SPDLOG_WARN("GL_EXT_framebuffer_object is unavaliable");
     }
     if (GLAD_GL_ARB_texture_float)
     {
+        SPDLOG_INFO("GL_ARB_texture_float is avaliable");
         kame::ogl::Context::getInstance().capability.arb_texture_float = true;
+    }
+    else
+    {
+        SPDLOG_WARN("GL_ARB_texture_float is unavaliable");
     }
     if (GLAD_GL_ARB_draw_instanced)
     {
+        SPDLOG_INFO("GL_ARB_draw_instanced is avaliable");
         kame::ogl::Context::getInstance().capability.arb_draw_instanced = true;
+    }
+    else
+    {
+        SPDLOG_WARN("GL_ARB_draw_instanced is unavaliable");
     }
 
     elapsedTimeUInt64 = SDL_GetPerformanceCounter();

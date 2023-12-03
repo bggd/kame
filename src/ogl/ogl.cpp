@@ -187,9 +187,21 @@ void drawElementsInstanced(const VertexArrayObject& vao, GLenum mode, GLsizei co
         glBindBuffer(GL_ARRAY_BUFFER, i.vbo_id);
         glEnableVertexAttribArray(i.location);
         glVertexAttribPointer(i.location, i.componentSize, i.type, i.normalized, i.stride, (const void*)i.offset);
+        if (i.divisor > 0)
+        {
+            glVertexAttribDivisor(i.location, i.divisor);
+        }
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vao.ibo_id);
     glDrawElementsInstanced(mode, count, type, NULL, primCount);
+    // reset divisor
+    for (const auto& i : vao.attributes)
+    {
+        if (i.divisor > 0)
+        {
+            glVertexAttribDivisor(i.location, 0);
+        }
+    }
 }
 
 VertexArrayObject& VertexArrayObject::begin()
@@ -199,7 +211,7 @@ VertexArrayObject& VertexArrayObject::begin()
     return *this;
 }
 
-VertexArrayObject& VertexArrayObject::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset)
+VertexArrayObject& VertexArrayObject::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset, GLuint divisor)
 {
     assert(inSetAttributes);
     assert(componentSize >= 1 || componentSize <= 4);
@@ -212,6 +224,7 @@ VertexArrayObject& VertexArrayObject::bindAttribute(GLuint location, const Verte
     attr.normalized = GL_FALSE;
     attr.stride = stride;
     attr.offset = offset;
+    attr.divisor = divisor;
 
     attributes.push_back(attr);
 
@@ -242,7 +255,7 @@ void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type)
     kame::ogl::drawElements(*this, mode, count, type);
 }
 
-void VertexArrayObject::drawElements(GLenum mode, GLsizei count, GLenum type, GLsizei primCount)
+void VertexArrayObject::drawElementsInstanced(GLenum mode, GLsizei count, GLenum type, GLsizei primCount)
 {
     assert(!inSetAttributes);
     kame::ogl::drawElementsInstanced(*this, mode, count, type, primCount);
@@ -412,6 +425,11 @@ void VertexBuffer::setBuffer(const std::vector<kame::math::Vector3>& vertices)
 }
 
 void VertexBuffer::setBuffer(const std::vector<kame::math::Vector2>& vertices)
+{
+    setBuffer((const float*)vertices.data());
+}
+
+void VertexBuffer::setBuffer(const std::vector<kame::math::Matrix>& vertices)
 {
     setBuffer((const float*)vertices.data());
 }

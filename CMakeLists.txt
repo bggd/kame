@@ -19,7 +19,9 @@ add_library(kame-cpp
     src/ogl/ogl.cpp
     src/gltf/gltf.cpp
     src/gltf/gltf_material.cpp
+    src/gltf/gltf_ext.cpp
     src/squirtle/squirtle.cpp
+    src/squirtle/instance.cpp
     src/squirtle/animation.cpp
     src/squirtle/material.cpp
     src/squirtle/camera.cpp
