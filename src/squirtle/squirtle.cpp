@@ -584,17 +584,15 @@ float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime)
 
 void Model::draw(std::vector<kame::math::Vector3>& positions, DrawCB fn)
 {
-    if (!nodes.empty())
+
+    int i = 0;
+    for (auto& n : nodes)
     {
-        int i = 0;
-        for (auto& n : nodes)
+        if (n.parent < 0)
         {
-            if (n.parent < 0)
-            {
-                updateGlobalXForm(this, i);
-            }
-            ++i;
+            updateGlobalXForm(this, i);
         }
+        ++i;
     }
 
     if (isSkinnedMesh())
