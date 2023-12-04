@@ -451,50 +451,48 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
 {
     for (auto& n : model->nodes)
     {
-        if (n.meshID < 0)
+        if (n.meshID < 0 || n.skinID < 0)
         {
             continue;
         }
 
         auto invertMtx = kame::math::Matrix::invert(n.globalXForm);
-        if (n.skinID >= 0)
+
+        Skin& s = model->skins[n.skinID];
+        static std::vector<kame::math::Matrix> skinMatrices;
+        skinMatrices.resize(s.matrices.size());
+        for (size_t i = 0; i < s.matrices.size(); ++i)
         {
-            Skin& s = model->skins[n.skinID];
-            static std::vector<kame::math::Matrix> skinMatrices;
-            skinMatrices.resize(s.matrices.size());
-            for (size_t i = 0; i < s.matrices.size(); ++i)
+            skinMatrices[i] = s.matrices[i] * invertMtx;
+        }
+
+        Mesh& srcMesh = model->meshes[n.meshID];
+        for (Primitive& pri : srcMesh.primitives)
+        {
+            const auto& priPositions = pri.getPositions();
+            const auto& priJoints = pri.getJoints();
+            const auto& priWeights = pri.getWeights();
+            if (positions.size() < priPositions.size())
             {
-                skinMatrices[i] = s.matrices[i] * invertMtx;
+                positions.resize(priPositions.size());
             }
-
-            Mesh& srcMesh = model->meshes[n.meshID];
-            for (Primitive& pri : srcMesh.primitives)
+            for (auto i : pri.getIndices())
             {
-                const auto& priPositions = pri.getPositions();
-                const auto& priJoints = pri.getJoints();
-                const auto& priWeights = pri.getWeights();
-                if (positions.size() < priPositions.size())
-                {
-                    positions.resize(priPositions.size());
-                }
-                for (auto i : pri.getIndices())
-                {
-                    auto vPos = priPositions[i];
-                    auto vJoint = priJoints[i];
-                    auto vWeight = priWeights[i];
+                auto vPos = priPositions[i];
+                auto vJoint = priJoints[i];
+                auto vWeight = priWeights[i];
 
-                    // clang-format off
+                // clang-format off
                 auto skinMtx =
                       skinMatrices[vJoint[0]] * vWeight.x
                     + skinMatrices[vJoint[1]] * vWeight.y
                     + skinMatrices[vJoint[2]] * vWeight.z
                     + skinMatrices[vJoint[3]] * vWeight.w;
-                    // clang-format on
+                // clang-format on
 
-                    positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
-                }
-                fn(positions, *model, pri);
+                positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
             }
+            fn(positions, *model, pri);
         }
     }
 }
