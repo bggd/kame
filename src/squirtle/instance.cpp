@@ -53,7 +53,7 @@ InstanceAttributes importInstanceAttributes(const kame::gltf::Gltf* gltf)
                 assert(acc.componentType == GL_FLOAT);
                 for (unsigned int i = 0; i < acc.count; ++i)
                 {
-                    auto v = ((float*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                    auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                     instance.scales.emplace_back(v);
                 }
             }
