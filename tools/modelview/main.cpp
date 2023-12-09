@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <cmath>
+#include <filesystem>
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -109,6 +110,8 @@ std::vector<kame::math::Vector3> gPositions;
 std::vector<kame::math::Vector2> gUV;
 std::vector<unsigned int> gIndices;
 
+std::vector<kame::ogl::Texture2D*> gTextures;
+
 kame::ogl::Shader* gShaderFrontFace = nullptr;
 kame::ogl::Shader* gShaderTexture = nullptr;
 kame::ogl::Shader* gShaderDrawLines = nullptr;
@@ -123,9 +126,9 @@ void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, con
     kame::squirtle::Material mat = model.materials[pri.material];
     gShaderTexture->setVector4("uBaseColorFactor", mat.baseColorFactor);
 
-    assert(mat.baseColorTexture >= 0 && mat.baseColorTexture < model.textures.size());
-    assert(model.textures[mat.baseColorTexture].gpuTex);
-    kame::ogl::setTexture2D(0, model.textures[mat.baseColorTexture].gpuTex);
+    assert(mat.baseColorTextureIndex >= 0 && mat.baseColorTextureIndex < gTextures.size());
+    assert(gTextures[mat.baseColorTextureIndex]);
+    kame::ogl::setTexture2D(0, gTextures[mat.baseColorTextureIndex]);
 
     gVBO->setBuffer(positions);
 
@@ -148,7 +151,7 @@ void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, con
 
 void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::squirtle::Model& model, const kame::squirtle::Primitive& pri)
 {
-    if (!isEdgeLines && pri.material >= 0 && model.materials[pri.material].baseColorTexture >= 0)
+    if (!isEdgeLines && pri.material >= 0 && model.materials[pri.material].baseColorTextureIndex >= 0)
     {
         kame::ogl::setShader(gShaderTexture);
         drawModelWithTexture(positions, model, pri);
@@ -174,6 +177,71 @@ void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::sq
         .bindIndexBuffer(gIBO)
         .end();
     vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
+}
+
+void loadTextures(const kame::gltf::Gltf* gltf)
+{
+    for (auto& t : gltf->textures)
+    {
+        assert(t.hasSource);
+        kame::ogl::Texture2D* tex;
+        auto& img = gltf->images[t.source];
+        if (img.hasURI)
+        {
+            std::filesystem::path path(gltf->basePath);
+            path /= img.uri;
+            tex = kame::ogl::loadTexture2D(path.string().c_str());
+        }
+        else
+        {
+            assert(img.hasBufferView);
+            auto& bv = gltf->bufferViews[img.bufferView];
+            auto& b = gltf->buffers[bv.buffer];
+            tex = kame::ogl::loadTexture2DFromMemory(b.data(), b.byteLength);
+        }
+
+        if (t.hasSampler)
+        {
+            auto& sampler = gltf->samplers[t.sampler];
+            if (sampler.hasMagFilter)
+            {
+                assert(sampler.magFilter == GL_NEAREST || sampler.magFilter == GL_LINEAR);
+                tex->setTexParameteri(GL_TEXTURE_MAG_FILTER, sampler.magFilter);
+            }
+            if (sampler.hasMinFilter)
+            {
+                assert(sampler.minFilter == GL_NEAREST || sampler.minFilter == GL_LINEAR || sampler.minFilter == GL_NEAREST_MIPMAP_NEAREST || sampler.minFilter == GL_LINEAR_MIPMAP_NEAREST || sampler.minFilter == GL_NEAREST_MIPMAP_LINEAR || sampler.minFilter == GL_LINEAR_MIPMAP_LINEAR);
+                if (kame::ogl::Context::getInstance().capability.ext_framebuffer_object)
+                {
+
+                    tex->setTexParameteri(GL_TEXTURE_MIN_FILTER, sampler.minFilter);
+                    if (sampler.minFilter == GL_NEAREST_MIPMAP_NEAREST || sampler.minFilter == GL_LINEAR_MIPMAP_NEAREST || sampler.minFilter == GL_NEAREST_MIPMAP_LINEAR || sampler.minFilter == GL_LINEAR_MIPMAP_LINEAR)
+                    {
+                        tex->generateMipmap();
+                    }
+                }
+                else
+                {
+                    GLenum minFilter = sampler.minFilter;
+                    if (minFilter == GL_NEAREST_MIPMAP_NEAREST || minFilter == GL_NEAREST_MIPMAP_LINEAR)
+                    {
+                        minFilter = GL_NEAREST;
+                    }
+                    else if (minFilter == GL_LINEAR_MIPMAP_NEAREST || minFilter == GL_LINEAR_MIPMAP_LINEAR)
+                    {
+                        minFilter = GL_LINEAR;
+                    }
+                    tex->setTexParameteri(GL_TEXTURE_MIN_FILTER, minFilter);
+                }
+            }
+            assert(sampler.wrapS == GL_CLAMP_TO_EDGE || sampler.wrapS == GL_MIRRORED_REPEAT || sampler.wrapS == GL_REPEAT);
+            tex->setTexParameteri(GL_TEXTURE_WRAP_S, sampler.wrapS);
+            assert(sampler.wrapT == GL_CLAMP_TO_EDGE || sampler.wrapT == GL_MIRRORED_REPEAT || sampler.wrapT == GL_REPEAT);
+            tex->setTexParameteri(GL_TEXTURE_WRAP_T, sampler.wrapT);
+        }
+
+        gTextures.emplace_back(tex);
+    }
 }
 
 int main(int argc, char** argv)
@@ -204,6 +272,7 @@ int main(int argc, char** argv)
 
     kame::gltf::Gltf* gltf = kame::gltf::loadGLTF(argv[1]);
     Model* model = importModel(gltf);
+    loadTextures(gltf);
     importMaterial(model, gltf);
     std::unordered_map<std::string, kame::squirtle::AnimationClip> clips;
     kame::squirtle::AnimationClip* activeClip = nullptr;
@@ -353,6 +422,15 @@ int main(int argc, char** argv)
 
         win.swapWindow();
     }
+
+    for (auto* tex : gTextures)
+    {
+        kame::ogl::deleteTexture2D(tex);
+    }
+
+    kame::ogl::deleteVertexBuffer(gVBO);
+    kame::ogl::deleteVertexBuffer(gVBOTexCoord);
+    kame::ogl::deleteIndexBuffer(gIBO);
 
     kame::ogl::deleteShader(gShaderDrawLines);
     kame::ogl::deleteShader(gShaderTexture);

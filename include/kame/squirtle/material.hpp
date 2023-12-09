@@ -4,10 +4,6 @@
 
 namespace kame::squirtle {
 
-struct Texture {
-    kame::ogl::Texture2D* gpuTex = nullptr;
-};
-
 enum AlphaMode {
     kALPHA_MODE_OPAQUE,
     kALPHA_MODE_MASK,
@@ -16,7 +12,7 @@ enum AlphaMode {
 
 struct Material {
     kame::math::Vector4 baseColorFactor = kame::math::Vector4::one();
-    int baseColorTexture = -1;
+    int baseColorTextureIndex = -1;
     int baseColorTexCoord = -1;
     float metallicFactor = 1.0f;
     float roughnessFactor = 1.0f;
