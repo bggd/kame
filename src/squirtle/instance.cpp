@@ -7,11 +7,7 @@ InstanceAttributes importInstanceAttributes(const kame::gltf::Gltf* gltf)
     InstanceAttributes instance;
     for (const auto& node : gltf->nodes)
     {
-        if (!node.hasExtensions)
-        {
-            continue;
-        }
-        if (!node.extensions->hasEXT_mesh_gpu_instancing)
+        if (!node.hasExtensions || !node.extensions->hasEXT_mesh_gpu_instancing)
         {
             continue;
         }

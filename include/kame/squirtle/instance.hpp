@@ -13,6 +13,7 @@ struct InstanceAttributes {
     std::vector<kame::math::Vector3> scales;
 };
 
+// TODO: accept a not origin of source node.
 InstanceAttributes importInstanceAttributes(const kame::gltf::Gltf* gltf);
 std::vector<kame::math::Matrix> toInstanceMatrices(const InstanceAttributes& attributes);
 
