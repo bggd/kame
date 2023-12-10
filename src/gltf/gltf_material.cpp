@@ -25,7 +25,7 @@ void loadTextures(Gltf* gltf, json& j)
             texture.source = e["source"].get<integer>();
             texture.hasSource = true;
         }
-        gltf->textures.push_back(texture);
+        gltf->textures.emplace_back(texture);
     }
 }
 
@@ -54,7 +54,7 @@ void loadImages(Gltf* gltf, json& j)
             image.bufferView = e["bufferView"].get<integer>();
             image.hasBufferView = true;
         }
-        gltf->images.push_back(image);
+        gltf->images.emplace_back(image);
     }
 }
 
@@ -86,7 +86,7 @@ void loadSamplers(Gltf* gltf, json& j)
         {
             sampler.wrapT = e["wrapT"].get<integer>();
         }
-        gltf->samplers.push_back(sampler);
+        gltf->samplers.emplace_back(sampler);
     }
 }
 
@@ -161,7 +161,7 @@ void loadMaterials(Gltf* gltf, json& j)
         {
             material.doubleSided = e["doubleSided"].get<bool>();
         }
-        gltf->materials.push_back(material);
+        gltf->materials.emplace_back(material);
     }
 }
 

@@ -32,10 +32,10 @@ void loadScenes(Gltf* gltf, json& j)
         {
             for (auto& n : e["nodes"])
             {
-                scene.nodes.push_back(n.get<integer>());
+                scene.nodes.emplace_back(n.get<integer>());
             }
         }
-        gltf->scenes.push_back(scene);
+        gltf->scenes.emplace_back(scene);
     }
 }
 
@@ -57,7 +57,7 @@ void loadNodes(Gltf* gltf, json& j)
         {
             for (auto& n : e["children"])
             {
-                node.children.push_back(n.get<integer>());
+                node.children.emplace_back(n.get<integer>());
             }
         }
         if (e.contains("skin"))
@@ -118,7 +118,7 @@ void loadNodes(Gltf* gltf, json& j)
         {
             loadExtensionsForNode(node, e["extensions"]);
         }
-        gltf->nodes.push_back(node);
+        gltf->nodes.emplace_back(node);
     }
 }
 
@@ -171,7 +171,7 @@ void loadBuffers(Gltf* gltf, json& j)
                 buffer.binaryData.back() = '\0';
             }
         }
-        gltf->buffers.push_back(buffer);
+        gltf->buffers.emplace_back(buffer);
     }
 }
 
@@ -206,7 +206,7 @@ void loadBufferViews(Gltf* gltf, json& j)
         }
         view.buffer = e["buffer"].get<integer>();
         view.byteLength = e["byteLength"].get<integer>();
-        gltf->bufferViews.push_back(view);
+        gltf->bufferViews.emplace_back(view);
     }
 }
 
@@ -243,21 +243,21 @@ void loadAccessors(Gltf* gltf, json& j)
         {
             for (auto& x : e["max"])
             {
-                accessor.max.push_back(x.get<integer>());
+                accessor.max.emplace_back(x.get<integer>());
             }
         }
         if (e.contains("min"))
         {
             for (auto& x : e["min"])
             {
-                accessor.min.push_back(x.get<integer>());
+                accessor.min.emplace_back(x.get<integer>());
             }
         }
         accessor.componentType = e["componentType"].get<integer>();
         accessor.count = e["count"].get<integer>();
         accessor.type = e["type"].get<std::string>();
 
-        gltf->accessors.push_back(accessor);
+        gltf->accessors.emplace_back(accessor);
     }
 }
 
@@ -295,11 +295,11 @@ void loadMeshes(Gltf* gltf, json& j)
             }
             for (auto& [key, val] : p["attributes"].items())
             {
-                primitive.attributes.push_back(std::make_pair(key, val));
+                primitive.attributes.emplace_back(std::make_pair(key, val));
             }
-            mesh.primitives.push_back(primitive);
+            mesh.primitives.emplace_back(primitive);
         }
-        gltf->meshes.push_back(mesh);
+        gltf->meshes.emplace_back(mesh);
     }
 }
 
@@ -327,7 +327,7 @@ void loadAnimations(Gltf* gltf, json& j)
                 animChan.target.hasNode = true;
             }
             animChan.target.path = c["target"]["path"].get<std::string>();
-            anim.channels.push_back(animChan);
+            anim.channels.emplace_back(animChan);
         }
         for (auto& s : e["samplers"])
         {
@@ -338,9 +338,9 @@ void loadAnimations(Gltf* gltf, json& j)
                 animSampler.interpolation = s["interpolation"].get<std::string>();
             }
             animSampler.output = s["output"].get<integer>();
-            anim.samplers.push_back(animSampler);
+            anim.samplers.emplace_back(animSampler);
         }
-        gltf->animations.push_back(anim);
+        gltf->animations.emplace_back(anim);
     }
 }
 
@@ -370,9 +370,9 @@ void loadSkins(Gltf* gltf, json& j)
         }
         for (auto& i : e["joints"])
         {
-            skin.joints.push_back(i.get<integer>());
+            skin.joints.emplace_back(i.get<integer>());
         }
-        gltf->skins.push_back(skin);
+        gltf->skins.emplace_back(skin);
     }
 }
 
@@ -518,7 +518,7 @@ std::vector<uint8_t> decodeBase64(const std::string& str, integer start)
             decode[1] = decode[1] & 0b11110000;
             bytes = decode[0] << 6 | decode[1];
             bytes = bytes << 12;
-            data.push_back(bytes >> 16);
+            data.emplace_back(bytes >> 16);
         }
         else if (decode[3] == 64)
         {
@@ -526,17 +526,17 @@ std::vector<uint8_t> decodeBase64(const std::string& str, integer start)
             bytes = decode[0] << 6 | decode[1];
             bytes = bytes << 6 | decode[2];
             bytes = bytes << 6;
-            data.push_back(bytes >> 16);
-            data.push_back(bytes >> 8);
+            data.emplace_back(bytes >> 16);
+            data.emplace_back(bytes >> 8);
         }
         else
         {
             bytes = decode[0] << 6 | decode[1];
             bytes = bytes << 6 | decode[2];
             bytes = bytes << 6 | decode[3];
-            data.push_back(bytes >> 16);
-            data.push_back(bytes >> 8);
-            data.push_back(bytes);
+            data.emplace_back(bytes >> 16);
+            data.emplace_back(bytes >> 8);
+            data.emplace_back(bytes);
         }
     }
 

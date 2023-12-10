@@ -385,7 +385,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
         for (auto c : n.children)
         {
             model->nodes[c].parent = nodeID;
-            node.children.push_back(c);
+            node.children.emplace_back(c);
         }
         ++nodeID;
     }
