@@ -523,7 +523,6 @@ void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawC
 
 float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime)
 {
-
     if (playTime > clip.endTime)
     {
         playTime = clip.startTime + (clip.endTime - playTime);
@@ -582,7 +581,6 @@ float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime)
 
 void Model::draw(std::vector<kame::math::Vector3>& positions, DrawCB fn)
 {
-
     int i = 0;
     for (auto& n : nodes)
     {
