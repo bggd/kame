@@ -211,17 +211,17 @@ VertexArrayObject& VertexArrayObject::begin()
     return *this;
 }
 
-VertexArrayObject& VertexArrayObject::bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset, GLuint divisor)
+VertexArrayObject& VertexArrayObject::bindAttribute(const VertexBuffer* vbo, GLuint location, GLuint componentSize, GLenum type, GLboolean normalized, GLsizei stride, uintptr_t offset, GLuint divisor)
 {
     assert(inSetAttributes);
     assert(componentSize >= 1 || componentSize <= 4);
 
     VertexArrayObject::Attribute attr;
-    attr.location = location;
     attr.vbo_id = vbo->id;
+    attr.location = location;
     attr.componentSize = componentSize;
-    attr.type = GL_FLOAT;
-    attr.normalized = GL_FALSE;
+    attr.type = type;
+    attr.normalized = normalized;
     attr.stride = stride;
     attr.offset = offset;
     attr.divisor = divisor;

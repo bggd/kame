@@ -142,8 +142,8 @@ void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, con
 
     kame::ogl::VertexArrayObject vao;
     vao.begin()
-        .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
-        .bindAttribute(gShaderTexture->getAttribLocation("vUV"), gVBOTexCoord, 2, 2 * sizeof(float), 0)
+        .bindAttribute(gVBO, gShaderTexture->getAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0)
+        .bindAttribute(gVBOTexCoord, gShaderTexture->getAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0)
         .bindIndexBuffer(gIBO)
         .end();
     vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
@@ -173,7 +173,7 @@ void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::sq
     gIBO->setBuffer(gIndices);
     kame::ogl::VertexArrayObject vao;
     vao.begin()
-        .bindAttribute(gShaderTexture->getAttribLocation("vPos"), gVBO, 3, 3 * sizeof(float), 0)
+        .bindAttribute(gVBO, gShaderTexture->getAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0)
         .bindIndexBuffer(gIBO)
         .end();
     vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);

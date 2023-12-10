@@ -174,8 +174,8 @@ int main(int argc, char** argv)
 
         kame::ogl::VertexArrayObject vao;
         vao.begin()
-            .bindAttribute(shader->getAttribLocation("vPos"), vboPositions, 3, 3 * sizeof(float), 0)
-            .bindAttribute(shader->getAttribLocation("vUV"), vboTexcoords, 2, 2 * sizeof(float), 0)
+            .bindAttribute(vboPositions, shader->getAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0)
+            .bindAttribute(vboTexcoords, shader->getAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0)
             .bindIndexBuffer(iboIndices)
             .end();
         vao.drawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT);

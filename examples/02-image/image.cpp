@@ -89,8 +89,8 @@ int main(int argc, char** argv)
         kame::ogl::setTexture2D(0, tex);
         kame::ogl::VertexArrayObject vao;
         vao.begin()
-            .bindAttribute(shader->getAttribLocation("aPos"), vbo, 3, 5 * sizeof(float), 0)
-            .bindAttribute(shader->getAttribLocation("aTexCoord"), vbo, 2, 5 * sizeof(float), 3 * sizeof(float))
+            .bindAttribute(vbo, shader->getAttribLocation("aPos"), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0)
+            .bindAttribute(vbo, shader->getAttribLocation("aTexCoord"), 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 3 * sizeof(float))
             .end();
         vao.drawArrays(GL_TRIANGLES, 0, 6);
         win.swapWindow();

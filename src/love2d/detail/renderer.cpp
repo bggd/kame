@@ -9,7 +9,7 @@ void kame::love2d::detail::PolygonVBO::init()
 
     vbo = kame::ogl::createVertexBuffer(sizeof(PolygonVertex) * numVertex, GL_DYNAMIC_DRAW);
     vao.begin()
-        .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
+        .bindAttribute(vbo, ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), 2, GL_FLOAT, GL_FALSE, sizeof(PolygonVertex), 0)
         .end();
 }
 
@@ -54,7 +54,7 @@ void kame::love2d::detail::PolygonVBO::reserve(size_t newSize)
 
     vbo = kame::ogl::createVertexBuffer(sizeof(PolygonVertex) * numVertex, GL_DYNAMIC_DRAW);
     vao.begin()
-        .bindAttribute(ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), vbo, 2, sizeof(PolygonVertex), 0)
+        .bindAttribute(vbo, ctx.renderer->shaderPolygonDraw->getAttribLocation("vPos"), 2, GL_FLOAT, GL_FALSE, sizeof(PolygonVertex), 0)
         .end();
 
     n = 0;
@@ -249,8 +249,8 @@ kame::love2d::detail::graphics::Image* kame::love2d::detail::Renderer::newImage(
     img->vbo->setBuffer(vtx);
 
     img->vao.begin()
-        .bindAttribute(shaderImageDraw->getAttribLocation("vPos"), img->vbo, 2, 4 * sizeof(float), 0)
-        .bindAttribute(shaderImageDraw->getAttribLocation("vUV"), img->vbo, 2, 4 * sizeof(float), 2 * sizeof(float))
+        .bindAttribute(img->vbo, shaderImageDraw->getAttribLocation("vPos"), 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0)
+        .bindAttribute(img->vbo, shaderImageDraw->getAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 2 * sizeof(float))
         .end();
 
     return img;
@@ -286,8 +286,8 @@ kame::love2d::detail::graphics::Quad* kame::love2d::detail::Renderer::newQuad(in
     quad->vbo->setBuffer(vtx);
 
     quad->vao.begin()
-        .bindAttribute(shaderImageDraw->getAttribLocation("vPos"), quad->vbo, 2, 4 * sizeof(float), 0)
-        .bindAttribute(shaderImageDraw->getAttribLocation("vUV"), quad->vbo, 2, 4 * sizeof(float), 2 * sizeof(float))
+        .bindAttribute(quad->vbo, shaderImageDraw->getAttribLocation("vPos"), 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0)
+        .bindAttribute(quad->vbo, shaderImageDraw->getAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 2 * sizeof(float))
         .end();
 
     return quad;

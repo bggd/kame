@@ -73,7 +73,7 @@ struct VertexArrayObject {
     bool inSetAttributes = false;
 
     VertexArrayObject& begin();
-    VertexArrayObject& bindAttribute(GLuint location, const VertexBuffer* vbo, GLuint componentSize, GLsizei stride, uintptr_t offset, GLuint divisor = 0);
+    VertexArrayObject& bindAttribute(const VertexBuffer* vbo, GLuint location, GLuint componentSize, GLenum type, GLboolean normalized, GLsizei stride, uintptr_t offset, GLuint divisor = 0);
     VertexArrayObject& bindIndexBuffer(const IndexBuffer* ibo);
     void end();
 
