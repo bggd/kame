@@ -492,7 +492,7 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
 
                 positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
             }
-            fn(positions, *model, pri);
+            fn({positions, *model, pri});
         }
     }
 }
@@ -516,7 +516,7 @@ void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawC
                 auto vPos = priPositions[i];
                 positions[i] = kame::math::Vector3::transform(vPos, n.globalXForm);
             }
-            fn(positions, *model, pri);
+            fn({positions, *model, pri});
         }
     }
 }

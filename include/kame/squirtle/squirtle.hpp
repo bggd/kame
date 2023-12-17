@@ -75,7 +75,13 @@ struct Skin {
     std::vector<kame::math::Matrix> matrices;
 };
 
-using DrawCB = std::function<void(const std::vector<kame::math::Vector3>& positions, const Model&, const Primitive&)>;
+struct DrawData {
+    const std::vector<kame::math::Vector3>& positions;
+    const Model& model;
+    const Primitive& primitive;
+};
+
+using DrawCB = std::function<void(const DrawData&)>; // std::function<void(const std::vector<kame::math::Vector3>& positions, const Model&, const Primitive&)>;
 
 struct Model {
     std::vector<Mesh> meshes;

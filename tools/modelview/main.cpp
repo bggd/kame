@@ -120,8 +120,12 @@ bool isEdgeLines = false;
 using namespace kame::math;
 using namespace kame::math::helper;
 
-void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, const kame::squirtle::Model& model, const kame::squirtle::Primitive& pri)
+void drawModelWithTexture(const kame::squirtle::DrawData& drawData)
 {
+    const std::vector<kame::math::Vector3>& positions = drawData.positions;
+    const kame::squirtle::Model& model = drawData.model;
+    const kame::squirtle::Primitive& pri = drawData.primitive;
+
     assert(pri.material < model.materials.size());
     kame::squirtle::Material mat = model.materials[pri.material];
     gShaderTexture->setVector4("uBaseColorFactor", mat.baseColorFactor);
@@ -149,12 +153,16 @@ void drawModelWithTexture(const std::vector<kame::math::Vector3>& positions, con
     vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
 }
 
-void drawModel(const std::vector<kame::math::Vector3>& positions, const kame::squirtle::Model& model, const kame::squirtle::Primitive& pri)
+void drawModel(const kame::squirtle::DrawData& drawData)
 {
+    const std::vector<kame::math::Vector3>& positions = drawData.positions;
+    const kame::squirtle::Model& model = drawData.model;
+    const kame::squirtle::Primitive& pri = drawData.primitive;
+
     if (!isEdgeLines && pri.material >= 0 && model.materials[pri.material].baseColorTextureIndex >= 0)
     {
         kame::ogl::setShader(gShaderTexture);
-        drawModelWithTexture(positions, model, pri);
+        drawModelWithTexture(drawData);
         return;
     }
 
