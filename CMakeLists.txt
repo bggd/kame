@@ -21,6 +21,7 @@ add_library(kame-cpp
     src/gltf/gltf_material.cpp
     src/gltf/gltf_ext.cpp
     src/squirtle/squirtle.cpp
+    src/squirtle/model.cpp
     src/squirtle/instance.cpp
     src/squirtle/animation.cpp
     src/squirtle/material.cpp
