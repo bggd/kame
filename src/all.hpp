@@ -39,6 +39,7 @@
 #include <span>
 #include <filesystem>
 #include <functional>
+#include <source_location>
 
 // assert is enabled on release build
 #ifdef NDEBUG
@@ -48,3 +49,32 @@
 #else
 #include <cassert>
 #endif
+
+[[maybe_unused]] static bool checkVulkanFunction(const char* fnName, VkResult result, std::source_location loc = std::source_location::current())
+{
+    if (result != VK_SUCCESS)
+    {
+        SPDLOG_CRITICAL("[Vulkan] Fatal on {} at {}:{}: {}", fnName, loc.file_name(), loc.line(), result);
+    }
+    return result == VK_SUCCESS;
+}
+
+[[maybe_unused]] static bool checkVulkanFunctionImcomplete(const char* fnName, VkResult result, std::source_location loc = std::source_location::current())
+{
+    if (result != VK_SUCCESS && result != VK_INCOMPLETE)
+    {
+        SPDLOG_CRITICAL("[Vulkan] Fatal on {} at {}:{}: {}", fnName, loc.file_name(), loc.line(), result);
+    }
+    if (result == VK_INCOMPLETE)
+    {
+        SPDLOG_DEBUG("[Vulkan] VK_INCOMPLETE is returned on {} at {}:{}", fnName, loc.file_name(), loc.line());
+    }
+
+    return result == VK_SUCCESS || result == VK_INCOMPLETE;
+}
+
+// clang-format off
+#define VK_CHECK(call) do { bool b = checkVulkanFunction(#call, call); assert(b); } while (0)
+
+#define VK_CHECK_INCOMPLETE(call)  do { bool b = checkVulkanFunctionImcomplete(#call, call); assert(b); } while (0)
+// clang-format on

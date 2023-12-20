@@ -1,3 +1,4 @@
+#define VOLK_IMPLEMENTATION
 #include <all.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -17,6 +18,7 @@ void kameInit()
     spdlog::info("kameInit");
     // stbi_set_flip_vertically_on_load(true);
     std::atexit(atexit_handler);
+    SPDLOG_DEBUG("Exe Path: {}", SDL_GetBasePath());
     isInit = true;
 }
 

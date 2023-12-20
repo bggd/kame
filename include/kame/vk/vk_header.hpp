@@ -2,11 +2,10 @@
 
 #if __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmicrosoft-enum-value"
+#pragma clang diagnostic ignored "-Wlanguage-extension-token"
 #endif
 
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_vulkan.h>
+#include <volk.h>
 
 #if __clang__
 #pragma clang diagnostic pop

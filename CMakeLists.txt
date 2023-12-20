@@ -15,8 +15,11 @@ add_library(kame-cpp
     src/math/matrix.cpp
     src/math/quaternion.cpp
     src/sdl/sdl.cpp
+    src/sdl/sdl_ogl.cpp
+    src/sdl/sdl_vk.cpp
     src/ogl/glad.cpp
     src/ogl/ogl.cpp
+    src/vk/vk.cpp
     src/gltf/gltf.cpp
     src/gltf/gltf_material.cpp
     src/gltf/gltf_ext.cpp
@@ -56,7 +59,7 @@ else()
     target_compile_options(kame-cpp PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-target_link_libraries(kame-cpp PUBLIC SDL3::SDL3 spdlog::spdlog nlohmann_json::nlohmann_json pystring box2d stb soloud)
+target_link_libraries(kame-cpp PUBLIC SDL3::SDL3 spdlog::spdlog nlohmann_json::nlohmann_json volk::volk_headers pystring box2d stb soloud)
 
 target_include_directories(kame-cpp
     PUBLIC

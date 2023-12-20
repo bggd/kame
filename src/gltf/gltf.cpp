@@ -382,6 +382,7 @@ Gltf* loadGLTF(const char* path)
     assert(gltf);
 
     SPDLOG_DEBUG("[Gltf] loading: {0}", path);
+    assert(std::filesystem::exists(path));
     std::fstream f(path);
     json j = json::parse(f, nullptr);
     assert(!j.is_discarded());

@@ -23,6 +23,12 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 set(JSON_Install OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(json)
 
+FetchContent_Declare(volk
+    URL https://github.com/zeux/volk/archive/refs/tags/1.3.270.tar.gz
+)
+set(VOLK_HEADERS_ONLY ON CACHE INTERNAL "")
+FetchContent_MakeAvailable(volk)
+
 FetchContent_Declare(lua
     URL https://github.com/lua/lua/archive/refs/tags/v5.4.6.tar.gz
 )
