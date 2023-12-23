@@ -25,6 +25,8 @@ struct Vulkan {
 
     VkInstance _instance = VK_NULL_HANDLE;
 
+    VkDevice _device = VK_NULL_HANDLE;
+
     bool _isInitialized = false;
 
     bool _hasDebugUtils = false;

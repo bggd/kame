@@ -103,6 +103,8 @@ void Vulkan::initValidationLayers()
         _validationLayers.emplace_back(VK_LAYER_KHRONOS_profiles_NAME);
     }
 
+    _debugInfo = VkDebugUtilsMessengerCreateInfoEXT{};
+
     _debugInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 
     _debugInfo.messageSeverity =
@@ -138,7 +140,10 @@ void Vulkan::createInstance(kame::sdl::WindowVk& window)
     ici.ppEnabledLayerNames = _validationLayers.data();
     ici.enabledLayerCount = _validationLayers.size();
 
-    ici.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&_debugInfo;
+    if (_hasDebugUtils)
+    {
+        ici.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&_debugInfo;
+    }
 
 #if defined(VK_USE_PLATFORM_MACOS_MVK) && (VK_HEADER_VERSION >= 216)
     ici.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
@@ -150,9 +155,11 @@ void Vulkan::createInstance(kame::sdl::WindowVk& window)
 
     volkLoadInstance(_instance);
 
-    assert(!_debugMessanger);
-
-    VK_CHECK(vkCreateDebugUtilsMessengerEXT(_instance, &_debugInfo, nullptr, &_debugMessanger));
+    if (_hasDebugUtils)
+    {
+        assert(!_debugMessanger);
+        VK_CHECK(vkCreateDebugUtilsMessengerEXT(_instance, &_debugInfo, nullptr, &_debugMessanger));
+    }
 }
 
 void Vulkan::startup(kame::sdl::WindowVk& window)
@@ -165,16 +172,19 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
 
     createInstance(window);
 
+    createDevice();
+
     _isInitialized = true;
 }
 
 void Vulkan::destroyInstance()
 {
-    assert(_debugMessanger);
+    if (_debugMessanger)
+    {
+        vkDestroyDebugUtilsMessengerEXT(_instance, _debugMessanger, nullptr);
 
-    vkDestroyDebugUtilsMessengerEXT(_instance, _debugMessanger, nullptr);
-
-    _debugMessanger = VK_NULL_HANDLE;
+        _debugMessanger = VK_NULL_HANDLE;
+    }
 
     assert(_instance);
 
@@ -182,7 +192,6 @@ void Vulkan::destroyInstance()
 
     _instance = VK_NULL_HANDLE;
 }
-
 void Vulkan::shutdown()
 {
     assert(_isInitialized);
