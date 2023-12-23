@@ -51,6 +51,18 @@ void Vulkan::initExtensions()
         _extensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 #endif
     }
+
+    uint32_t extCount;
+
+    auto sdlExt = SDL_Vulkan_GetInstanceExtensions(&extCount);
+
+    if (sdlExt)
+    {
+        for (uint32_t i = 0; i < extCount; ++i)
+        {
+            _extensions.emplace_back(sdlExt[i]);
+        }
+    }
 }
 
 void Vulkan::initValidationLayers()
@@ -115,18 +127,6 @@ void Vulkan::createInstance(kame::sdl::WindowVk& window)
     ai.apiVersion = VK_API_VERSION_1_0;
 
     ai.pApplicationName = SDL_GetWindowTitle(window.window);
-
-    uint32_t count;
-
-    auto sdlExt = SDL_Vulkan_GetInstanceExtensions(&count);
-
-    if (sdlExt)
-    {
-        for (uint32_t i = 0; i < count; ++i)
-        {
-            _extensions.emplace_back(sdlExt[i]);
-        }
-    }
 
     VkInstanceCreateInfo ici{};
     ici.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
