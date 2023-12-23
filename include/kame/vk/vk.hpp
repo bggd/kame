@@ -25,12 +25,18 @@ struct Vulkan {
 
     VkInstance _instance = VK_NULL_HANDLE;
 
+    VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
     VkDevice _device = VK_NULL_HANDLE;
+
+    uint32_t _qFamilyGraphicsIndex = 0;
+    VkQueue _graphicsQueue = VK_NULL_HANDLE;
 
     bool _isInitialized = false;
 
     bool _hasDebugUtils = false;
     bool _hasKHR_PORTABILITY_ENUMERATION = false;
+    bool _hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION = false;
+    // bool _hasKHR_portability_subset = false;
 
     // validation layers
     bool _hasKHRONOS_validation = false;
@@ -42,9 +48,15 @@ struct Vulkan {
 
     void createInstance(kame::sdl::WindowVk& window);
 
+    void pickPhysicalDevice();
+
+    void createDevice();
+
     void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
+
+    void destroyDevice();
 
     void shutdown();
 };

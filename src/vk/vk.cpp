@@ -9,6 +9,8 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 static const char* VK_LAYER_KHRONOS_validation_NAME = "VK_LAYER_KHRONOS_validation";
 static const char* VK_LAYER_KHRONOS_profiles_NAME = "VK_LAYER_KHRONOS_profiles";
 
+static const char* VK_KHR_portability_subset_NAME = "VK_KHR_portability_subset";
+
 namespace kame::vk {
 
 void Vulkan::initExtensions()
@@ -28,28 +30,27 @@ void Vulkan::initExtensions()
 
     _hasDebugUtils = false;
     _hasKHR_PORTABILITY_ENUMERATION = false;
+    _hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION = false;
 
     for (const auto& p : _extensionProperties)
     {
         if (!_hasDebugUtils && SDL_strcmp(VK_EXT_DEBUG_UTILS_EXTENSION_NAME, p.extensionName))
         {
             _hasDebugUtils = true;
+            _extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
         if (!_hasKHR_PORTABILITY_ENUMERATION && SDL_strcmp(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME, p.extensionName))
         {
             _hasKHR_PORTABILITY_ENUMERATION = true;
-        }
-    }
-
-    if (_hasDebugUtils)
-    {
-        _extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    }
-    if (_hasKHR_PORTABILITY_ENUMERATION)
-    {
 #if defined(VK_USE_PLATFORM_MACOS_MVK) && (VK_HEADER_VERSION >= 216)
-        _extensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+            _extensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 #endif
+        }
+        if (!_hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION && SDL_strcmp(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, p.extensionName))
+        {
+            _hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION = true;
+            _extensions.emplace_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+        }
     }
 
     uint32_t extCount;
@@ -158,8 +159,113 @@ void Vulkan::createInstance(kame::sdl::WindowVk& window)
     if (_hasDebugUtils)
     {
         assert(!_debugMessanger);
+
         VK_CHECK(vkCreateDebugUtilsMessengerEXT(_instance, &_debugInfo, nullptr, &_debugMessanger));
     }
+}
+
+void Vulkan::pickPhysicalDevice()
+{
+    assert(!_physicalDevice);
+
+    uint32_t deviceCount;
+
+    VK_CHECK_INCOMPLETE(vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr));
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+
+    VK_CHECK_INCOMPLETE(vkEnumeratePhysicalDevices(_instance, &deviceCount, devices.data()));
+
+    assert(deviceCount);
+
+    VkPhysicalDevice pick = VK_NULL_HANDLE;
+
+    uint32_t queueCount = 0;
+
+    std::vector<VkQueueFamilyProperties> properties;
+
+    for (uint32_t i = 0; i < deviceCount; ++i)
+    {
+        VkPhysicalDeviceProperties dp;
+
+        vkGetPhysicalDeviceProperties(devices[i], &dp);
+
+        if (dp.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        {
+            vkGetPhysicalDeviceQueueFamilyProperties(devices[i], &queueCount, nullptr);
+            properties.resize(queueCount);
+            vkGetPhysicalDeviceQueueFamilyProperties(devices[i], &queueCount, properties.data());
+
+            for (uint32_t i = 0; i < queueCount; ++i)
+            {
+                const auto& family = properties[i];
+
+                if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+                {
+                    pick = devices[i];
+
+                    _qFamilyGraphicsIndex = i;
+
+                    break;
+                }
+            }
+        }
+    }
+
+    assert(pick);
+
+    _physicalDevice = pick;
+}
+
+void Vulkan::createDevice()
+{
+    float priority = 1.0f;
+
+    VkDeviceQueueCreateInfo qci_0{};
+    qci_0.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    qci_0.pQueuePriorities = &priority;
+    qci_0.queueCount = 1;
+    qci_0.queueFamilyIndex = _qFamilyGraphicsIndex;
+
+    std::vector<VkDeviceQueueCreateInfo> qciInfos = {qci_0};
+
+    VkPhysicalDeviceFeatures features{};
+
+    VkDeviceCreateInfo dci{};
+    dci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+
+    dci.queueCreateInfoCount = qciInfos.size();
+    dci.pQueueCreateInfos = qciInfos.data();
+
+    dci.enabledLayerCount = _validationLayers.size();
+    dci.ppEnabledLayerNames = _validationLayers.data();
+
+    std::vector<const char*> ext;
+
+    if (_hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION)
+    {
+
+        uint32_t count;
+        VK_CHECK_INCOMPLETE(vkEnumerateDeviceExtensionProperties(_physicalDevice, nullptr, &count, nullptr));
+        std::vector<VkExtensionProperties> properties(count);
+        VK_CHECK_INCOMPLETE(vkEnumerateDeviceExtensionProperties(_physicalDevice, nullptr, &count, properties.data()));
+
+        for (const auto& p : properties)
+        {
+            if (SDL_strcmp(VK_KHR_portability_subset_NAME, p.extensionName))
+            {
+                ext.emplace_back(VK_KHR_portability_subset_NAME);
+                break;
+            }
+        }
+
+        dci.enabledExtensionCount = ext.size();
+        dci.ppEnabledExtensionNames = ext.data();
+    }
+
+    dci.pEnabledFeatures = &features;
+
+    VK_CHECK(vkCreateDevice(_physicalDevice, &dci, nullptr, &_device));
 }
 
 void Vulkan::startup(kame::sdl::WindowVk& window)
@@ -171,6 +277,8 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
     initValidationLayers();
 
     createInstance(window);
+
+    pickPhysicalDevice();
 
     createDevice();
 
@@ -192,9 +300,25 @@ void Vulkan::destroyInstance()
 
     _instance = VK_NULL_HANDLE;
 }
+
+void Vulkan::destroyDevice()
+{
+    assert(_physicalDevice);
+
+    _physicalDevice = VK_NULL_HANDLE;
+
+    assert(_device);
+
+    vkDestroyDevice(_device, nullptr);
+
+    _device = VK_NULL_HANDLE;
+}
+
 void Vulkan::shutdown()
 {
     assert(_isInitialized);
+
+    destroyDevice();
 
     destroyInstance();
 
