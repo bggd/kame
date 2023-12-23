@@ -32,27 +32,9 @@ void WindowVk::openWindow(const char* title, int w, int h)
 
 void WindowVk::closeWindow()
 {
-    // for (auto imageView : swapChainImageViews)
-    //{
-    //     vkDestroyImageView(logicalDevice, imageView, nullptr);
-    // }
-
-    // vkDestroySwapchainKHR(logicalDevice, swapChain, nullptr);
-    // vkDestroyDevice(logicalDevice, nullptr);
-    // if (isVkDebugMode)
-    //{
-    //     vkDestroyDebugUtilsMessengerEXT(vulkanInstance, debugMessenger, nullptr);
-    // }
-    // vkDestroySurfaceKHR(vulkanInstance, surface, nullptr);
-    // vkDestroyInstance(vulkanInstance, nullptr);
     volkFinalize();
     SDL_DestroyWindow(window);
     SDL_Quit();
-}
-
-void WindowVk::setVkDebugMode(bool debug)
-{
-    isVkDebugMode = debug;
 }
 
 } // namespace kame::sdl

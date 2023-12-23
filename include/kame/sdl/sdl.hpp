@@ -64,20 +64,8 @@ struct WindowOGL : WindowBase {
 };
 
 struct WindowVk : WindowBase {
-    VkSurfaceKHR surface = nullptr;
-    VkInstance vulkanInstance = nullptr;
-    VkPhysicalDevice physicalDevice = nullptr;
-    VkDevice logicalDevice = nullptr;
-    VkQueue graphicsQueue = nullptr;
-    VkQueue presentQueue = nullptr;
-    VkSwapchainKHR swapChain = nullptr;
-    std::vector<VkImage> swapChainImages;
-    std::vector<VkImageView> swapChainImageViews;
-    VkDebugUtilsMessengerEXT debugMessenger = nullptr;
-    bool isVkDebugMode = false;
     virtual void openWindow(const char* title = "kame", int w = 640, int h = 480) override;
     virtual void closeWindow() override;
-    void setVkDebugMode(bool debug);
 };
 
 } // namespace kame::sdl
