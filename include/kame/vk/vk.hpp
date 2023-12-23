@@ -52,11 +52,15 @@ struct Vulkan {
 
     void createDevice();
 
+    void createQueue();
+
     void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
 
     void destroyDevice();
+
+    void destroyQueue();
 
     void shutdown();
 };

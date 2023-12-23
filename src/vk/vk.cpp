@@ -268,6 +268,13 @@ void Vulkan::createDevice()
     VK_CHECK(vkCreateDevice(_physicalDevice, &dci, nullptr, &_device));
 }
 
+void Vulkan::createQueue()
+{
+    assert(!_graphicsQueue);
+
+    vkGetDeviceQueue(_device, _qFamilyGraphicsIndex, 0, &_graphicsQueue);
+}
+
 void Vulkan::startup(kame::sdl::WindowVk& window)
 {
     assert(!_isInitialized);
@@ -281,6 +288,8 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
     pickPhysicalDevice();
 
     createDevice();
+
+    createQueue();
 
     _isInitialized = true;
 }
@@ -314,9 +323,18 @@ void Vulkan::destroyDevice()
     _device = VK_NULL_HANDLE;
 }
 
+void Vulkan::destroyQueue()
+{
+    assert(_graphicsQueue);
+
+    _graphicsQueue = VK_NULL_HANDLE;
+}
+
 void Vulkan::shutdown()
 {
     assert(_isInitialized);
+
+    destroyQueue();
 
     destroyDevice();
 
