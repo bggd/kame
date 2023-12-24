@@ -502,9 +502,13 @@ VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkM
     return result;
 }
 
-void Vulkan::freeMemory(VkDeviceMemory mem)
+void Vulkan::freeMemory(VkDeviceMemory& mem)
 {
+    assert(mem);
+
     vkFreeMemory(_device, mem, nullptr);
+
+    mem = VK_NULL_HANDLE;
 }
 
 void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VkMemoryRequirements& memRequirements)
@@ -521,14 +525,38 @@ void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer&
     vkGetBufferMemoryRequirements(_device, buffer, &memRequirements);
 }
 
-void Vulkan::destroyBuffer(VkBuffer buffer)
+void Vulkan::destroyBuffer(VkBuffer& buffer)
 {
+    assert(buffer);
+
     vkDestroyBuffer(_device, buffer, nullptr);
+
+    buffer = VK_NULL_HANDLE;
 }
 
 void Vulkan::bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset)
 {
     VK_CHECK(vkBindBufferMemory(_device, buffer, deviceMemory, memoryOffset));
+}
+
+void Vulkan::createShaderModule(const std::vector<char>& code, VkShaderModule& shader)
+{
+    VkShaderModuleCreateInfo smci{};
+    smci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+
+    smci.codeSize = code.size();
+    smci.pCode = (const uint32_t*)code.data();
+
+    VK_CHECK(vkCreateShaderModule(_device, &smci, nullptr, &shader));
+}
+
+void Vulkan::destroyShaderModule(VkShaderModule& shader)
+{
+    assert(shader);
+
+    vkDestroyShaderModule(_device, shader, nullptr);
+
+    shader = VK_NULL_HANDLE;
 }
 
 } // namespace kame::vk
