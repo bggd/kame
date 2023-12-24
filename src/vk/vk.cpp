@@ -13,6 +13,22 @@ static const char* VK_KHR_portability_subset_NAME = "VK_KHR_portability_subset";
 
 namespace kame::vk {
 
+void Vulkan::initLoader()
+{
+    VK_CHECK(volkInitialize());
+
+    uint32_t version = volkGetInstanceVersion();
+    SPDLOG_INFO("Vulkan Version: {}.{}.{}",
+                VK_VERSION_MAJOR(version),
+                VK_VERSION_MINOR(version),
+                VK_VERSION_PATCH(version));
+}
+
+void Vulkan::deinitLoader()
+{
+    volkFinalize();
+}
+
 void Vulkan::initExtensions()
 {
     uint32_t count = 0;
@@ -53,6 +69,7 @@ void Vulkan::initExtensions()
         }
     }
 
+    /*
     uint32_t extCount;
 
     auto sdlExt = SDL_Vulkan_GetInstanceExtensions(&extCount);
@@ -64,6 +81,7 @@ void Vulkan::initExtensions()
             _extensions.emplace_back(sdlExt[i]);
         }
     }
+*/
 }
 
 void Vulkan::initValidationLayers()
@@ -123,13 +141,13 @@ void Vulkan::initValidationLayers()
     _debugInfo.pfnUserCallback = debugCallback;
 }
 
-void Vulkan::createInstance(kame::sdl::WindowVk& window)
+void Vulkan::createInstance(const char* appName)
 {
     VkApplicationInfo ai{};
     ai.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     ai.apiVersion = VK_API_VERSION_1_0;
 
-    ai.pApplicationName = SDL_GetWindowTitle(window.window);
+    ai.pApplicationName = appName;
 
     VkInstanceCreateInfo ici{};
     ici.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -350,15 +368,17 @@ void Vulkan::createSyncObjects()
     }
 }
 
-void Vulkan::startup(kame::sdl::WindowVk& window)
+void Vulkan::startupHeadless(const char* appName)
 {
     assert(!_isInitialized);
+
+    initLoader();
 
     initExtensions();
 
     initValidationLayers();
 
-    createInstance(window);
+    createInstance(appName);
 
     pickPhysicalDevice();
 
@@ -454,6 +474,8 @@ void Vulkan::shutdown()
     destroyDevice();
 
     destroyInstance();
+
+    deinitLoader();
 
     _isInitialized = false;
 }

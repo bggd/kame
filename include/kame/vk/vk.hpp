@@ -52,11 +52,14 @@ struct Vulkan {
     bool _hasKHRONOS_validation = false;
     bool _hasKHRONOS_profiles = false;
 
+    void initLoader();
+    void deinitLoader();
+
     void initExtensions();
 
     void initValidationLayers();
 
-    void createInstance(kame::sdl::WindowVk& window);
+    void createInstance(const char* appName = "");
 
     void pickPhysicalDevice();
 
@@ -72,7 +75,7 @@ struct Vulkan {
 
     void createSyncObjects();
 
-    void startup(kame::sdl::WindowVk& window);
+    void startupHeadless(const char* appName = "");
 
     void destroyInstance();
 

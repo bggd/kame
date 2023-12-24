@@ -19,20 +19,10 @@ void WindowVk::openWindow(const char* title, int w, int h)
     assert(window);
 
     SDL_ShowWindow(window);
-
-    VkResult r = volkInitialize();
-    assert(r == VK_SUCCESS);
-
-    uint32_t version = volkGetInstanceVersion();
-    SPDLOG_INFO("Vulkan Version: {}.{}.{}",
-                VK_VERSION_MAJOR(version),
-                VK_VERSION_MINOR(version),
-                VK_VERSION_PATCH(version));
 }
 
 void WindowVk::closeWindow()
 {
-    volkFinalize();
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
