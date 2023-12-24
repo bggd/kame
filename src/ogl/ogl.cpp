@@ -496,47 +496,17 @@ void IndexBuffer::setBuffer(const std::vector<unsigned int>& vertices)
 
 Texture2D* loadTexture2D(const char* path, bool flipY)
 {
-    Texture2D* t = new Texture2D();
-    assert(t);
+    int64_t len = 0;
+    char* data = kame::squirtle::fileRead(path, len);
 
-    int x, y, c;
-    stbi_set_flip_vertically_on_load(flipY);
-    unsigned char* data = stbi_load(path, &x, &y, &c, 0);
-    if (!data)
-    {
-        SPDLOG_CRITICAL("loadTexture2D: \"{0}\" ({1})", path, stbi_failure_reason());
-    }
     assert(data);
-    assert(c > 2 && c < 5);
-    SPDLOG_INFO("loadTexture2D: \"{0}\" (width:{1}, height:{2}, channel:{3})", path, x, y, c);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    if (c == 3)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        t->format = GL_RGB;
-    }
-    else if (c == 4)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        t->format = GL_RGBA;
-    }
-    stbi_image_free(data);
+    assert(len <= std::numeric_limits<int>::max());
 
-    t->id = tex;
-    t->width = x;
-    t->height = y;
-    t->numChannel = c;
-    return t;
+    return loadTexture2DFromMemory((const unsigned char*)data, len, flipY, path);
 }
 
-Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY)
+Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY, const char* path)
 {
     Texture2D* t = new Texture2D();
     assert(t);
@@ -546,11 +516,11 @@ Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY
     unsigned char* data = stbi_load_from_memory(src, len, &x, &y, &c, 0);
     if (!data)
     {
-        SPDLOG_CRITICAL("loadTexture2D: ({0})", stbi_failure_reason());
+        SPDLOG_CRITICAL("loadTexture2D: {} ({})", path, stbi_failure_reason());
     }
     assert(data);
     assert(c > 2 && c < 5);
-    SPDLOG_INFO("loadTexture2D: (width:{0}, height:{1}, channel:{2})", x, y, c);
+    SPDLOG_INFO("loadTexture2D: {} (width:{}, height:{}, channel:{})", path, x, y, c);
 
     GLuint tex;
     glGenTextures(1, &tex);

@@ -213,7 +213,7 @@ IndexBuffer* createIndexBuffer(GLsizeiptr numBytes, GLenum usage);
 void deleteIndexBuffer(IndexBuffer* ibo);
 
 Texture2D* loadTexture2D(const char* path, bool flipY = false);
-Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY = false);
+Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY = false, const char* path = "");
 Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum format, GLenum type);
 void deleteTexture2D(Texture2D* tex);
 
