@@ -250,8 +250,6 @@ void Vulkan::createDevice()
 
     std::vector<VkDeviceQueueCreateInfo> qciInfos = {qci_0};
 
-    VkPhysicalDeviceFeatures features{};
-
     VkDeviceCreateInfo dci{};
     dci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
@@ -261,7 +259,7 @@ void Vulkan::createDevice()
     dci.enabledLayerCount = _validationLayers.size();
     dci.ppEnabledLayerNames = _validationLayers.data();
 
-    std::vector<const char*> ext;
+    std::vector<const char*> ext{};
 
     if (_hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION)
     {
@@ -283,6 +281,8 @@ void Vulkan::createDevice()
         dci.enabledExtensionCount = ext.size();
         dci.ppEnabledExtensionNames = ext.data();
     }
+
+    VkPhysicalDeviceFeatures features{};
 
     dci.pEnabledFeatures = &features;
 
