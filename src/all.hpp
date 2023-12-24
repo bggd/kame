@@ -24,6 +24,8 @@
 
 #include <pystring.h>
 
+#include <magic_enum.hpp>
+
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
@@ -54,8 +56,11 @@
 {
     if (result != VK_SUCCESS)
     {
-        SPDLOG_CRITICAL("[Vulkan] Fatal on {} at {}:{}: {}", fnName, loc.file_name(), loc.line(), result);
+        auto n = magic_enum::enum_name(result);
+
+        SPDLOG_CRITICAL("[Vulkan] Fatal on {} at {}:{}: {}", fnName, loc.file_name(), loc.line(), n);
     }
+
     return result == VK_SUCCESS;
 }
 
@@ -63,7 +68,9 @@
 {
     if (result != VK_SUCCESS && result != VK_INCOMPLETE)
     {
-        SPDLOG_CRITICAL("[Vulkan] Fatal on {} at {}:{}: {}", fnName, loc.file_name(), loc.line(), result);
+        auto n = magic_enum::enum_name(result);
+
+        SPDLOG_CRITICAL("[Vulkan] Fatal on {} at {}:{}: {}", fnName, loc.file_name(), loc.line(), n);
     }
     if (result == VK_INCOMPLETE)
     {

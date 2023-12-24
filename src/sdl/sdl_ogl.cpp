@@ -305,21 +305,20 @@ void debugGLMessageCallback(GLenum source, GLenum type, unsigned int id, GLenum 
 void kame::sdl::spdlogSDL2([[maybe_unused]] void* userdata, int category, SDL_LogPriority priority, const char* message)
 {
     std::string msg;
-    const char* categoryString[] = {
-        "SDL_LOG_CATEGORY_APPLICATION",
-        "SDL_LOG_CATEGORY_ERROR",
-        "SDL_LOG_CATEGORY_ASSERT",
-        "SDL_LOG_CATEGORY_SYSTEM",
-        "SDL_LOG_CATEGORY_AUDIO",
-        "SDL_LOG_CATEGORY_VIDEO",
-        "SDL_LOG_CATEGORY_RENDER",
-        "SDL_LOG_CATEGORY_INPUT",
-        "SDL_LOG_CATEGORY_TEST"};
-    if (category <= SDL_LOG_CATEGORY_TEST)
+
+    if (auto c = magic_enum::enum_cast<SDL_LogCategory>(category); c.has_value())
     {
-        msg += categoryString[category];
-        msg += ": ";
+        auto s = magic_enum::enum_name(c.value());
+
+        msg += s;
     }
+    else
+    {
+        msg += "SDL_LOG";
+    }
+
+    msg += ": ";
+
     msg += message;
 
     switch (priority)

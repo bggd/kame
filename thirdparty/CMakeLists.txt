@@ -29,6 +29,11 @@ FetchContent_Declare(volk
 set(VOLK_HEADERS_ONLY ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(volk)
 
+FetchContent_Declare(magic_enum
+    URL https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.5.tar.gz
+)
+FetchContent_MakeAvailable(magic_enum)
+
 FetchContent_Declare(lua
     URL https://github.com/lua/lua/archive/refs/tags/v5.4.6.tar.gz
 )
