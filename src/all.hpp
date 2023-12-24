@@ -67,7 +67,7 @@
     }
     if (result == VK_INCOMPLETE)
     {
-        SPDLOG_DEBUG("[Vulkan] VK_INCOMPLETE is returned on {} at {}:{}", fnName, loc.file_name(), loc.line());
+        SPDLOG_WARN("[Vulkan] VK_INCOMPLETE is returned on {} at {}:{}", fnName, loc.file_name(), loc.line());
     }
 
     return result == VK_SUCCESS || result == VK_INCOMPLETE;
