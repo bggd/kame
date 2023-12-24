@@ -164,6 +164,13 @@ void Vulkan::createInstance(kame::sdl::WindowVk& window)
     }
 }
 
+void Vulkan::initMemProperties()
+{
+    _memProperties = VkPhysicalDeviceMemoryProperties{};
+
+    vkGetPhysicalDeviceMemoryProperties(_physicalDevice, &_memProperties);
+}
+
 void Vulkan::pickPhysicalDevice()
 {
     assert(!_physicalDevice);
@@ -308,6 +315,8 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
 
     pickPhysicalDevice();
 
+    initMemProperties();
+
     createDevice();
 
     createQueue();
@@ -362,6 +371,53 @@ void Vulkan::shutdown()
     destroyInstance();
 
     _isInitialized = false;
+}
+
+bool Vulkan::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t startIdx, uint32_t& type)
+{
+    for (uint32_t i = startIdx; i < _memProperties.memoryTypeCount; i++)
+    {
+        if (typeFilter & (1 << i))
+        {
+            if ((_memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+            {
+                type = i;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory* deviceMemory)
+{
+    VkMemoryAllocateInfo mai{};
+    mai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+
+    mai.allocationSize = memRequirements.size;
+
+    VkResult result = VK_ERROR_UNKNOWN;
+
+    for (uint32_t i = 0; i < _memProperties.memoryTypeCount; ++i)
+    {
+        if (findMemoryType(memRequirements.memoryTypeBits, properties, i, mai.memoryTypeIndex))
+        {
+            result = vkAllocateMemory(_device, &mai, nullptr, deviceMemory);
+
+            if (result == VK_SUCCESS)
+            {
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
+void Vulkan::freeMemory(VkDeviceMemory mem)
+{
+    vkFreeMemory(_device, mem, nullptr);
 }
 
 } // namespace kame::vk

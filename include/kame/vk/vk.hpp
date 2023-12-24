@@ -26,6 +26,7 @@ struct Vulkan {
     VkInstance _instance = VK_NULL_HANDLE;
 
     VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
+    VkPhysicalDeviceMemoryProperties _memProperties;
     VkDevice _device = VK_NULL_HANDLE;
 
     uint32_t _qFamilyGraphicsIndex = 0;
@@ -50,6 +51,8 @@ struct Vulkan {
 
     void pickPhysicalDevice();
 
+    void initMemProperties();
+
     void createDevice();
 
     void createQueue();
@@ -63,6 +66,12 @@ struct Vulkan {
     void destroyQueue();
 
     void shutdown();
+
+    bool findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t startIdx, uint32_t& type);
+
+    VkResult allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory* deviceMemory);
+
+    void freeMemory(VkDeviceMemory mem);
 };
 
 } // namespace kame::vk
