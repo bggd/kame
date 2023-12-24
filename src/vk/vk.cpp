@@ -290,6 +290,8 @@ void Vulkan::createDevice()
     }
 
     VK_CHECK(vkCreateDevice(_physicalDevice, &dci, nullptr, &_device));
+
+    volkLoadDevice(_device);
 }
 
 void Vulkan::createQueue()
