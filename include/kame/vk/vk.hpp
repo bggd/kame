@@ -8,6 +8,8 @@
 
 #include <kame/sdl/sdl.hpp>
 
+#define KAME_VK_MAX_FRAMES_IN_FLIGHT 2
+
 namespace kame::vk {
 
 struct Vulkan {
@@ -31,6 +33,13 @@ struct Vulkan {
 
     uint32_t _qFamilyGraphicsIndex = 0;
     VkQueue _graphicsQueue = VK_NULL_HANDLE;
+
+    VkCommandPool _commandPool = VK_NULL_HANDLE;
+
+    std::vector<VkCommandBuffer> _cmdBuffers;
+    std::vector<VkFence> _inFlightFences;
+
+    uint32_t currentFrame = 0;
 
     bool _isInitialized = false;
 
@@ -57,6 +66,8 @@ struct Vulkan {
 
     void createQueue();
 
+    void createCommandPool();
+
     void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
@@ -64,6 +75,8 @@ struct Vulkan {
     void destroyDevice();
 
     void destroyQueue();
+
+    void destroyCommandPool();
 
     void shutdown();
 

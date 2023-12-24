@@ -303,6 +303,20 @@ void Vulkan::createQueue()
     vkGetDeviceQueue(_device, _qFamilyGraphicsIndex, 0, &_graphicsQueue);
 }
 
+void Vulkan::createCommandPool()
+{
+    assert(!_commandPool);
+
+    VkCommandPoolCreateInfo cpci{};
+    cpci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+
+    cpci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+    cpci.queueFamilyIndex = _qFamilyGraphicsIndex;
+
+    VK_CHECK(vkCreateCommandPool(_device, &cpci, nullptr, &_commandPool));
+}
+
 void Vulkan::startup(kame::sdl::WindowVk& window)
 {
     assert(!_isInitialized);
@@ -320,6 +334,8 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
     createDevice();
 
     createQueue();
+
+    createCommandPool();
 
     _isInitialized = true;
 }
@@ -360,9 +376,18 @@ void Vulkan::destroyQueue()
     _graphicsQueue = VK_NULL_HANDLE;
 }
 
+void Vulkan::destroyCommandPool()
+{
+    assert(_commandPool);
+
+    vkDestroyCommandPool(_device, _commandPool, nullptr);
+}
+
 void Vulkan::shutdown()
 {
     assert(_isInitialized);
+
+    destroyCommandPool();
 
     destroyQueue();
 
