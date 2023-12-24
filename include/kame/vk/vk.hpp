@@ -55,7 +55,7 @@ struct Vulkan {
     void initLoader();
     void deinitLoader();
 
-    void initExtensions();
+    void initExtensions(std::vector<const char*> additionalExt = {});
 
     void initValidationLayers();
 

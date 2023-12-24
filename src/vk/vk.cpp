@@ -29,7 +29,7 @@ void Vulkan::deinitLoader()
     volkFinalize();
 }
 
-void Vulkan::initExtensions()
+void Vulkan::initExtensions(std::vector<const char*> additionalExt)
 {
     uint32_t count = 0;
 
@@ -69,19 +69,10 @@ void Vulkan::initExtensions()
         }
     }
 
-    /*
-    uint32_t extCount;
-
-    auto sdlExt = SDL_Vulkan_GetInstanceExtensions(&extCount);
-
-    if (sdlExt)
+    for (auto p : additionalExt)
     {
-        for (uint32_t i = 0; i < extCount; ++i)
-        {
-            _extensions.emplace_back(sdlExt[i]);
-        }
+        _extensions.emplace_back(p);
     }
-*/
 }
 
 void Vulkan::initValidationLayers()
