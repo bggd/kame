@@ -456,9 +456,9 @@ void Vulkan::shutdown()
     _isInitialized = false;
 }
 
-bool Vulkan::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t startIdx, uint32_t& type)
+bool Vulkan::_findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t& i, uint32_t& type)
 {
-    for (uint32_t i = startIdx; i < _memProperties.memoryTypeCount; i++)
+    while (i < _memProperties.memoryTypeCount)
     {
         if (typeFilter & (1 << i))
         {
@@ -468,6 +468,8 @@ bool Vulkan::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags propertie
                 return true;
             }
         }
+
+        ++i;
     }
 
     return false;
@@ -484,7 +486,7 @@ VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkM
 
     for (uint32_t i = 0; i < _memProperties.memoryTypeCount; ++i)
     {
-        if (findMemoryType(memRequirements.memoryTypeBits, properties, i, mai.memoryTypeIndex))
+        if (_findMemoryType(memRequirements.memoryTypeBits, properties, i, mai.memoryTypeIndex))
         {
             result = vkAllocateMemory(_device, &mai, nullptr, &deviceMemory);
 
