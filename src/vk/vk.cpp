@@ -289,10 +289,6 @@ void Vulkan::createDevice()
         dci.ppEnabledExtensionNames = ext.data();
     }
 
-    VkPhysicalDeviceFeatures features{};
-
-    dci.pEnabledFeatures = &features;
-
     VK_CHECK(vkCreateDevice(_physicalDevice, &dci, nullptr, &_device));
 }
 
