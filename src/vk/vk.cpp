@@ -212,6 +212,27 @@ void Vulkan::pickPhysicalDevice()
         }
     }
 
+    if (!pick)
+    {
+        vkGetPhysicalDeviceQueueFamilyProperties(devices[0], &queueCount, nullptr);
+        properties.resize(queueCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(devices[0], &queueCount, properties.data());
+
+        for (uint32_t i = 0; i < queueCount; ++i)
+        {
+            const auto& family = properties[i];
+
+            if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            {
+                pick = devices[0];
+
+                _qFamilyGraphicsIndex = i;
+
+                break;
+            }
+        }
+    }
+
     assert(pick);
 
     _physicalDevice = pick;
