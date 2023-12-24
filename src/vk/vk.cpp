@@ -317,6 +317,41 @@ void Vulkan::createCommandPool()
     VK_CHECK(vkCreateCommandPool(_device, &cpci, nullptr, &_commandPool));
 }
 
+void Vulkan::createCommandBuffers()
+{
+    assert(_cmdBuffers.empty());
+
+    _cmdBuffers.resize(KAME_VK_MAX_FRAMES_IN_FLIGHT);
+
+    VkCommandBufferAllocateInfo cbai{};
+    cbai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+
+    cbai.commandPool = _commandPool;
+
+    cbai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+    cbai.commandBufferCount = _cmdBuffers.size();
+
+    VK_CHECK(vkAllocateCommandBuffers(_device, &cbai, _cmdBuffers.data()));
+}
+
+void Vulkan::createSyncObjects()
+{
+    assert(_inFlightFences.empty());
+
+    _inFlightFences.resize(KAME_VK_MAX_FRAMES_IN_FLIGHT);
+
+    VkFenceCreateInfo fci{};
+    fci.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+
+    fci.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    for (size_t i = 0; i < _inFlightFences.size(); ++i)
+    {
+        VK_CHECK(vkCreateFence(_device, &fci, nullptr, &_inFlightFences[i]));
+    }
+}
+
 void Vulkan::startup(kame::sdl::WindowVk& window)
 {
     assert(!_isInitialized);
@@ -336,6 +371,10 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
     createQueue();
 
     createCommandPool();
+
+    createCommandBuffers();
+
+    createSyncObjects();
 
     _isInitialized = true;
 }
@@ -383,9 +422,32 @@ void Vulkan::destroyCommandPool()
     vkDestroyCommandPool(_device, _commandPool, nullptr);
 }
 
+void Vulkan::destroyCommandBuffers()
+{
+    assert(!_cmdBuffers.empty());
+
+    _cmdBuffers.clear();
+}
+
+void Vulkan::destroySyncObjects()
+{
+    assert(!_inFlightFences.empty());
+
+    for (auto& fence : _inFlightFences)
+    {
+        vkDestroyFence(_device, fence, nullptr);
+    }
+
+    _inFlightFences.clear();
+}
+
 void Vulkan::shutdown()
 {
     assert(_isInitialized);
+
+    destroySyncObjects();
+
+    destroyCommandBuffers();
 
     destroyCommandPool();
 
@@ -415,7 +477,7 @@ bool Vulkan::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags propertie
     return false;
 }
 
-VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory* deviceMemory)
+VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemory)
 {
     VkMemoryAllocateInfo mai{};
     mai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -428,7 +490,7 @@ VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkM
     {
         if (findMemoryType(memRequirements.memoryTypeBits, properties, i, mai.memoryTypeIndex))
         {
-            result = vkAllocateMemory(_device, &mai, nullptr, deviceMemory);
+            result = vkAllocateMemory(_device, &mai, nullptr, &deviceMemory);
 
             if (result == VK_SUCCESS)
             {
@@ -443,6 +505,30 @@ VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkM
 void Vulkan::freeMemory(VkDeviceMemory mem)
 {
     vkFreeMemory(_device, mem, nullptr);
+}
+
+void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VkMemoryRequirements& memRequirements)
+{
+    VkBufferCreateInfo bci{};
+    bci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+
+    bci.size = size;
+    bci.usage = usage;
+    bci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VK_CHECK(vkCreateBuffer(_device, &bci, nullptr, &buffer));
+
+    vkGetBufferMemoryRequirements(_device, buffer, &memRequirements);
+}
+
+void Vulkan::destroyBuffer(VkBuffer buffer)
+{
+    vkDestroyBuffer(_device, buffer, nullptr);
+}
+
+void Vulkan::bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset)
+{
+    VK_CHECK(vkBindBufferMemory(_device, buffer, deviceMemory, memoryOffset));
 }
 
 } // namespace kame::vk

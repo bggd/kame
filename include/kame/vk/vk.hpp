@@ -68,6 +68,10 @@ struct Vulkan {
 
     void createCommandPool();
 
+    void createCommandBuffers();
+
+    void createSyncObjects();
+
     void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
@@ -78,13 +82,23 @@ struct Vulkan {
 
     void destroyCommandPool();
 
+    void destroyCommandBuffers();
+
+    void destroySyncObjects();
+
     void shutdown();
 
     bool findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t startIdx, uint32_t& type);
 
-    VkResult allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory* deviceMemory);
+    VkResult allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemory);
 
     void freeMemory(VkDeviceMemory mem);
+
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VkMemoryRequirements& memRequirements);
+
+    void destroyBuffer(VkBuffer buffer);
+
+    void bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset = 0);
 };
 
 } // namespace kame::vk
