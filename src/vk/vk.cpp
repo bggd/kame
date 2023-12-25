@@ -359,7 +359,7 @@ void Vulkan::createSyncObjects()
     }
 }
 
-void Vulkan::startupHeadless(const char* appName)
+void Vulkan::startup(const char* appName)
 {
     assert(!_isInitialized);
 

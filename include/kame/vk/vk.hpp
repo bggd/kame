@@ -75,7 +75,7 @@ struct Vulkan {
 
     void createSyncObjects();
 
-    void startupHeadless(const char* appName = "");
+    void startup(const char* appName = "");
 
     void destroyInstance();
 
