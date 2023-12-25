@@ -1,5 +1,7 @@
 #pragma once
 
+#include <spirv_cross.hpp>
+
 #include <kame/vk/vk.hpp>
 
 #include <kame/squirtle/squirtle.hpp>

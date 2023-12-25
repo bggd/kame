@@ -29,6 +29,21 @@ FetchContent_Declare(volk
 set(VOLK_HEADERS_ONLY ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(volk)
 
+FetchContent_Declare(spirvcross
+    URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.268.0.tar.gz
+)
+set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_CLI OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_ENABLE_GLSL OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_ENABLE_HLSL OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_ENABLE_MSL OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_ENABLE_CPP OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_ENABLE_REFLECT OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_ENABLE_UTIL OFF CACHE INTERNAL "")
+set(SPIRV_CROSS_SKIP_INSTALL OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(spirvcross)
+
 FetchContent_Declare(magic_enum
     URL https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.5.tar.gz
 )
