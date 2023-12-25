@@ -39,7 +39,8 @@ struct Vulkan {
     std::vector<VkCommandBuffer> _cmdBuffers;
     std::vector<VkFence> _inFlightFences;
 
-    uint32_t currentFrame = 0;
+    uint32_t _numFramesInFlight = 0;
+    uint32_t _currentFrameInFlight = 0;
 
     bool _isInitialized = false;
 

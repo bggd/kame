@@ -317,7 +317,7 @@ void Vulkan::createCommandPool()
     VkCommandPoolCreateInfo cpci{};
     cpci.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 
-    cpci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    cpci.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
 
     cpci.queueFamilyIndex = _qFamilyGraphicsIndex;
 
@@ -328,7 +328,7 @@ void Vulkan::createCommandBuffers()
 {
     assert(_cmdBuffers.empty());
 
-    _cmdBuffers.resize(KAME_VK_MAX_FRAMES_IN_FLIGHT);
+    _cmdBuffers.resize(_numFramesInFlight);
 
     VkCommandBufferAllocateInfo cbai{};
     cbai.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -346,7 +346,7 @@ void Vulkan::createSyncObjects()
 {
     assert(_inFlightFences.empty());
 
-    _inFlightFences.resize(KAME_VK_MAX_FRAMES_IN_FLIGHT);
+    _inFlightFences.resize(_numFramesInFlight);
 
     VkFenceCreateInfo fci{};
     fci.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -362,6 +362,8 @@ void Vulkan::createSyncObjects()
 void Vulkan::startup(const char* appName)
 {
     assert(!_isInitialized);
+
+    _numFramesInFlight = KAME_VK_MAX_FRAMES_IN_FLIGHT;
 
     initLoader();
 
@@ -467,6 +469,8 @@ void Vulkan::shutdown()
     destroyInstance();
 
     deinitLoader();
+
+    _numFramesInFlight = 0;
 
     _isInitialized = false;
 }
