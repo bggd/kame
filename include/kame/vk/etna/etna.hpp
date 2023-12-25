@@ -1,8 +1,12 @@
 #pragma once
 
-#include "kame/vk/vk.hpp"
+#include <kame/vk/vk.hpp>
+
+#include <kame/squirtle/squirtle.hpp>
 
 namespace kame::vk::etna {
+
+using kame::squirtle::loadSPIRV;
 
 struct BufferVK {
     VkBuffer _buffer = VK_NULL_HANDLE;
@@ -27,7 +31,7 @@ struct Etna : kame::vk::Vulkan {
 
         endCmd();
 
-        flush(true);
+        flush();
     }
 
     void createStagingBuffer(VkDeviceSize size, StagingBuffer& buffer, const void* data)

@@ -126,7 +126,7 @@ struct Vulkan {
 
     VkFence _getFence();
 
-    void flush(bool wait);
+    void flush(bool wait = true);
 };
 
 } // namespace kame::vk
