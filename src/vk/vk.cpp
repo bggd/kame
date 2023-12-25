@@ -528,6 +528,16 @@ void Vulkan::freeMemory(VkDeviceMemory& mem)
     mem = VK_NULL_HANDLE;
 }
 
+void Vulkan::mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData)
+{
+    VK_CHECK(vkMapMemory(_device, memory, offset, size, flags, ppData));
+}
+
+void Vulkan::unmapMemory(VkDeviceMemory memory)
+{
+    vkUnmapMemory(_device, memory);
+}
+
 void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VkMemoryRequirements& memRequirements)
 {
     VkBufferCreateInfo bci{};
@@ -574,6 +584,76 @@ void Vulkan::destroyShaderModule(VkShaderModule& shader)
     vkDestroyShaderModule(_device, shader, nullptr);
 
     shader = VK_NULL_HANDLE;
+}
+
+VkCommandBuffer Vulkan::_getCmdBuffer()
+{
+    return _cmdBuffers[_currentFrameInFlight];
+}
+
+void Vulkan::setMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst)
+{
+    VkMemoryBarrier mb{};
+    mb.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+
+    mb.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+    mb.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+
+    vkCmdPipelineBarrier(_getCmdBuffer(), src, dst, 0, 1, &mb, 0, nullptr, 0, nullptr);
+}
+
+void Vulkan::beginCmd()
+{
+    VkCommandBufferBeginInfo cbbi{};
+    cbbi.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    cbbi.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    VK_CHECK(vkBeginCommandBuffer(_getCmdBuffer(), &cbbi));
+}
+
+void Vulkan::endCmd()
+{
+    VK_CHECK(vkEndCommandBuffer(_getCmdBuffer()));
+}
+
+void Vulkan::cmdCopyBuffer(VkBuffer src, VkBuffer dst, const VkBufferCopy& region)
+{
+    vkCmdCopyBuffer(_getCmdBuffer(), src, dst, 1, &region);
+}
+
+VkQueue Vulkan::_getQueue()
+{
+    return _graphicsQueue;
+}
+
+VkFence Vulkan::_getFence()
+{
+    return _inFlightFences[_currentFrameInFlight];
+}
+
+void Vulkan::flush(bool wait)
+{
+    VkFence fence = _getFence();
+
+    VK_CHECK(vkResetFences(_device, 1, &fence));
+
+    VkSubmitInfo si{};
+    si.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    VkCommandBuffer cmd = _getCmdBuffer();
+
+    si.commandBufferCount = 1;
+    si.pCommandBuffers = &cmd;
+
+    VK_CHECK(vkQueueSubmit(_getQueue(), 1, &si, fence));
+
+    if (wait)
+    {
+        VK_CHECK(vkWaitForFences(_device, 1, &fence, VK_TRUE, UINT64_MAX));
+    }
+
+    _currentFrameInFlight = (_currentFrameInFlight + 1) % _numFramesInFlight;
 }
 
 } // namespace kame::vk

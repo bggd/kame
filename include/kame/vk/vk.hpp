@@ -98,6 +98,10 @@ struct Vulkan {
 
     void freeMemory(VkDeviceMemory& mem);
 
+    void mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData);
+
+    void unmapMemory(VkDeviceMemory memory);
+
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VkMemoryRequirements& memRequirements);
 
     void destroyBuffer(VkBuffer& buffer);
@@ -107,6 +111,22 @@ struct Vulkan {
     void createShaderModule(const std::vector<char>&, VkShaderModule& shader);
 
     void destroyShaderModule(VkShaderModule& shader);
+
+    VkCommandBuffer _getCmdBuffer();
+
+    void setMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst);
+
+    void beginCmd();
+
+    void endCmd();
+
+    void cmdCopyBuffer(VkBuffer src, VkBuffer dst, const VkBufferCopy& region);
+
+    VkQueue _getQueue();
+
+    VkFence _getFence();
+
+    void flush(bool wait);
 };
 
 } // namespace kame::vk
