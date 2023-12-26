@@ -610,6 +610,46 @@ void Vulkan::destroyDescriptorPool(VkDescriptorPool& pool)
     pool = VK_NULL_HANDLE;
 }
 
+void Vulkan::createDescriptorSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& bindings, VkDescriptorSetLayoutCreateFlags flags, VkDescriptorSetLayout& layoutResult)
+{
+    VkDescriptorSetLayoutCreateInfo dslci{};
+    dslci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+
+    dslci.flags = flags;
+
+    dslci.bindingCount = bindings.size();
+    dslci.pBindings = bindings.data();
+
+    VK_CHECK(vkCreateDescriptorSetLayout(_device, &dslci, nullptr, &layoutResult));
+}
+
+void Vulkan::destroyDescriptorSetLayout(VkDescriptorSetLayout& layout)
+{
+    assert(layout);
+
+    vkDestroyDescriptorSetLayout(_device, layout, nullptr);
+
+    layout = VK_NULL_HANDLE;
+}
+
+void Vulkan::createDescriptorSet(VkDescriptorPool& pool, VkDescriptorSetLayout& layout, VkDescriptorSet& setResult)
+{
+    VkDescriptorSetAllocateInfo dsai{};
+    dsai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+
+    dsai.descriptorPool = pool;
+
+    dsai.descriptorSetCount = 1;
+    dsai.pSetLayouts = &layout;
+
+    VK_CHECK(vkAllocateDescriptorSets(_device, &dsai, &setResult));
+}
+
+void Vulkan::updateDescriptorSet(const std::vector<VkWriteDescriptorSet>& wdsList)
+{
+    vkUpdateDescriptorSets(_device, wdsList.size(), wdsList.data(), 0, nullptr);
+}
+
 VkCommandBuffer Vulkan::_getCmdBuffer()
 {
     return _cmdBuffers[_currentFrameInFlight];

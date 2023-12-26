@@ -116,6 +116,14 @@ struct Vulkan {
 
     void destroyDescriptorPool(VkDescriptorPool& pool);
 
+    void createDescriptorSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& bindings, VkDescriptorSetLayoutCreateFlags flags, VkDescriptorSetLayout& layoutResult);
+
+    void destroyDescriptorSetLayout(VkDescriptorSetLayout& layout);
+
+    void createDescriptorSet(VkDescriptorPool& pool, VkDescriptorSetLayout& layout, VkDescriptorSet& setResult);
+
+    void updateDescriptorSet(const std::vector<VkWriteDescriptorSet>& wdsList);
+
     VkCommandBuffer _getCmdBuffer();
 
     void setMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst);
