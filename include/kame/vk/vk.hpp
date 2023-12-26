@@ -94,21 +94,21 @@ struct Vulkan {
 
     bool _findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t& i, uint32_t& type);
 
-    VkResult allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemory);
+    VkResult allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemoryResult);
 
-    void freeMemory(VkDeviceMemory& mem);
+    void freeMemory(VkDeviceMemory& memory);
 
     void mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData);
 
     void unmapMemory(VkDeviceMemory memory);
 
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VkMemoryRequirements& memRequirements);
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& bufferResult, VkMemoryRequirements& memRequirementsResult);
 
     void destroyBuffer(VkBuffer& buffer);
 
     void bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset = 0);
 
-    void createShaderModule(const std::vector<char>&, VkShaderModule& shader);
+    void createShaderModule(const std::vector<char>&, VkShaderModule& shaderResult);
 
     void destroyShaderModule(VkShaderModule& shader);
 

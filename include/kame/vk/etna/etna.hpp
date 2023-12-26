@@ -36,7 +36,7 @@ struct Etna : kame::vk::Vulkan {
         flush();
     }
 
-    void createStagingBuffer(VkDeviceSize size, StagingBuffer& buffer, const void* data)
+    void createStagingBuffer(VkDeviceSize size, StagingBuffer& bufferResult, const void* data)
     {
         VkBuffer stagingBuffer = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;
@@ -58,9 +58,9 @@ struct Etna : kame::vk::Vulkan {
 
         unmapMemory(memory);
 
-        buffer._buffer = stagingBuffer;
-        buffer._memory = memory;
-        buffer._size = size;
+        bufferResult._buffer = stagingBuffer;
+        bufferResult._memory = memory;
+        bufferResult._size = size;
     }
 
     void destroyStagingBuffer(StagingBuffer& buffer)
@@ -72,7 +72,7 @@ struct Etna : kame::vk::Vulkan {
         buffer._size = 0;
     }
 
-    void createSSBO(VkDeviceSize size, SSBO& buffer)
+    void createSSBO(VkDeviceSize size, SSBO& bufferResult)
     {
         VkBuffer ssboBuffer = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;
@@ -87,9 +87,9 @@ struct Etna : kame::vk::Vulkan {
 
         bindBufferMemory(ssboBuffer, memory, 0);
 
-        buffer._buffer = ssboBuffer;
-        buffer._memory = memory;
-        buffer._size = size;
+        bufferResult._buffer = ssboBuffer;
+        bufferResult._memory = memory;
+        bufferResult._size = size;
     }
 
     void destroySSBO(SSBO& ssbo)

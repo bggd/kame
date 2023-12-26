@@ -494,7 +494,7 @@ bool Vulkan::_findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properti
     return false;
 }
 
-VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemory)
+VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemoryResult)
 {
     VkMemoryAllocateInfo mai{};
     mai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -507,7 +507,7 @@ VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkM
     {
         if (_findMemoryType(memRequirements.memoryTypeBits, properties, i, mai.memoryTypeIndex))
         {
-            result = vkAllocateMemory(_device, &mai, nullptr, &deviceMemory);
+            result = vkAllocateMemory(_device, &mai, nullptr, &deviceMemoryResult);
 
             if (result == VK_SUCCESS)
             {
@@ -519,13 +519,13 @@ VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkM
     return result;
 }
 
-void Vulkan::freeMemory(VkDeviceMemory& mem)
+void Vulkan::freeMemory(VkDeviceMemory& memory)
 {
-    assert(mem);
+    assert(memory);
 
-    vkFreeMemory(_device, mem, nullptr);
+    vkFreeMemory(_device, memory, nullptr);
 
-    mem = VK_NULL_HANDLE;
+    memory = VK_NULL_HANDLE;
 }
 
 void Vulkan::mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData)
@@ -538,7 +538,7 @@ void Vulkan::unmapMemory(VkDeviceMemory memory)
     vkUnmapMemory(_device, memory);
 }
 
-void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer, VkMemoryRequirements& memRequirements)
+void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& bufferResult, VkMemoryRequirements& memRequirementsResult)
 {
     VkBufferCreateInfo bci{};
     bci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -547,9 +547,9 @@ void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer&
     bci.usage = usage;
     bci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    VK_CHECK(vkCreateBuffer(_device, &bci, nullptr, &buffer));
+    VK_CHECK(vkCreateBuffer(_device, &bci, nullptr, &bufferResult));
 
-    vkGetBufferMemoryRequirements(_device, buffer, &memRequirements);
+    vkGetBufferMemoryRequirements(_device, bufferResult, &memRequirementsResult);
 }
 
 void Vulkan::destroyBuffer(VkBuffer& buffer)
@@ -566,7 +566,7 @@ void Vulkan::bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDe
     VK_CHECK(vkBindBufferMemory(_device, buffer, deviceMemory, memoryOffset));
 }
 
-void Vulkan::createShaderModule(const std::vector<char>& code, VkShaderModule& shader)
+void Vulkan::createShaderModule(const std::vector<char>& code, VkShaderModule& shaderResult)
 {
     VkShaderModuleCreateInfo smci{};
     smci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -574,7 +574,7 @@ void Vulkan::createShaderModule(const std::vector<char>& code, VkShaderModule& s
     smci.codeSize = code.size();
     smci.pCode = (const uint32_t*)code.data();
 
-    VK_CHECK(vkCreateShaderModule(_device, &smci, nullptr, &shader));
+    VK_CHECK(vkCreateShaderModule(_device, &smci, nullptr, &shaderResult));
 }
 
 void Vulkan::destroyShaderModule(VkShaderModule& shader)
