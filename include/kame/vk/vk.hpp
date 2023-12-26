@@ -112,6 +112,10 @@ struct Vulkan {
 
     void destroyShaderModule(VkShaderModule& shader);
 
+    void createDescriptorPool(const std::vector<VkDescriptorPoolSize>& requestSize, VkDescriptorPoolCreateFlagBits flags, uint32_t maxSets, VkDescriptorPool& poolResult);
+
+    void destroyDescriptorPool(VkDescriptorPool& pool);
+
     VkCommandBuffer _getCmdBuffer();
 
     void setMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst);

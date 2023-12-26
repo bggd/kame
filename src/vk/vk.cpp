@@ -586,6 +586,30 @@ void Vulkan::destroyShaderModule(VkShaderModule& shader)
     shader = VK_NULL_HANDLE;
 }
 
+void Vulkan::createDescriptorPool(const std::vector<VkDescriptorPoolSize>& requestSize, VkDescriptorPoolCreateFlagBits flags, uint32_t maxSets, VkDescriptorPool& poolResult)
+{
+    VkDescriptorPoolCreateInfo dpci;
+    dpci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+
+    dpci.flags = flags;
+
+    dpci.maxSets = maxSets;
+
+    dpci.poolSizeCount = requestSize.size();
+    dpci.pPoolSizes = requestSize.data();
+
+    VK_CHECK(vkCreateDescriptorPool(_device, &dpci, nullptr, &poolResult));
+}
+
+void Vulkan::destroyDescriptorPool(VkDescriptorPool& pool)
+{
+    assert(pool);
+
+    vkDestroyDescriptorPool(_device, pool, nullptr);
+
+    pool = VK_NULL_HANDLE;
+}
+
 VkCommandBuffer Vulkan::_getCmdBuffer()
 {
     return _cmdBuffers[_currentFrameInFlight];
