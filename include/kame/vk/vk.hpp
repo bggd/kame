@@ -124,6 +124,10 @@ struct Vulkan {
 
     void updateDescriptorSet(const std::vector<VkWriteDescriptorSet>& wdsList);
 
+    void createGraphicPipeline(VkGraphicsPipelineCreateInfo& info, VkPipeline& pipelineResult);
+
+    void destroyGraphicsPipeline(VkPipeline& pipeline);
+
     VkCommandBuffer _getCmdBuffer();
 
     void setMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst);

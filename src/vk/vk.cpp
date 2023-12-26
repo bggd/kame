@@ -650,6 +650,20 @@ void Vulkan::updateDescriptorSet(const std::vector<VkWriteDescriptorSet>& wdsLis
     vkUpdateDescriptorSets(_device, wdsList.size(), wdsList.data(), 0, nullptr);
 }
 
+void Vulkan::createGraphicPipeline(VkGraphicsPipelineCreateInfo& info, VkPipeline& pipelineResult)
+{
+    VK_CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &info, nullptr, &pipelineResult));
+}
+
+void Vulkan::destroyGraphicsPipeline(VkPipeline& pipeline)
+{
+    assert(pipeline);
+
+    vkDestroyPipeline(_device, pipeline, nullptr);
+
+    pipeline = VK_NULL_HANDLE;
+}
+
 VkCommandBuffer Vulkan::_getCmdBuffer()
 {
     return _cmdBuffers[_currentFrameInFlight];
