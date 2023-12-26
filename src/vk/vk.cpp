@@ -216,6 +216,14 @@ void Vulkan::pickPhysicalDevice()
             {
                 const auto& family = properties[i];
 
+                VkBool32 presentSupport;
+                VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(devices[i], i, _surface, &presentSupport));
+
+                if (!presentSupport)
+                {
+                    continue;
+                }
+
                 if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
                 {
                     pick = devices[i];
@@ -230,21 +238,36 @@ void Vulkan::pickPhysicalDevice()
 
     if (!pick)
     {
-        vkGetPhysicalDeviceQueueFamilyProperties(devices[0], &queueCount, nullptr);
-        properties.resize(queueCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(devices[0], &queueCount, properties.data());
-
-        for (uint32_t i = 0; i < queueCount; ++i)
+        for (uint32_t i = 0; i < deviceCount; ++i)
         {
-            const auto& family = properties[i];
+            VkPhysicalDeviceProperties dp;
 
-            if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            vkGetPhysicalDeviceProperties(devices[i], &dp);
+
+            vkGetPhysicalDeviceQueueFamilyProperties(devices[i], &queueCount, nullptr);
+            properties.resize(queueCount);
+            vkGetPhysicalDeviceQueueFamilyProperties(devices[i], &queueCount, properties.data());
+
+            for (uint32_t i = 0; i < queueCount; ++i)
             {
-                pick = devices[0];
+                const auto& family = properties[i];
 
-                _qFamilyGraphicsIndex = i;
+                VkBool32 presentSupport;
+                VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(devices[i], i, _surface, &presentSupport));
 
-                break;
+                if (!presentSupport)
+                {
+                    continue;
+                }
+
+                if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+                {
+                    pick = devices[i];
+
+                    _qFamilyGraphicsIndex = i;
+
+                    break;
+                }
             }
         }
     }
@@ -254,7 +277,7 @@ void Vulkan::pickPhysicalDevice()
     _physicalDevice = pick;
 }
 
-void Vulkan::createDevice()
+void Vulkan::createDevice(std::vector<const char*> ext)
 {
     float priority = 1.0f;
 
@@ -275,8 +298,6 @@ void Vulkan::createDevice()
     dci.enabledLayerCount = _validationLayers.size();
     dci.ppEnabledLayerNames = _validationLayers.data();
 
-    std::vector<const char*> ext{};
-
     if (_hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION)
     {
 
@@ -293,7 +314,10 @@ void Vulkan::createDevice()
                 break;
             }
         }
+    }
 
+    if (!ext.empty())
+    {
         dci.enabledExtensionCount = ext.size();
         dci.ppEnabledExtensionNames = ext.data();
     }
@@ -359,37 +383,6 @@ void Vulkan::createSyncObjects()
     }
 }
 
-void Vulkan::_startup(const char* appName, const std::vector<const char*>& additionalEx)
-{
-    assert(!_isInitialized);
-
-    _numFramesInFlight = KAME_VK_MAX_FRAMES_IN_FLIGHT;
-
-    initLoader();
-
-    initExtensions(additionalEx);
-
-    initValidationLayers();
-
-    createInstance(appName);
-
-    pickPhysicalDevice();
-
-    initMemProperties();
-
-    createDevice();
-
-    createQueue();
-
-    createCommandPool();
-
-    createCommandBuffers();
-
-    createSyncObjects();
-
-    _isInitialized = true;
-}
-
 void Vulkan::createSurface(kame::sdl::WindowVk& window)
 {
     assert(!_surface);
@@ -401,19 +394,38 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
 {
     assert(!_isInitialized);
 
+    _numFramesInFlight = KAME_VK_MAX_FRAMES_IN_FLIGHT;
+
     uint32_t count = 0;
-    char const* const* pExt = SDL_Vulkan_GetInstanceExtensions(&count);
+    auto pExt = SDL_Vulkan_GetInstanceExtensions(&count);
+
     std::vector<const char*> ext(pExt, pExt + count);
 
-    _startup(SDL_GetWindowTitle(window.window), ext);
+    initLoader();
 
-    _isInitialized = true;
+    initExtensions(ext);
 
-    assert(!_isInitWithSurface);
+    initValidationLayers();
+
+    createInstance(SDL_GetWindowTitle(window.window));
 
     createSurface(window);
 
-    _isInitWithSurface = true;
+    pickPhysicalDevice();
+
+    initMemProperties();
+
+    createDevice({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
+
+    createQueue();
+
+    createCommandPool();
+
+    createCommandBuffers();
+
+    createSyncObjects();
+
+    _isInitialized = true;
 }
 
 void Vulkan::destroyInstance()
@@ -487,13 +499,9 @@ void Vulkan::destroySurface()
 
 void Vulkan::shutdown()
 {
-    assert(_isInitWithSurface);
+    assert(_isInitialized);
 
     destroySurface();
-
-    _isInitWithSurface = false;
-
-    assert(_isInitialized);
 
     destroySyncObjects();
 

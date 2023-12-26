@@ -45,7 +45,6 @@ struct Vulkan {
     VkSurfaceKHR _surface = VK_NULL_HANDLE;
 
     bool _isInitialized = false;
-    bool _isInitWithSurface = false;
 
     // extensions
     bool _hasDebugUtils = false;
@@ -70,7 +69,7 @@ struct Vulkan {
 
     void initMemProperties();
 
-    void createDevice();
+    void createDevice(std::vector<const char*> ext = {});
 
     void createQueue();
 
@@ -79,8 +78,6 @@ struct Vulkan {
     void createCommandBuffers();
 
     void createSyncObjects();
-
-    void _startup(const char* appName = "", const std::vector<const char*>& additionalEx = {});
 
     void createSurface(kame::sdl::WindowVk& window);
 
