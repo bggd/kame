@@ -528,9 +528,9 @@ void Vulkan::freeMemory(VkDeviceMemory& memory)
     memory = VK_NULL_HANDLE;
 }
 
-void Vulkan::mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData)
+void Vulkan::mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, void** ppData)
 {
-    VK_CHECK(vkMapMemory(_device, memory, offset, size, flags, ppData));
+    VK_CHECK(vkMapMemory(_device, memory, offset, size, 0, ppData));
 }
 
 void Vulkan::unmapMemory(VkDeviceMemory memory)

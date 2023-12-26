@@ -52,7 +52,7 @@ struct Etna : kame::vk::Vulkan {
         bindBufferMemory(stagingBuffer, memory, 0);
 
         void* dst;
-        mapMemory(memory, 0, size, 0, &dst);
+        mapMemory(memory, 0, size, &dst);
 
         std::memcpy(dst, data, size);
 

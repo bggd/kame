@@ -98,7 +98,7 @@ struct Vulkan {
 
     void freeMemory(VkDeviceMemory& memory);
 
-    void mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, VkMemoryMapFlags flags, void** ppData);
+    void mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, void** ppData);
 
     void unmapMemory(VkDeviceMemory memory);
 
