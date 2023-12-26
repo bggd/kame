@@ -42,8 +42,12 @@ struct Vulkan {
     uint32_t _numFramesInFlight = 0;
     uint32_t _currentFrameInFlight = 0;
 
-    bool _isInitialized = false;
+    VkSurfaceKHR _surface = VK_NULL_HANDLE;
 
+    bool _isInitialized = false;
+    bool _isInitWithSurface = false;
+
+    // extensions
     bool _hasDebugUtils = false;
     bool _hasKHR_PORTABILITY_ENUMERATION = false;
     bool _hasKHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION = false;
@@ -76,7 +80,11 @@ struct Vulkan {
 
     void createSyncObjects();
 
-    void startup(const char* appName = "");
+    void _startup(const char* appName = "", const std::vector<const char*>& additionalEx = {});
+
+    void createSurface(kame::sdl::WindowVk& window);
+
+    void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
 
@@ -89,6 +97,8 @@ struct Vulkan {
     void destroyCommandBuffers();
 
     void destroySyncObjects();
+
+    void destroySurface();
 
     void shutdown();
 

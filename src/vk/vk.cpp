@@ -359,7 +359,7 @@ void Vulkan::createSyncObjects()
     }
 }
 
-void Vulkan::startup(const char* appName)
+void Vulkan::_startup(const char* appName, const std::vector<const char*>& additionalEx)
 {
     assert(!_isInitialized);
 
@@ -367,7 +367,7 @@ void Vulkan::startup(const char* appName)
 
     initLoader();
 
-    initExtensions();
+    initExtensions(additionalEx);
 
     initValidationLayers();
 
@@ -388,6 +388,32 @@ void Vulkan::startup(const char* appName)
     createSyncObjects();
 
     _isInitialized = true;
+}
+
+void Vulkan::createSurface(kame::sdl::WindowVk& window)
+{
+    assert(!_surface);
+
+    assert(SDL_Vulkan_CreateSurface(window.window, _instance, nullptr, &_surface));
+}
+
+void Vulkan::startup(kame::sdl::WindowVk& window)
+{
+    assert(!_isInitialized);
+
+    uint32_t count = 0;
+    char const* const* pExt = SDL_Vulkan_GetInstanceExtensions(&count);
+    std::vector<const char*> ext(pExt, pExt + count);
+
+    _startup(SDL_GetWindowTitle(window.window), ext);
+
+    _isInitialized = true;
+
+    assert(!_isInitWithSurface);
+
+    createSurface(window);
+
+    _isInitWithSurface = true;
 }
 
 void Vulkan::destroyInstance()
@@ -452,8 +478,21 @@ void Vulkan::destroySyncObjects()
     _inFlightFences.clear();
 }
 
+void Vulkan::destroySurface()
+{
+    assert(_surface);
+
+    vkDestroySurfaceKHR(_instance, _surface, nullptr);
+}
+
 void Vulkan::shutdown()
 {
+    assert(_isInitWithSurface);
+
+    destroySurface();
+
+    _isInitWithSurface = false;
+
     assert(_isInitialized);
 
     destroySyncObjects();
