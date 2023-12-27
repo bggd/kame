@@ -52,6 +52,10 @@ struct Vulkan {
     VkImageView _depthStencilView = VK_NULL_HANDLE;
     VkDeviceMemory _depthStencilMemory = VK_NULL_HANDLE;
 
+    VkRenderPass _renderPass = VK_NULL_HANDLE;
+
+    std::vector<VkFramebuffer> _framebuffers;
+
     bool _isInitialized = false;
 
     // extensions
@@ -97,6 +101,10 @@ struct Vulkan {
 
     void createDefaultDepthStencil();
 
+    void createDefaultRenderPass();
+
+    void createDefaultFramebuffers();
+
     void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
@@ -118,6 +126,10 @@ struct Vulkan {
     void destroySwapchainImageViews();
 
     void destroyDefaultDepthStencil();
+
+    void destroyDefaultRenderPass();
+
+    void destroyDefaultFramebuffers();
 
     void shutdown();
 
