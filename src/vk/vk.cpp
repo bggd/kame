@@ -503,11 +503,6 @@ void Vulkan::createSwapchainImageViews()
 
     assert(count >= _swapchainCreateInfo.minImageCount);
 
-    if (count > _swapchainCreateInfo.minImageCount)
-    {
-        count = _swapchainCreateInfo.minImageCount;
-    }
-
     std::vector<VkImage> images(count);
     VK_CHECK_INCOMPLETE(vkGetSwapchainImagesKHR(_device, _swapchain, &count, images.data()));
 
