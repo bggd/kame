@@ -43,6 +43,10 @@ struct Vulkan {
     uint32_t _currentFrameInFlight = 0;
 
     VkSurfaceKHR _surface = VK_NULL_HANDLE;
+    VkSurfaceFormatKHR _surfaceFormat = {};
+
+    VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
+    std::vector<VkImageView> _swapchainImageViews;
 
     bool _isInitialized = false;
 
@@ -81,6 +85,12 @@ struct Vulkan {
 
     void createSurface(kame::sdl::WindowVk& window);
 
+    void createSwapchain(VkExtent2D screenSize);
+
+    void createSwapchain(kame::sdl::WindowVk& window);
+
+    void createSwapchainImageViews();
+
     void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
@@ -96,6 +106,10 @@ struct Vulkan {
     void destroySyncObjects();
 
     void destroySurface();
+
+    void destroySwapchain();
+
+    void destroySwapchainImageViews();
 
     void shutdown();
 

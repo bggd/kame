@@ -390,6 +390,141 @@ void Vulkan::createSurface(kame::sdl::WindowVk& window)
     assert(SDL_Vulkan_CreateSurface(window.window, _instance, nullptr, &_surface));
 }
 
+void Vulkan::createSwapchain(VkExtent2D screenSize)
+{
+    VkSurfaceCapabilitiesKHR caps{};
+
+    VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physicalDevice, _surface, &caps));
+
+    uint32_t formatCount = 0;
+
+    VK_CHECK_INCOMPLETE(vkGetPhysicalDeviceSurfaceFormatsKHR(_physicalDevice, _surface, &formatCount, nullptr));
+
+    std::vector<VkSurfaceFormatKHR> formats(formatCount);
+
+    VK_CHECK_INCOMPLETE(vkGetPhysicalDeviceSurfaceFormatsKHR(_physicalDevice, _surface, &formatCount, formats.data()));
+
+    assert(!formats.empty());
+
+    uint32_t modeCount = 0;
+
+    VK_CHECK_INCOMPLETE(vkGetPhysicalDeviceSurfacePresentModesKHR(_physicalDevice, _surface, &modeCount, nullptr));
+
+    std::vector<VkPresentModeKHR> presentModes(modeCount);
+
+    VK_CHECK_INCOMPLETE(vkGetPhysicalDeviceSurfacePresentModesKHR(_physicalDevice, _surface, &modeCount, presentModes.data()));
+
+    assert(!presentModes.empty());
+
+    _surfaceFormat = VkSurfaceFormatKHR{};
+
+    if (formatCount == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
+    {
+        _surfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
+        _surfaceFormat.colorSpace = formats[0].colorSpace;
+    }
+    else
+    {
+        _surfaceFormat = formats[0];
+    }
+
+    VkExtent2D swapChainSize;
+    swapChainSize.width = SDL_clamp(screenSize.width,
+                                    caps.minImageExtent.width,
+                                    caps.maxImageExtent.width);
+    swapChainSize.height = SDL_clamp(screenSize.height,
+                                     caps.minImageExtent.height,
+                                     caps.maxImageExtent.height);
+
+    uint32_t imageCount = caps.minImageCount + 1;
+    if (caps.maxImageCount > 0 && imageCount > caps.maxImageCount)
+    {
+        imageCount = caps.maxImageCount;
+    }
+
+    VkSwapchainCreateInfoKHR sci{};
+    sci.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+
+    sci.surface = _surface;
+
+    sci.minImageCount = imageCount;
+    sci.imageFormat = _surfaceFormat.format;
+    sci.imageColorSpace = _surfaceFormat.colorSpace;
+    sci.imageExtent = swapChainSize;
+    sci.imageArrayLayers = 1;
+    sci.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    sci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    sci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    sci.preTransform = caps.currentTransform;
+    sci.clipped = VK_TRUE;
+    sci.oldSwapchain = VK_NULL_HANDLE;
+
+    for (auto mode : presentModes)
+    {
+        if (mode == VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            sci.presentMode = mode;
+            break;
+        }
+        else if (mode == VK_PRESENT_MODE_FIFO_RELAXED_KHR)
+        {
+            sci.presentMode = mode;
+            break;
+        }
+        else if (mode == VK_PRESENT_MODE_FIFO_KHR)
+        {
+            sci.presentMode = mode;
+            break;
+        }
+    }
+
+    VK_CHECK(vkCreateSwapchainKHR(_device, &sci, nullptr, &_swapchain));
+}
+
+void Vulkan::createSwapchain(kame::sdl::WindowVk& window)
+{
+    int x, y;
+    SDL_GetWindowSizeInPixels(window.window, &x, &y);
+    assert(x > 0 && y > 0);
+
+    VkExtent2D screenSize;
+    screenSize.width = (uint32_t)x;
+    screenSize.height = (uint32_t)y;
+
+    createSwapchain(screenSize);
+}
+
+void Vulkan::createSwapchainImageViews()
+{
+    uint32_t count = 0;
+    VK_CHECK_INCOMPLETE(vkGetSwapchainImagesKHR(_device, _swapchain, &count, nullptr));
+
+    std::vector<VkImage> images(count);
+    VK_CHECK_INCOMPLETE(vkGetSwapchainImagesKHR(_device, _swapchain, &count, images.data()));
+
+    _swapchainImageViews.resize(count);
+
+    for (size_t i = 0; i < _swapchainImageViews.size(); ++i)
+    {
+        VkImageViewCreateInfo ivci{};
+        ivci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        ivci.image = images[i];
+        ivci.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        ivci.format = _surfaceFormat.format;
+        ivci.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ivci.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ivci.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ivci.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ivci.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ivci.subresourceRange.baseMipLevel = 0;
+        ivci.subresourceRange.levelCount = 1;
+        ivci.subresourceRange.baseArrayLayer = 0;
+        ivci.subresourceRange.layerCount = 1;
+
+        VK_CHECK(vkCreateImageView(_device, &ivci, nullptr, &_swapchainImageViews[i]));
+    }
+}
+
 void Vulkan::startup(kame::sdl::WindowVk& window)
 {
     assert(!_isInitialized);
@@ -424,6 +559,10 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
     createCommandBuffers();
 
     createSyncObjects();
+
+    createSwapchain(window);
+
+    createSwapchainImageViews();
 
     _isInitialized = true;
 }
@@ -495,11 +634,36 @@ void Vulkan::destroySurface()
     assert(_surface);
 
     vkDestroySurfaceKHR(_instance, _surface, nullptr);
+
+    _surface = VK_NULL_HANDLE;
+}
+
+void Vulkan::destroySwapchain()
+{
+    assert(_swapchain);
+
+    vkDestroySwapchainKHR(_device, _swapchain, nullptr);
+
+    _swapchain = VK_NULL_HANDLE;
+}
+
+void Vulkan::destroySwapchainImageViews()
+{
+    for (auto view : _swapchainImageViews)
+    {
+        vkDestroyImageView(_device, view, nullptr);
+    }
+
+    _swapchainImageViews.clear();
 }
 
 void Vulkan::shutdown()
 {
     assert(_isInitialized);
+
+    destroySwapchainImageViews();
+
+    destroySwapchain();
 
     destroySurface();
 
