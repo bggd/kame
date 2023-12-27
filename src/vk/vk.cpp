@@ -416,16 +416,16 @@ void Vulkan::createSwapchain(VkExtent2D screenSize)
 
     assert(!presentModes.empty());
 
-    _surfaceFormat = VkSurfaceFormatKHR{};
+    VkSurfaceFormatKHR surfaceFormat = {};
 
     if (formatCount == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
     {
-        _surfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
-        _surfaceFormat.colorSpace = formats[0].colorSpace;
+        surfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
+        surfaceFormat.colorSpace = formats[0].colorSpace;
     }
     else
     {
-        _surfaceFormat = formats[0];
+        surfaceFormat = formats[0];
     }
 
     VkExtent2D swapChainSize;
@@ -448,8 +448,8 @@ void Vulkan::createSwapchain(VkExtent2D screenSize)
     sci.surface = _surface;
 
     sci.minImageCount = imageCount;
-    sci.imageFormat = _surfaceFormat.format;
-    sci.imageColorSpace = _surfaceFormat.colorSpace;
+    sci.imageFormat = surfaceFormat.format;
+    sci.imageColorSpace = surfaceFormat.colorSpace;
     sci.imageExtent = swapChainSize;
     sci.imageArrayLayers = 1;
     sci.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -479,6 +479,8 @@ void Vulkan::createSwapchain(VkExtent2D screenSize)
     }
 
     VK_CHECK(vkCreateSwapchainKHR(_device, &sci, nullptr, &_swapchain));
+
+    _swapchainCreateInfo = sci;
 }
 
 void Vulkan::createSwapchain(kame::sdl::WindowVk& window)
@@ -499,6 +501,13 @@ void Vulkan::createSwapchainImageViews()
     uint32_t count = 0;
     VK_CHECK_INCOMPLETE(vkGetSwapchainImagesKHR(_device, _swapchain, &count, nullptr));
 
+    assert(count >= _swapchainCreateInfo.minImageCount);
+
+    if (count > _swapchainCreateInfo.minImageCount)
+    {
+        count = _swapchainCreateInfo.minImageCount;
+    }
+
     std::vector<VkImage> images(count);
     VK_CHECK_INCOMPLETE(vkGetSwapchainImagesKHR(_device, _swapchain, &count, images.data()));
 
@@ -510,7 +519,7 @@ void Vulkan::createSwapchainImageViews()
         ivci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         ivci.image = images[i];
         ivci.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        ivci.format = _surfaceFormat.format;
+        ivci.format = _swapchainCreateInfo.imageFormat;
         ivci.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
         ivci.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
         ivci.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;

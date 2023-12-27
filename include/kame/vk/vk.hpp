@@ -43,9 +43,9 @@ struct Vulkan {
     uint32_t _currentFrameInFlight = 0;
 
     VkSurfaceKHR _surface = VK_NULL_HANDLE;
-    VkSurfaceFormatKHR _surfaceFormat = {};
 
     VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
+    VkSwapchainCreateInfoKHR _swapchainCreateInfo = {};
     std::vector<VkImageView> _swapchainImageViews;
 
     bool _isInitialized = false;
