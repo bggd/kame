@@ -48,6 +48,10 @@ struct Vulkan {
     VkSwapchainCreateInfoKHR _swapchainCreateInfo = {};
     std::vector<VkImageView> _swapchainImageViews;
 
+    VkImage _depthStencil = VK_NULL_HANDLE;
+    VkImageView _depthStencilView = VK_NULL_HANDLE;
+    VkDeviceMemory _depthStencilMemory = VK_NULL_HANDLE;
+
     bool _isInitialized = false;
 
     // extensions
@@ -91,6 +95,8 @@ struct Vulkan {
 
     void createSwapchainImageViews();
 
+    void createDefaultDepthStencil();
+
     void startup(kame::sdl::WindowVk& window);
 
     void destroyInstance();
@@ -111,6 +117,8 @@ struct Vulkan {
 
     void destroySwapchainImageViews();
 
+    void destroyDefaultDepthStencil();
+
     void shutdown();
 
     bool _findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t& i, uint32_t& type);
@@ -128,6 +136,16 @@ struct Vulkan {
     void destroyBuffer(VkBuffer& buffer);
 
     void bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset = 0);
+
+    void createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags usage, VkImage& imageResult, VkMemoryRequirements& memRequirementsResult);
+
+    void destroyImage2D(VkImage& image);
+
+    void bindImageMemory(VkImage image, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset = 0);
+
+    void createImageView2D(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView& imageViewResult);
+
+    void destroyImageView(VkImageView& imageView);
 
     void createShaderModule(const std::vector<char>&, VkShaderModule& shaderResult);
 

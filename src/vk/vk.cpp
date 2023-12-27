@@ -529,6 +529,26 @@ void Vulkan::createSwapchainImageViews()
     }
 }
 
+void Vulkan::createDefaultDepthStencil()
+{
+    VkExtent2D size{};
+
+    size.width = _swapchainCreateInfo.imageExtent.width;
+    size.height = _swapchainCreateInfo.imageExtent.height;
+
+    VkImageUsageFlags usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+    VkMemoryRequirements memReq{};
+
+    createImage2D(size, VK_FORMAT_D32_SFLOAT, usage, _depthStencil, memReq);
+
+    allocateMemory(memReq, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _depthStencilMemory);
+
+    bindImageMemory(_depthStencil, _depthStencilMemory);
+
+    createImageView2D(_depthStencil, VK_FORMAT_D32_SFLOAT, VK_IMAGE_ASPECT_DEPTH_BIT, _depthStencilView);
+}
+
 void Vulkan::startup(kame::sdl::WindowVk& window)
 {
     assert(!_isInitialized);
@@ -567,6 +587,8 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
     createSwapchain(window);
 
     createSwapchainImageViews();
+
+    createDefaultDepthStencil();
 
     _isInitialized = true;
 }
@@ -653,17 +675,38 @@ void Vulkan::destroySwapchain()
 
 void Vulkan::destroySwapchainImageViews()
 {
-    for (auto view : _swapchainImageViews)
+    for (auto& view : _swapchainImageViews)
     {
-        vkDestroyImageView(_device, view, nullptr);
+        destroyImageView(view);
     }
 
     _swapchainImageViews.clear();
 }
 
+void Vulkan::destroyDefaultDepthStencil()
+{
+    assert(_depthStencil);
+    assert(_depthStencilView);
+    assert(_depthStencilMemory);
+
+    destroyImageView(_depthStencilView);
+
+    _depthStencilView = VK_NULL_HANDLE;
+
+    destroyImage2D(_depthStencil);
+
+    _depthStencil = VK_NULL_HANDLE;
+
+    freeMemory(_depthStencilMemory);
+
+    _depthStencilMemory = VK_NULL_HANDLE;
+}
+
 void Vulkan::shutdown()
 {
     assert(_isInitialized);
+
+    destroyDefaultDepthStencil();
 
     destroySwapchainImageViews();
 
@@ -779,6 +822,71 @@ void Vulkan::destroyBuffer(VkBuffer& buffer)
 void Vulkan::bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset)
 {
     VK_CHECK(vkBindBufferMemory(_device, buffer, deviceMemory, memoryOffset));
+}
+
+void Vulkan::createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags usage, VkImage& imageResult, VkMemoryRequirements& memRequirementsResult)
+{
+    VkImageCreateInfo ici{};
+    ici.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+
+    ici.imageType = VK_IMAGE_TYPE_2D;
+    ici.extent.width = size.width;
+    ici.extent.height = size.height;
+    ici.extent.depth = 1;
+    ici.mipLevels = 1;
+    ici.arrayLayers = 1;
+    ici.format = format;
+    ici.tiling = VK_IMAGE_TILING_OPTIMAL;
+    ici.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    ici.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    ici.usage = usage;
+    ici.samples = VK_SAMPLE_COUNT_1_BIT;
+
+    VK_CHECK(vkCreateImage(_device, &ici, nullptr, &imageResult));
+
+    vkGetImageMemoryRequirements(_device, imageResult, &memRequirementsResult);
+}
+
+void Vulkan::destroyImage2D(VkImage& image)
+{
+    assert(image);
+
+    vkDestroyImage(_device, image, nullptr);
+
+    image = VK_NULL_HANDLE;
+}
+
+void Vulkan::bindImageMemory(VkImage image, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset)
+{
+    VK_CHECK(vkBindImageMemory(_device, image, deviceMemory, memoryOffset));
+}
+
+void Vulkan::createImageView2D(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView& imageViewResult)
+{
+    VkImageViewCreateInfo ivci{};
+    ivci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+
+    ivci.image = image;
+    ivci.format = format;
+
+    ivci.viewType = VK_IMAGE_VIEW_TYPE_2D;
+
+    ivci.subresourceRange.aspectMask = aspectMask;
+    ivci.subresourceRange.baseMipLevel = 0;
+    ivci.subresourceRange.levelCount = 1;
+    ivci.subresourceRange.baseArrayLayer = 0;
+    ivci.subresourceRange.layerCount = 1;
+
+    VK_CHECK(vkCreateImageView(_device, &ivci, nullptr, &imageViewResult));
+}
+
+void Vulkan::destroyImageView(VkImageView& imageView)
+{
+    assert(imageView);
+
+    vkDestroyImageView(_device, imageView, nullptr);
+
+    imageView = VK_NULL_HANDLE;
 }
 
 void Vulkan::createShaderModule(const std::vector<char>& code, VkShaderModule& shaderResult)
