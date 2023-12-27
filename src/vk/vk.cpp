@@ -925,7 +925,7 @@ VkFence Vulkan::_getFence()
     return _inFlightFences[_currentFrameInFlight];
 }
 
-void Vulkan::flush(bool wait)
+void Vulkan::submitCommands(bool wait)
 {
     VkFence fence = _getFence();
 

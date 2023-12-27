@@ -33,7 +33,7 @@ struct Etna : kame::vk::Vulkan {
 
         endCmd();
 
-        flush();
+        submitCommands();
     }
 
     void createStagingBuffer(VkDeviceSize size, StagingBuffer& bufferResult, const void* data)
