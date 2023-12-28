@@ -22,20 +22,6 @@ struct SSBO : BufferVK {};
 
 struct Etna : kame::vk::Vulkan {
 
-    void beginFrame()
-    {
-        beginCmd();
-    }
-
-    void endFrame()
-    {
-        setMemoryBarrier(VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
-
-        endCmd();
-
-        submitCommands();
-    }
-
     void createStagingBuffer(VkDeviceSize size, StagingBuffer& bufferResult, const void* data)
     {
         VkBuffer stagingBuffer = VK_NULL_HANDLE;
@@ -112,7 +98,10 @@ struct Etna : kame::vk::Vulkan {
 
         cmdCopyBuffer(stagingBuffer._buffer, ssbo._buffer, region);
 
-        setMemoryBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+        cmdMemoryBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_ACCESS_MEMORY_WRITE_BIT, VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT);
+
+        submitCmds();
 
         destroyStagingBuffer(stagingBuffer);
     }

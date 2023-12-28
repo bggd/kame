@@ -181,11 +181,13 @@ struct Vulkan {
 
     VkCommandBuffer _getCmdBuffer();
 
-    void setMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst);
+    void _beginCmd();
 
-    void beginCmd();
+    void _endCmd();
 
-    void endCmd();
+    void cmdPipelineBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst);
+
+    void cmdMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst, VkAccessFlags srcAccess, VkAccessFlags dstAccess);
 
     void cmdCopyBuffer(VkBuffer src, VkBuffer dst, const VkBufferCopy& region);
 
@@ -193,7 +195,7 @@ struct Vulkan {
 
     VkFence _getFence();
 
-    void submitCommands(bool wait = true);
+    void submitCmds(bool waitFence = true);
 };
 
 } // namespace kame::vk
