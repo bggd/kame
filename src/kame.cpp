@@ -1,4 +1,3 @@
-#define VOLK_IMPLEMENTATION
 #include <all.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION

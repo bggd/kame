@@ -20,6 +20,7 @@ add_library(kame-cpp
     src/ogl/glad.cpp
     src/ogl/ogl.cpp
     src/vk/vk.cpp
+    src/vk/volk.cpp
     src/gltf/gltf.cpp
     src/gltf/gltf_material.cpp
     src/gltf/gltf_ext.cpp
