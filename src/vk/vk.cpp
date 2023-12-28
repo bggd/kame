@@ -1062,7 +1062,7 @@ void Vulkan::createDescriptorPool(const std::vector<VkDescriptorPoolSize>& reque
 {
     assert(!poolResult);
 
-    VkDescriptorPoolCreateInfo dpci;
+    VkDescriptorPoolCreateInfo dpci{};
     dpci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 
     dpci.flags = flags;
