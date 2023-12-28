@@ -13,9 +13,8 @@ bool isInit = false;
 
 void kameInit()
 {
-    // TODO: KAME_SPDLOG_LEVEL_DEBUG
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::info("kameInit");
+    spdlog::set_pattern("[%H:%M:%S:%e] [%^%l%$] %v");
+    SPDLOG_INFO("kameInit");
     // stbi_set_flip_vertically_on_load(true);
     std::atexit(atexit_handler);
     SPDLOG_DEBUG("Exe Path: {}", SDL_GetBasePath());
@@ -27,7 +26,7 @@ void kameShutdown()
 {
     assert(isInit);
     isInit = false;
-    spdlog::info("kameShutdown");
+    SPDLOG_INFO("kameShutdown");
 }
 
 bool kameIsInit()
