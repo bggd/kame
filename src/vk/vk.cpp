@@ -749,6 +749,8 @@ void Vulkan::destroySyncObjects()
 
     for (auto& fence : _inFlightFences)
     {
+        assert(fence);
+
         vkDestroyFence(_device, fence, nullptr);
     }
 
@@ -777,6 +779,8 @@ void Vulkan::destroySwapchainImageViews()
 {
     for (auto& view : _swapchainImageViews)
     {
+        assert(view);
+
         destroyImageView(view);
     }
 
@@ -818,8 +822,6 @@ void Vulkan::destroyDefaultFramebuffers()
         assert(fb);
 
         vkDestroyFramebuffer(_device, fb, nullptr);
-
-        fb = VK_NULL_HANDLE;
     }
 
     _framebuffers.clear();
@@ -881,6 +883,8 @@ bool Vulkan::_findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properti
 
 VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemoryResult)
 {
+    assert(!deviceMemoryResult);
+
     VkMemoryAllocateInfo mai{};
     mai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 
@@ -915,16 +919,22 @@ void Vulkan::freeMemory(VkDeviceMemory& memory)
 
 void Vulkan::mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, void** ppData)
 {
+    assert(memory);
+
     VK_CHECK(vkMapMemory(_device, memory, offset, size, 0, ppData));
 }
 
 void Vulkan::unmapMemory(VkDeviceMemory memory)
 {
+    assert(memory);
+
     vkUnmapMemory(_device, memory);
 }
 
 void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& bufferResult, VkMemoryRequirements& memRequirementsResult)
 {
+    assert(!bufferResult);
+
     VkBufferCreateInfo bci{};
     bci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 
@@ -948,11 +958,16 @@ void Vulkan::destroyBuffer(VkBuffer& buffer)
 
 void Vulkan::bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset)
 {
+    assert(buffer);
+    assert(deviceMemory);
+
     VK_CHECK(vkBindBufferMemory(_device, buffer, deviceMemory, memoryOffset));
 }
 
 void Vulkan::createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags usage, VkImage& imageResult, VkMemoryRequirements& memRequirementsResult)
 {
+    assert(!imageResult);
+
     VkImageCreateInfo ici{};
     ici.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 
@@ -985,11 +1000,16 @@ void Vulkan::destroyImage2D(VkImage& image)
 
 void Vulkan::bindImageMemory(VkImage image, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset)
 {
+    assert(image);
+    assert(deviceMemory);
+
     VK_CHECK(vkBindImageMemory(_device, image, deviceMemory, memoryOffset));
 }
 
 void Vulkan::createImageView2D(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView& imageViewResult)
 {
+    assert(!imageViewResult);
+
     VkImageViewCreateInfo ivci{};
     ivci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 
@@ -1018,6 +1038,8 @@ void Vulkan::destroyImageView(VkImageView& imageView)
 
 void Vulkan::createShaderModule(const std::vector<char>& code, VkShaderModule& shaderResult)
 {
+    assert(!shaderResult);
+
     VkShaderModuleCreateInfo smci{};
     smci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 
@@ -1038,6 +1060,8 @@ void Vulkan::destroyShaderModule(VkShaderModule& shader)
 
 void Vulkan::createDescriptorPool(const std::vector<VkDescriptorPoolSize>& requestSize, VkDescriptorPoolCreateFlagBits flags, uint32_t maxSets, VkDescriptorPool& poolResult)
 {
+    assert(!poolResult);
+
     VkDescriptorPoolCreateInfo dpci;
     dpci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 
@@ -1062,6 +1086,8 @@ void Vulkan::destroyDescriptorPool(VkDescriptorPool& pool)
 
 void Vulkan::createDescriptorSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& bindings, VkDescriptorSetLayoutCreateFlags flags, VkDescriptorSetLayout& layoutResult)
 {
+    assert(!layoutResult);
+
     VkDescriptorSetLayoutCreateInfo dslci{};
     dslci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 
@@ -1084,6 +1110,9 @@ void Vulkan::destroyDescriptorSetLayout(VkDescriptorSetLayout& layout)
 
 void Vulkan::createDescriptorSet(VkDescriptorPool& pool, VkDescriptorSetLayout& layout, VkDescriptorSet& setResult)
 {
+    assert(pool);
+    assert(!setResult);
+
     VkDescriptorSetAllocateInfo dsai{};
     dsai.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 
@@ -1102,6 +1131,8 @@ void Vulkan::updateDescriptorSet(const std::vector<VkWriteDescriptorSet>& wdsLis
 
 void Vulkan::createGraphicPipeline(VkGraphicsPipelineCreateInfo& info, VkPipeline& pipelineResult)
 {
+    assert(!pipelineResult);
+
     VK_CHECK(vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &info, nullptr, &pipelineResult));
 }
 
