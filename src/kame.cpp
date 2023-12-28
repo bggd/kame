@@ -19,11 +19,13 @@ void kameInit()
     // stbi_set_flip_vertically_on_load(true);
     std::atexit(atexit_handler);
     SPDLOG_DEBUG("Exe Path: {}", SDL_GetBasePath());
+    assert(!isInit);
     isInit = true;
 }
 
 void kameShutdown()
 {
+    assert(isInit);
     isInit = false;
     spdlog::info("kameShutdown");
 }
