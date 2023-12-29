@@ -132,7 +132,7 @@ void Vulkan::initValidationLayers()
     _debugInfo.pfnUserCallback = debugCallback;
 }
 
-void Vulkan::createInstance(const char* appName)
+void Vulkan::initInstance(const char* appName)
 {
     VkApplicationInfo ai{};
     ai.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -279,7 +279,7 @@ void Vulkan::pickPhysicalDevice()
     _physicalDevice = pick;
 }
 
-void Vulkan::createDevice(std::vector<const char*> ext)
+void Vulkan::initDevice(std::vector<const char*> ext)
 {
     float priority = 1.0f;
 
@@ -329,14 +329,14 @@ void Vulkan::createDevice(std::vector<const char*> ext)
     volkLoadDevice(_device);
 }
 
-void Vulkan::createQueue()
+void Vulkan::initQueue()
 {
     assert(!_graphicsQueue);
 
     vkGetDeviceQueue(_device, _qFamilyGraphicsIndex, 0, &_graphicsQueue);
 }
 
-void Vulkan::createCommandPool()
+void Vulkan::initCommandPool()
 {
     assert(!_commandPool);
 
@@ -350,7 +350,7 @@ void Vulkan::createCommandPool()
     VK_CHECK(vkCreateCommandPool(_device, &cpci, nullptr, &_commandPool));
 }
 
-void Vulkan::createCommandBuffers()
+void Vulkan::initCommandBuffers()
 {
     assert(_cmdBuffers.empty());
 
@@ -368,7 +368,7 @@ void Vulkan::createCommandBuffers()
     VK_CHECK(vkAllocateCommandBuffers(_device, &cbai, _cmdBuffers.data()));
 }
 
-void Vulkan::createSyncObjects()
+void Vulkan::initSyncObjects()
 {
     assert(_inFlightFences.empty());
 
@@ -385,14 +385,14 @@ void Vulkan::createSyncObjects()
     }
 }
 
-void Vulkan::createSurface(kame::sdl::WindowVk& window)
+void Vulkan::initSurface(kame::sdl::WindowVk& window)
 {
     assert(!_surface);
 
     assert(SDL_Vulkan_CreateSurface(window.window, _instance, nullptr, &_surface));
 }
 
-void Vulkan::createSwapchain(VkExtent2D screenSize)
+void Vulkan::initSwapchain(VkExtent2D screenSize)
 {
     VkSurfaceCapabilitiesKHR caps{};
 
@@ -485,7 +485,7 @@ void Vulkan::createSwapchain(VkExtent2D screenSize)
     _swapchainCreateInfo = sci;
 }
 
-void Vulkan::createSwapchain(kame::sdl::WindowVk& window)
+void Vulkan::initSwapchain(kame::sdl::WindowVk& window)
 {
     int x, y;
     SDL_GetWindowSizeInPixels(window.window, &x, &y);
@@ -495,10 +495,10 @@ void Vulkan::createSwapchain(kame::sdl::WindowVk& window)
     screenSize.width = (uint32_t)x;
     screenSize.height = (uint32_t)y;
 
-    createSwapchain(screenSize);
+    initSwapchain(screenSize);
 }
 
-void Vulkan::createSwapchainImageViews()
+void Vulkan::initSwapchainImageViews()
 {
     uint32_t count = 0;
     VK_CHECK_INCOMPLETE(vkGetSwapchainImagesKHR(_device, _swapchain, &count, nullptr));
@@ -531,7 +531,7 @@ void Vulkan::createSwapchainImageViews()
     }
 }
 
-void Vulkan::createDefaultDepthStencil()
+void Vulkan::initDefaultDepthStencil()
 {
     VkExtent2D size{};
 
@@ -551,7 +551,7 @@ void Vulkan::createDefaultDepthStencil()
     createImageView2D(_depthStencil, VK_FORMAT_D32_SFLOAT, VK_IMAGE_ASPECT_DEPTH_BIT, _depthStencilView);
 }
 
-void Vulkan::createDefaultRenderPass()
+void Vulkan::initDefaultRenderPass()
 {
     VkAttachmentDescription adColor{};
     adColor.format = _swapchainCreateInfo.imageFormat;
@@ -620,7 +620,7 @@ void Vulkan::createDefaultRenderPass()
     VK_CHECK(vkCreateRenderPass(_device, &rpci, nullptr, &_renderPass));
 }
 
-void Vulkan::createDefaultFramebuffers()
+void Vulkan::initDefaultFramebuffers()
 {
     _framebuffers.resize(_swapchainImageViews.size());
 
@@ -660,40 +660,40 @@ void Vulkan::startup(kame::sdl::WindowVk& window)
 
     initValidationLayers();
 
-    createInstance(SDL_GetWindowTitle(window.window));
+    initInstance(SDL_GetWindowTitle(window.window));
 
-    createSurface(window);
+    initSurface(window);
 
     pickPhysicalDevice();
 
     initMemProperties();
 
-    createDevice({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
+    initDevice({VK_KHR_SWAPCHAIN_EXTENSION_NAME});
 
-    createQueue();
+    initQueue();
 
-    createCommandPool();
+    initCommandPool();
 
-    createCommandBuffers();
+    initCommandBuffers();
 
-    createSyncObjects();
+    initSyncObjects();
 
-    createSwapchain(window);
+    initSwapchain(window);
 
-    createSwapchainImageViews();
+    initSwapchainImageViews();
 
-    createDefaultDepthStencil();
+    initDefaultDepthStencil();
 
-    createDefaultRenderPass();
+    initDefaultRenderPass();
 
-    createDefaultFramebuffers();
+    initDefaultFramebuffers();
 
     _isInitialized = true;
 
     _beginCmd();
 }
 
-void Vulkan::destroyInstance()
+void Vulkan::deinitInstance()
 {
     if (_debugMessanger)
     {
@@ -709,7 +709,7 @@ void Vulkan::destroyInstance()
     _instance = VK_NULL_HANDLE;
 }
 
-void Vulkan::destroyDevice()
+void Vulkan::deinitDevice()
 {
     assert(_physicalDevice);
 
@@ -722,28 +722,28 @@ void Vulkan::destroyDevice()
     _device = VK_NULL_HANDLE;
 }
 
-void Vulkan::destroyQueue()
+void Vulkan::deinitQueue()
 {
     assert(_graphicsQueue);
 
     _graphicsQueue = VK_NULL_HANDLE;
 }
 
-void Vulkan::destroyCommandPool()
+void Vulkan::deinitCommandPool()
 {
     assert(_commandPool);
 
     vkDestroyCommandPool(_device, _commandPool, nullptr);
 }
 
-void Vulkan::destroyCommandBuffers()
+void Vulkan::deinitCommandBuffers()
 {
     assert(!_cmdBuffers.empty());
 
     _cmdBuffers.clear();
 }
 
-void Vulkan::destroySyncObjects()
+void Vulkan::deinitSyncObjects()
 {
     assert(!_inFlightFences.empty());
 
@@ -757,7 +757,7 @@ void Vulkan::destroySyncObjects()
     _inFlightFences.clear();
 }
 
-void Vulkan::destroySurface()
+void Vulkan::deinitSurface()
 {
     assert(_surface);
 
@@ -766,7 +766,7 @@ void Vulkan::destroySurface()
     _surface = VK_NULL_HANDLE;
 }
 
-void Vulkan::destroySwapchain()
+void Vulkan::deinitSwapchain()
 {
     assert(_swapchain);
 
@@ -775,7 +775,7 @@ void Vulkan::destroySwapchain()
     _swapchain = VK_NULL_HANDLE;
 }
 
-void Vulkan::destroySwapchainImageViews()
+void Vulkan::deinitSwapchainImageViews()
 {
     for (auto& view : _swapchainImageViews)
     {
@@ -787,7 +787,7 @@ void Vulkan::destroySwapchainImageViews()
     _swapchainImageViews.clear();
 }
 
-void Vulkan::destroyDefaultDepthStencil()
+void Vulkan::deinitDefaultDepthStencil()
 {
     assert(_depthStencil);
     assert(_depthStencilView);
@@ -806,7 +806,7 @@ void Vulkan::destroyDefaultDepthStencil()
     _depthStencilMemory = VK_NULL_HANDLE;
 }
 
-void Vulkan::destroyDefaultRenderPass()
+void Vulkan::deinitDefaultRenderPass()
 {
     assert(_renderPass);
 
@@ -815,7 +815,7 @@ void Vulkan::destroyDefaultRenderPass()
     _renderPass = VK_NULL_HANDLE;
 }
 
-void Vulkan::destroyDefaultFramebuffers()
+void Vulkan::deinitDefaultFramebuffers()
 {
     for (auto& fb : _framebuffers)
     {
@@ -831,29 +831,29 @@ void Vulkan::shutdown()
 {
     assert(_isInitialized);
 
-    destroyDefaultFramebuffers();
+    deinitDefaultFramebuffers();
 
-    destroyDefaultRenderPass();
+    deinitDefaultRenderPass();
 
-    destroyDefaultDepthStencil();
+    deinitDefaultDepthStencil();
 
-    destroySwapchainImageViews();
+    deinitSwapchainImageViews();
 
-    destroySwapchain();
+    deinitSwapchain();
 
-    destroySurface();
+    deinitSurface();
 
-    destroySyncObjects();
+    deinitSyncObjects();
 
-    destroyCommandBuffers();
+    deinitCommandBuffers();
 
-    destroyCommandPool();
+    deinitCommandPool();
 
-    destroyQueue();
+    deinitQueue();
 
-    destroyDevice();
+    deinitDevice();
 
-    destroyInstance();
+    deinitInstance();
 
     deinitLoader();
 

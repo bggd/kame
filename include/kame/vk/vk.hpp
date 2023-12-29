@@ -75,61 +75,61 @@ struct Vulkan {
 
     void initValidationLayers();
 
-    void createInstance(const char* appName = "");
+    void initInstance(const char* appName = "");
 
     void pickPhysicalDevice();
 
     void initMemProperties();
 
-    void createDevice(std::vector<const char*> ext = {});
+    void initDevice(std::vector<const char*> ext = {});
 
-    void createQueue();
+    void initQueue();
 
-    void createCommandPool();
+    void initCommandPool();
 
-    void createCommandBuffers();
+    void initCommandBuffers();
 
-    void createSyncObjects();
+    void initSyncObjects();
 
-    void createSurface(kame::sdl::WindowVk& window);
+    void initSurface(kame::sdl::WindowVk& window);
 
-    void createSwapchain(VkExtent2D screenSize);
+    void initSwapchain(VkExtent2D screenSize);
 
-    void createSwapchain(kame::sdl::WindowVk& window);
+    void initSwapchain(kame::sdl::WindowVk& window);
 
-    void createSwapchainImageViews();
+    void initSwapchainImageViews();
 
-    void createDefaultDepthStencil();
+    void initDefaultDepthStencil();
 
-    void createDefaultRenderPass();
+    void initDefaultRenderPass();
 
-    void createDefaultFramebuffers();
+    void initDefaultFramebuffers();
 
     void startup(kame::sdl::WindowVk& window);
 
-    void destroyInstance();
+    void deinitInstance();
 
-    void destroyDevice();
+    void deinitDevice();
 
-    void destroyQueue();
+    void deinitQueue();
 
-    void destroyCommandPool();
+    void deinitCommandPool();
 
-    void destroyCommandBuffers();
+    void deinitCommandBuffers();
 
-    void destroySyncObjects();
+    void deinitSyncObjects();
 
-    void destroySurface();
+    void deinitSurface();
 
-    void destroySwapchain();
+    void deinitSwapchain();
 
-    void destroySwapchainImageViews();
+    void deinitSwapchainImageViews();
 
-    void destroyDefaultDepthStencil();
+    void deinitDefaultDepthStencil();
 
-    void destroyDefaultRenderPass();
+    void deinitDefaultRenderPass();
 
-    void destroyDefaultFramebuffers();
+    void deinitDefaultFramebuffers();
 
     void shutdown();
 
