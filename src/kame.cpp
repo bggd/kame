@@ -13,7 +13,10 @@ bool isInit = false;
 
 void kameInit()
 {
-    spdlog::set_pattern("[%H:%M:%S:%e] [%^%l%$] %v [%@:%!]");
+    if (SPDLOG_ACTIVE_LEVEL != SPDLOG_LEVEL_OFF)
+    {
+        spdlog::set_pattern("[%H:%M:%S:%e] [%^%l%$] %v [%@:%!]");
+    }
     SPDLOG_INFO("kameInit");
     // stbi_set_flip_vertically_on_load(true);
     std::atexit(atexit_handler);
