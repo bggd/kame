@@ -540,15 +540,15 @@ void Vulkan::initDefaultDepthStencil()
 
     VkImageUsageFlags usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 
-    VkMemoryRequirements memReq{};
+    _depthStencil = createImage2D(size, VK_FORMAT_D32_SFLOAT, usage);
 
-    createImage2D(size, VK_FORMAT_D32_SFLOAT, usage, _depthStencil, memReq);
+    VkMemoryRequirements memReq = getImageMemoryRequirements(_depthStencil);
 
-    allocateMemory(memReq, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _depthStencilMemory);
+    _depthStencilMemory = allocateDeviceMemory(memReq, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     bindImageMemory(_depthStencil, _depthStencilMemory);
 
-    createImageView2D(_depthStencil, VK_FORMAT_D32_SFLOAT, VK_IMAGE_ASPECT_DEPTH_BIT, _depthStencilView);
+    _depthStencilView = createImageView2D(_depthStencil, VK_FORMAT_D32_SFLOAT, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
 void Vulkan::initDefaultRenderPass()
@@ -797,11 +797,11 @@ void Vulkan::deinitDefaultDepthStencil()
 
     _depthStencilView = VK_NULL_HANDLE;
 
-    destroyImage2D(_depthStencil);
+    destroyImage(_depthStencil);
 
     _depthStencil = VK_NULL_HANDLE;
 
-    freeMemory(_depthStencilMemory);
+    freeDeviceMemory(_depthStencilMemory);
 
     _depthStencilMemory = VK_NULL_HANDLE;
 }
@@ -881,22 +881,22 @@ bool Vulkan::_findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properti
     return false;
 }
 
-VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemoryResult)
+VkDeviceMemory Vulkan::allocateDeviceMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkResult& result)
 {
-    assert(!deviceMemoryResult);
+    VkDeviceMemory deviceMemory;
 
     VkMemoryAllocateInfo mai{};
     mai.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 
     mai.allocationSize = memRequirements.size;
 
-    VkResult result = VK_ERROR_UNKNOWN;
+    result = VK_ERROR_UNKNOWN;
 
     for (uint32_t i = 0; i < _memProperties.memoryTypeCount; ++i)
     {
         if (_findMemoryType(memRequirements.memoryTypeBits, properties, i, mai.memoryTypeIndex))
         {
-            result = vkAllocateMemory(_device, &mai, nullptr, &deviceMemoryResult);
+            result = vkAllocateMemory(_device, &mai, nullptr, &deviceMemory);
 
             if (result == VK_SUCCESS)
             {
@@ -905,10 +905,10 @@ VkResult Vulkan::allocateMemory(const VkMemoryRequirements& memRequirements, VkM
         }
     }
 
-    return result;
+    return deviceMemory;
 }
 
-void Vulkan::freeMemory(VkDeviceMemory& memory)
+void Vulkan::freeDeviceMemory(VkDeviceMemory& memory)
 {
     assert(memory);
 
@@ -917,34 +917,46 @@ void Vulkan::freeMemory(VkDeviceMemory& memory)
     memory = VK_NULL_HANDLE;
 }
 
-void Vulkan::mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, void** ppData)
+void Vulkan::memcpyDeviceMemory(VkDeviceMemory memory, const void* srcData, VkDeviceSize size)
 {
     assert(memory);
+    assert(srcData);
 
-    VK_CHECK(vkMapMemory(_device, memory, offset, size, 0, ppData));
-}
+    void* mappedData = nullptr;
 
-void Vulkan::unmapMemory(VkDeviceMemory memory)
-{
-    assert(memory);
+    VK_CHECK(vkMapMemory(_device, memory, 0, size, 0, &mappedData));
+
+    std::memcpy(mappedData, srcData, size);
 
     vkUnmapMemory(_device, memory);
 }
 
-void Vulkan::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& bufferResult, VkMemoryRequirements& memRequirementsResult)
+VkBuffer Vulkan::createBuffer(const VkBufferCreateInfo& info)
 {
-    assert(!bufferResult);
-
     VkBufferCreateInfo bci{};
     bci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-
-    bci.size = size;
-    bci.usage = usage;
+    bci.size = info.size;
+    bci.usage = info.usage;
     bci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    VK_CHECK(vkCreateBuffer(_device, &bci, nullptr, &bufferResult));
+    VkBuffer buffer = VK_NULL_HANDLE;
 
-    vkGetBufferMemoryRequirements(_device, bufferResult, &memRequirementsResult);
+    VK_CHECK(vkCreateBuffer(_device, &bci, nullptr, &buffer));
+
+    return buffer;
+
+    // vkGetBufferMemoryRequirements(_device, bufferResult, &memRequirementsResult);
+}
+
+VkMemoryRequirements Vulkan::getBufferMemoryRequirements(VkBuffer& buffer)
+{
+    assert(buffer);
+
+    VkMemoryRequirements requirements{};
+
+    vkGetBufferMemoryRequirements(_device, buffer, &requirements);
+
+    return requirements;
 }
 
 void Vulkan::destroyBuffer(VkBuffer& buffer)
@@ -964,10 +976,31 @@ void Vulkan::bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDe
     VK_CHECK(vkBindBufferMemory(_device, buffer, deviceMemory, memoryOffset));
 }
 
-void Vulkan::createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags usage, VkImage& imageResult, VkMemoryRequirements& memRequirementsResult)
+VkImage Vulkan::createImage(const VkImageCreateInfo& info)
 {
-    assert(!imageResult);
+    VkImageCreateInfo ici = info;
+    ici.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 
+    VkImage image = VK_NULL_HANDLE;
+
+    VK_CHECK(vkCreateImage(_device, &ici, nullptr, &image));
+
+    return image;
+}
+
+VkMemoryRequirements Vulkan::getImageMemoryRequirements(VkImage image)
+{
+    assert(image);
+
+    VkMemoryRequirements requirements{};
+
+    vkGetImageMemoryRequirements(_device, image, &requirements);
+
+    return requirements;
+}
+
+VkImage Vulkan::createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags usage)
+{
     VkImageCreateInfo ici{};
     ici.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 
@@ -984,12 +1017,10 @@ void Vulkan::createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags u
     ici.usage = usage;
     ici.samples = VK_SAMPLE_COUNT_1_BIT;
 
-    VK_CHECK(vkCreateImage(_device, &ici, nullptr, &imageResult));
-
-    vkGetImageMemoryRequirements(_device, imageResult, &memRequirementsResult);
+    return createImage(ici);
 }
 
-void Vulkan::destroyImage2D(VkImage& image)
+void Vulkan::destroyImage(VkImage& image)
 {
     assert(image);
 
@@ -1006,9 +1037,21 @@ void Vulkan::bindImageMemory(VkImage image, VkDeviceMemory deviceMemory, VkDevic
     VK_CHECK(vkBindImageMemory(_device, image, deviceMemory, memoryOffset));
 }
 
-void Vulkan::createImageView2D(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView& imageViewResult)
+VkImageView Vulkan::createImageView(const VkImageViewCreateInfo& info)
 {
-    assert(!imageViewResult);
+    VkImageViewCreateInfo ivci = info;
+    ivci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+
+    VkImageView view = VK_NULL_HANDLE;
+
+    VK_CHECK(vkCreateImageView(_device, &ivci, nullptr, &view));
+
+    return view;
+}
+
+VkImageView Vulkan::createImageView2D(VkImage image, VkFormat format, VkImageAspectFlags aspectMask)
+{
+    assert(image);
 
     VkImageViewCreateInfo ivci{};
     ivci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1024,7 +1067,7 @@ void Vulkan::createImageView2D(VkImage image, VkFormat format, VkImageAspectFlag
     ivci.subresourceRange.baseArrayLayer = 0;
     ivci.subresourceRange.layerCount = 1;
 
-    VK_CHECK(vkCreateImageView(_device, &ivci, nullptr, &imageViewResult));
+    return createImageView(ivci);
 }
 
 void Vulkan::destroyImageView(VkImageView& imageView)
@@ -1036,17 +1079,19 @@ void Vulkan::destroyImageView(VkImageView& imageView)
     imageView = VK_NULL_HANDLE;
 }
 
-void Vulkan::createShaderModule(const std::vector<char>& code, VkShaderModule& shaderResult)
+VkShaderModule Vulkan::createShaderModule(const std::vector<char>& code)
 {
-    assert(!shaderResult);
-
     VkShaderModuleCreateInfo smci{};
     smci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 
     smci.codeSize = code.size();
     smci.pCode = (const uint32_t*)code.data();
 
-    VK_CHECK(vkCreateShaderModule(_device, &smci, nullptr, &shaderResult));
+    VkShaderModule shaderModule = VK_NULL_HANDLE;
+
+    VK_CHECK(vkCreateShaderModule(_device, &smci, nullptr, &shaderModule));
+
+    return shaderModule;
 }
 
 void Vulkan::destroyShaderModule(VkShaderModule& shader)
@@ -1185,6 +1230,9 @@ void Vulkan::cmdMemoryBarrier(VkPipelineStageFlags src, VkPipelineStageFlags dst
 
 void Vulkan::cmdCopyBuffer(VkBuffer src, VkBuffer dst, const VkBufferCopy& region)
 {
+    assert(src);
+    assert(dst);
+
     vkCmdCopyBuffer(_getCmdBuffer(), src, dst, 1, &region);
 }
 

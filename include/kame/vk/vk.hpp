@@ -135,31 +135,42 @@ struct Vulkan {
 
     bool _findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t& i, uint32_t& type);
 
-    VkResult allocateMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkDeviceMemory& deviceMemoryResult);
+    [[nodiscard]] VkDeviceMemory allocateDeviceMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties, VkResult& result);
+    [[nodiscard]] VkDeviceMemory allocateDeviceMemory(const VkMemoryRequirements& memRequirements, VkMemoryPropertyFlags properties)
+    {
+        VkResult r{};
+        return allocateDeviceMemory(memRequirements, properties, r);
+    };
 
-    void freeMemory(VkDeviceMemory& memory);
+    void freeDeviceMemory(VkDeviceMemory& memory);
 
-    void mapMemory(VkDeviceMemory memory, VkDeviceSize offset, VkDeviceSize size, void** ppData);
+    void memcpyDeviceMemory(VkDeviceMemory memory, const void* srcData, VkDeviceSize size);
 
-    void unmapMemory(VkDeviceMemory memory);
+    [[nodiscard]] VkBuffer createBuffer(const VkBufferCreateInfo& info);
 
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& bufferResult, VkMemoryRequirements& memRequirementsResult);
+    [[nodiscard]] VkMemoryRequirements getBufferMemoryRequirements(VkBuffer& buffer);
 
     void destroyBuffer(VkBuffer& buffer);
 
     void bindBufferMemory(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset = 0);
 
-    void createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags usage, VkImage& imageResult, VkMemoryRequirements& memRequirementsResult);
+    [[nodiscard]] VkImage createImage(const VkImageCreateInfo& info);
 
-    void destroyImage2D(VkImage& image);
+    [[nodiscard]] VkMemoryRequirements getImageMemoryRequirements(VkImage image);
+
+    [[nodiscard]] VkImage createImage2D(VkExtent2D size, VkFormat format, VkImageUsageFlags usage);
+
+    void destroyImage(VkImage& image);
 
     void bindImageMemory(VkImage image, VkDeviceMemory deviceMemory, VkDeviceSize memoryOffset = 0);
 
-    void createImageView2D(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView& imageViewResult);
+    [[nodiscard]] VkImageView createImageView(const VkImageViewCreateInfo& info);
+
+    [[nodiscard]] VkImageView createImageView2D(VkImage image, VkFormat format, VkImageAspectFlags aspectMask);
 
     void destroyImageView(VkImageView& imageView);
 
-    void createShaderModule(const std::vector<char>&, VkShaderModule& shaderResult);
+    [[nodiscard]] VkShaderModule createShaderModule(const std::vector<char>& code);
 
     void destroyShaderModule(VkShaderModule& shader);
 

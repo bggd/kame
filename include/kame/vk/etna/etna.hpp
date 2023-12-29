@@ -104,25 +104,19 @@ struct Etna : kame::vk::Vulkan {
 
     void createStagingBuffer(VkDeviceSize size, StagingBuffer& bufferResult, const void* data)
     {
-        VkBuffer stagingBuffer = VK_NULL_HANDLE;
-        VkDeviceMemory memory = VK_NULL_HANDLE;
+        VkBuffer stagingBuffer = createBuffer(
+            VkBufferCreateInfo{
+                .size = size,
+                .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT});
 
-        VkMemoryRequirements req;
+        VkMemoryRequirements req = getBufferMemoryRequirements(stagingBuffer);
 
-        VkBufferUsageFlags usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        VkDeviceMemory memory = allocateDeviceMemory(req, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        assert(memory);
 
-        createBuffer(size, usage, stagingBuffer, req);
+        bindBufferMemory(stagingBuffer, memory);
 
-        allocateMemory(req, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, memory);
-
-        bindBufferMemory(stagingBuffer, memory, 0);
-
-        void* dst;
-        mapMemory(memory, 0, size, &dst);
-
-        std::memcpy(dst, data, size);
-
-        unmapMemory(memory);
+        memcpyDeviceMemory(memory, data, size);
 
         bufferResult._buffer = stagingBuffer;
         bufferResult._memory = memory;
@@ -133,25 +127,23 @@ struct Etna : kame::vk::Vulkan {
     {
         destroyBuffer(buffer._buffer);
 
-        freeMemory(buffer._memory);
+        freeDeviceMemory(buffer._memory);
 
         buffer._size = 0;
     }
 
     void createSSBO(VkDeviceSize size, SSBO& bufferResult)
     {
-        VkBuffer ssboBuffer = VK_NULL_HANDLE;
-        VkDeviceMemory memory = VK_NULL_HANDLE;
+        VkBuffer ssboBuffer = createBuffer(
+            VkBufferCreateInfo{
+                .size = size,
+                .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT});
 
-        VkMemoryRequirements req;
+        VkMemoryRequirements req = getBufferMemoryRequirements(ssboBuffer);
 
-        VkBufferUsageFlags usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        VkDeviceMemory memory = allocateDeviceMemory(req, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        createBuffer(size, usage, ssboBuffer, req);
-
-        allocateMemory(req, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, memory);
-
-        bindBufferMemory(ssboBuffer, memory, 0);
+        bindBufferMemory(ssboBuffer, memory);
 
         bufferResult._buffer = ssboBuffer;
         bufferResult._memory = memory;
@@ -162,7 +154,7 @@ struct Etna : kame::vk::Vulkan {
     {
         destroyBuffer(ssbo._buffer);
 
-        freeMemory(ssbo._memory);
+        freeDeviceMemory(ssbo._memory);
 
         ssbo._size = 0;
     }
