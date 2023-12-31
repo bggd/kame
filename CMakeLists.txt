@@ -30,19 +30,6 @@ add_library(kame-cpp
     src/squirtle/animation.cpp
     src/squirtle/material.cpp
     src/squirtle/camera.cpp
-    src/lua/lua.cpp
-    src/love2d/love2d.cpp
-    src/love2d/detail/context.cpp
-    src/love2d/detail/graphics.cpp
-    src/love2d/detail/renderer.cpp
-    src/love2d/detail/physics.cpp
-    src/love2d/detail/physics_debug_draw.cpp
-    src/love2d/detail/box2d.cpp
-    src/love2d/graphics.cpp
-    src/love2d/physics.cpp
-    src/love2d/timer.cpp
-    src/love2d/mouse.cpp
-    src/love2d/keyboard.cpp
 )
 
 set_target_properties(kame-cpp PROPERTIES
@@ -68,7 +55,6 @@ target_link_libraries(kame-cpp PUBLIC
     spirv-cross-core
     magic_enum::magic_enum
     pystring
-    box2d
     stb
     soloud
 )
@@ -100,34 +86,6 @@ if(KAME_BUILD_TESTS)
     target_link_libraries(unit_test PRIVATE kame-cpp GTest::gtest_main)
     include(GoogleTest)
     gtest_discover_tests(unit_test)
-endif()
-
-option(KAME_BINDING_LUA "Build lua binding" OFF)
-if(KAME_BINDING_LUA)
-    add_library(kame SHARED
-        bindings/lua/kame-lua.cpp
-    )
-
-    set_target_properties(kame PROPERTIES
-        CXX_STANDARD 20
-        CXX_EXTENSIONS OFF
-        CXX_STANDARD_REQUIRED ON
-        POSITION_INDEPENDENT_CODE ON
-        PREFIX ""
-    )
-
-    target_include_directories(kame-cpp PUBLIC ${KAME_LUA_INCDIR})
-    target_include_directories(kame PUBLIC ${KAME_LUA_INCDIR})
-
-    target_link_libraries(kame PUBLIC kame-cpp ${KAME_LUALIB})
-
-    install(TARGETS kame
-        EXPORT kame
-        RUNTIME DESTINATION lib
-        LIBRARY DESTINATION lib
-    )
-else()
-    target_link_libraries(kame-cpp PUBLIC lua)
 endif()
 
 #install(TARGETS kame-cpp

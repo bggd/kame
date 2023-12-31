@@ -49,48 +49,6 @@ FetchContent_Declare(magic_enum
 )
 FetchContent_MakeAvailable(magic_enum)
 
-FetchContent_Declare(lua
-    URL https://github.com/lua/lua/archive/refs/tags/v5.4.6.tar.gz
-)
-FetchContent_MakeAvailable(lua)
-add_library(lua STATIC
-    ${lua_SOURCE_DIR}/lzio.c
-    ${lua_SOURCE_DIR}/lctype.c
-    ${lua_SOURCE_DIR}/lopcodes.c
-    ${lua_SOURCE_DIR}/lmem.c
-    ${lua_SOURCE_DIR}/lundump.c
-    ${lua_SOURCE_DIR}/ldump.c
-    ${lua_SOURCE_DIR}/lstate.c
-    ${lua_SOURCE_DIR}/lgc.c
-    ${lua_SOURCE_DIR}/llex.c
-    ${lua_SOURCE_DIR}/lcode.c
-    ${lua_SOURCE_DIR}/lparser.c
-    ${lua_SOURCE_DIR}/ldebug.c
-    ${lua_SOURCE_DIR}/lfunc.c
-    ${lua_SOURCE_DIR}/lobject.c
-    ${lua_SOURCE_DIR}/ltm.c
-    ${lua_SOURCE_DIR}/lstring.c
-    ${lua_SOURCE_DIR}/ltable.c
-    ${lua_SOURCE_DIR}/ldo.c
-    ${lua_SOURCE_DIR}/lvm.c
-    ${lua_SOURCE_DIR}/lapi.c
-
-    ${lua_SOURCE_DIR}/lauxlib.c
-
-    ${lua_SOURCE_DIR}/lbaselib.c
-    ${lua_SOURCE_DIR}/lcorolib.c
-    ${lua_SOURCE_DIR}/ldblib.c
-    ${lua_SOURCE_DIR}/liolib.c
-    ${lua_SOURCE_DIR}/lmathlib.c
-    ${lua_SOURCE_DIR}/loadlib.c
-    ${lua_SOURCE_DIR}/loslib.c
-    ${lua_SOURCE_DIR}/lstrlib.c
-    ${lua_SOURCE_DIR}/ltablib.c
-    ${lua_SOURCE_DIR}/lutf8lib.c
-    ${lua_SOURCE_DIR}/linit.c
-)
-target_include_directories(lua PUBLIC ${lua_SOURCE_DIR})
-
 # v1.1.4
 add_library(pystring STATIC pystring/pystring.cpp)
 target_include_directories(pystring PUBLIC pystring)
@@ -113,13 +71,6 @@ target_include_directories(imgui PUBLIC
     ${imgui_SOURCE_DIR}/backends
 )
 target_link_libraries(imgui PUBLIC SDL3::SDL3)
-
-FetchContent_Declare(box2d
-    URL https://github.com/erincatto/box2d/archive/refs/tags/v2.4.1.tar.gz
-)
-set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(box2d)
 
 # Oct 12, 2023
 FetchContent_Declare(stb
