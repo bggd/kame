@@ -33,6 +33,9 @@ add_library(kame-cpp
 )
 
 set_target_properties(kame-cpp PROPERTIES
+    C_STANDARD 99
+    C_EXTENSIONS OFF
+    C_STANDARD_REQUIRED ON
     CXX_STANDARD 20
     CXX_EXTENSIONS OFF
     CXX_STANDARD_REQUIRED ON
