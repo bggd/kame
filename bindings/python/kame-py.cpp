@@ -4,6 +4,8 @@
 #include "math/vector4_py.hpp"
 #include "math/matrix_py.hpp"
 
+#include "sdl/sdl_py.hpp"
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(kame, m)
@@ -12,4 +14,7 @@ PYBIND11_MODULE(kame, m)
     initVector3(math);
     initVector4(math);
     initMatrix(m);
+
+    auto sdl = m.def_submodule("sdl");
+    initSDL(sdl);
 }
