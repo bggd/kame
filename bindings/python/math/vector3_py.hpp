@@ -39,7 +39,7 @@ static void initVector3(py::module& m)
         .def("length", &Vector3::length)
         .def("normalize", &Vector3::normalize)
         .def("cross", &Vector3::cross)
-        .def("transform", [](Vector3 v, const kame::math::Matrix& x) { return Vector3::transform(v, x); })
-        .def("transform", [](Vector3 v, kame::math::Quaternion q) { return Vector3::transform(v, q); })
+        .def("transform", py::overload_cast<Vector3, const kame::math::Matrix&>(&Vector3::transform))
+        .def("transform", py::overload_cast<Vector3, kame::math::Quaternion>(&Vector3::transform))
         .def("lerp", &Vector3::lerp);
 }
