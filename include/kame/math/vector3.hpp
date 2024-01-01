@@ -16,7 +16,7 @@ struct Vector3 {
     Vector3(float valueForAll) : x(valueForAll), y(valueForAll), z(valueForAll) {}
     Vector3(float X, float Y, float Z) : x(X), y(Y), z(Z) {}
 
-    Vector3 operator-()
+    Vector3 operator-() const
     {
         return {-x, -y, -z};
     }

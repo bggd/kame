@@ -6,6 +6,8 @@ endif()
 
 project(kame-proj LANGUAGES C CXX)
 
+option(KAME_BINDING_PYTHON "Build python binding" OFF)
+
 add_subdirectory(thirdparty)
 
 add_library(kame-cpp
@@ -89,6 +91,11 @@ if(KAME_BUILD_TESTS)
     target_link_libraries(unit_test PRIVATE kame-cpp GTest::gtest_main)
     include(GoogleTest)
     gtest_discover_tests(unit_test)
+endif()
+
+if(KAME_BINDING_PYTHON)
+    pybind11_add_module(kame bindings/python/kame-py.cpp)
+    target_link_libraries(kame PRIVATE kame-cpp)
 endif()
 
 #install(TARGETS kame-cpp

@@ -148,6 +148,13 @@ target_include_directories(soloud
         ${soloud_SOURCE_DIR}/src/backend/miniaudio
 )
 
+if(KAME_BINDING_PYTHON)
+    FetchContent_Declare(pybind11
+        URL https://github.com/pybind/pybind11/archive/refs/tags/v2.11.1.tar.gz
+    )
+    FetchContent_MakeAvailable(pybind11)
+endif()
+
 if(KAME_BUILD_TESTS)
     FetchContent_Declare(googletest
         URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz

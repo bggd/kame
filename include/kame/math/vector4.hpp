@@ -18,7 +18,7 @@ struct Vector4 {
     Vector4(Vector3 xyz, float w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) {}
     Vector4(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
 
-    Vector4 operator-()
+    Vector4 operator-() const
     {
         return Vector4(-x, -y, -z, -w);
     }
