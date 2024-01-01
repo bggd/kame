@@ -94,7 +94,7 @@ if(KAME_BUILD_TESTS)
 endif()
 
 if(KAME_BINDING_PYTHON)
-    pybind11_add_module(kame bindings/python/kame-py.cpp)
+    pybind11_add_module(kame bindings/python/kame_py.cpp)
     target_link_libraries(kame PRIVATE kame-cpp)
 endif()
 
