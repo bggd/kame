@@ -6,6 +6,8 @@
 
 #include "sdl/sdl_py.hpp"
 
+#include "ogl/ogl_py.hpp"
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(kame, m)
@@ -17,4 +19,7 @@ PYBIND11_MODULE(kame, m)
 
     auto sdl = m.def_submodule("sdl");
     initSDL(sdl);
+
+    auto ogl = m.def_submodule("ogl");
+    initOGL(ogl);
 }
