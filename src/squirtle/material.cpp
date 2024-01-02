@@ -20,6 +20,7 @@ void importMaterial(Model* model, const kame::gltf::Gltf* gltf)
 
         Texture tex;
         tex.imageIndex = t.source;
+
         if (t.hasSampler)
         {
             auto sampler = gltf->samplers[t.sampler];
