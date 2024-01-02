@@ -34,6 +34,8 @@ struct WindowBase {
     uint64_t elapsedTimeUInt64 = 0;
     double elapsedTime = 0.0;
 
+    virtual ~WindowBase() {}
+
     virtual void openWindow(const char* title = "kame", int w = 640, int h = 480) = 0;
     virtual void closeWindow() = 0;
     virtual void setWindowFlags(uint32_t flags);

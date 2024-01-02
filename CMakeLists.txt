@@ -94,8 +94,16 @@ if(KAME_BUILD_TESTS)
 endif()
 
 if(KAME_BINDING_PYTHON)
-    pybind11_add_module(kame bindings/python/kame_py.cpp)
-    target_link_libraries(kame PRIVATE kame-cpp)
+    pybind11_add_module(kame_py bindings/python/kame_py.cpp)
+    set_target_properties(kame_py PROPERTIES
+        C_STANDARD 99
+        C_EXTENSIONS OFF
+        C_STANDARD_REQUIRED ON
+        CXX_STANDARD 20
+        CXX_EXTENSIONS OFF
+        CXX_STANDARD_REQUIRED ON
+    )
+    target_link_libraries(kame_py PRIVATE kame-cpp)
 endif()
 
 #install(TARGETS kame-cpp
