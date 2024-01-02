@@ -10,6 +10,19 @@ enum AlphaMode {
     kALPHA_MODE_BLEND
 };
 
+struct Image {
+    std::string mimeType;
+    std::string url;
+};
+
+struct Texture {
+    int imageIndex = -1;
+    GLenum magFilter = GL_LINEAR;
+    GLenum minFilter = GL_NEAREST_MIPMAP_LINEAR;
+    GLenum wrapS = GL_REPEAT;
+    GLenum wrapT = GL_REPEAT;
+};
+
 struct Material {
     kame::math::Vector4 baseColorFactor = kame::math::Vector4::one();
     int baseColorTextureIndex = -1;

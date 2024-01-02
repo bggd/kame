@@ -88,6 +88,8 @@ struct Model {
     std::vector<Node> nodes;
     std::vector<Skin> skins;
     std::vector<Material> materials;
+    std::vector<Texture> textures;
+    std::vector<Image> images;
     bool _isSkinnedMesh = false;
 
     bool isSkinnedMesh()
