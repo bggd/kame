@@ -120,7 +120,7 @@ bool isEdgeLines = false;
 using namespace kame::math;
 using namespace kame::math::helper;
 
-void drawModelWithTexture(const kame::squirtle::DrawData& drawData)
+void drawModelWithTexture(const kame::squirtle::UpdateData& drawData)
 {
     const std::vector<kame::math::Vector3>& positions = drawData.positions;
     const kame::squirtle::Model& model = drawData.model;
@@ -153,7 +153,7 @@ void drawModelWithTexture(const kame::squirtle::DrawData& drawData)
     vao.drawElements(pri.mode, pri.getIndices().size(), GL_UNSIGNED_INT);
 }
 
-void drawModel(const kame::squirtle::DrawData& drawData)
+void drawModel(const kame::squirtle::UpdateData& drawData)
 {
     const std::vector<kame::math::Vector3>& positions = drawData.positions;
     const kame::squirtle::Model& model = drawData.model;
@@ -411,7 +411,7 @@ int main(int argc, char** argv)
         gShaderDrawLines->setMatrix("uModel", orbitCamera.getModelMatrix());
 
         isEdgeLines = false;
-        model->draw(gPositions, drawModel);
+        model->update(gPositions, drawModel);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDepthMask(GL_FALSE);
@@ -422,7 +422,7 @@ int main(int argc, char** argv)
                          .build();
         kame::ogl::setDepthStencilState(depthState);
         isEdgeLines = true;
-        model->draw(gPositions, drawModel);
+        model->update(gPositions, drawModel);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         ImGui::Render();

@@ -75,13 +75,13 @@ struct Skin {
     std::vector<kame::math::Matrix> matrices;
 };
 
-struct DrawData {
+struct UpdateData {
     const std::vector<kame::math::Vector3>& positions;
     const Model& model;
     const Primitive& primitive;
 };
 
-using DrawCB = std::function<void(const DrawData&)>; // std::function<void(const std::vector<kame::math::Vector3>& positions, const Model&, const Primitive&)>;
+using UpdateCB = std::function<void(const UpdateData&)>;
 
 struct Model {
     std::vector<Mesh> meshes;
@@ -97,7 +97,7 @@ struct Model {
         return _isSkinnedMesh;
     }
 
-    void draw(std::vector<kame::math::Vector3>& positions, DrawCB fn);
+    void update(std::vector<kame::math::Vector3>& positions, UpdateCB fn);
 };
 
 Model* importModel(const kame::gltf::Gltf* gltf);

@@ -447,7 +447,7 @@ void updateSkinMatrices(Model* model)
     }
 }
 
-void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawCB& fn)
+void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions, UpdateCB& fn)
 {
     for (auto& n : model->nodes)
     {
@@ -497,7 +497,7 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
     }
 }
 
-void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, DrawCB& fn)
+void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, UpdateCB& fn)
 {
     for (auto& n : model->nodes)
     {
@@ -579,7 +579,7 @@ float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime)
     return time;
 }
 
-void Model::draw(std::vector<kame::math::Vector3>& positions, DrawCB fn)
+void Model::update(std::vector<kame::math::Vector3>& positions, UpdateCB fn)
 {
     int i = 0;
     for (auto& n : nodes)
