@@ -485,9 +485,9 @@ void updateSkinnedMesh(Model* model, std::vector<kame::math::Vector3>& positions
                 // clang-format off
                 auto skinMtx =
                     skinMatrices[vJoint[0]] * vWeight.x
-                    + skinMatrices[vJoint[1]] * vWeight.y
-                    + skinMatrices[vJoint[2]] * vWeight.z
-                    + skinMatrices[vJoint[3]] * vWeight.w;
+                  + skinMatrices[vJoint[1]] * vWeight.y
+                  + skinMatrices[vJoint[2]] * vWeight.z
+                  + skinMatrices[vJoint[3]] * vWeight.w;
                 // clang-format on
 
                 positions[i] = kame::math::Vector3::transform(vPos, skinMtx);
