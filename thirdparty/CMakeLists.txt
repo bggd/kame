@@ -1,9 +1,9 @@
 include(FetchContent)
 
-# Dec 8, 2023
+# Jan 5, 2023
 FetchContent_Declare(SDL
     GIT_REPOSITORY https://github.com/libsdl-org/SDL
-    GIT_TAG 3c5e9e61123f9e020081a4a7936e305dc1ef378a
+    GIT_TAG 21c80ac8432500ddb4dd456cee64537a1e7701d3
 )
 set(SDL_SHARED_DEFAULT OFF CACHE INTERNAL "")
 set(SDL_SHARED OFF CACHE INTERNAL "")
