@@ -8,6 +8,8 @@
 
 #include "ogl/ogl_py.hpp"
 
+#include "gltf/gltf_py.hpp"
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(kame, m)
@@ -22,4 +24,7 @@ PYBIND11_MODULE(kame, m)
 
     auto ogl = m.def_submodule("ogl");
     initOGL(ogl);
+
+    auto gltf = m.def_submodule("gltf");
+    initGltf(m);
 }
