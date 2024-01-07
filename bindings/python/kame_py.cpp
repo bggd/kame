@@ -10,6 +10,8 @@
 
 #include "gltf/gltf_py.hpp"
 
+#include "squirtle/squirtle_py.hpp"
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(kame, m)
@@ -27,4 +29,7 @@ PYBIND11_MODULE(kame, m)
 
     auto gltf = m.def_submodule("gltf");
     initGltf(m);
+
+    auto squirtle = m.def_submodule("squirtle");
+    initSquirtle(m);
 }

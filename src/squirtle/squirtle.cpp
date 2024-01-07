@@ -2,7 +2,7 @@
 
 namespace kame::squirtle {
 
-char* fileRead(const char* fileName, int64_t& len)
+char* loadFile(const char* fileName, int64_t& len)
 {
     assert(fileName);
 
@@ -40,7 +40,7 @@ std::vector<char> loadSPIRV(const char* fileName)
     assert(fileName);
 
     int64_t len;
-    char* str = fileRead(fileName, len);
+    char* str = loadFile(fileName, len);
     assert(str);
     assert(len > 0);
     std::vector<char> bin(str, str + len);

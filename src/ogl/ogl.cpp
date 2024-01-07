@@ -499,7 +499,7 @@ Texture2D* loadTexture2D(const char* path, bool flipY)
     assert(path);
 
     int64_t len = 0;
-    char* data = kame::squirtle::fileRead(path, len);
+    char* data = kame::squirtle::loadFile(path, len);
 
     assert(data);
 

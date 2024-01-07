@@ -382,7 +382,7 @@ Gltf* loadGLTF(const char* path)
     assert(std::filesystem::exists(path));
 
     int64_t len;
-    const unsigned char* buf = (const unsigned char*)kame::squirtle::fileRead(path, len);
+    const unsigned char* buf = (const unsigned char*)kame::squirtle::loadFile(path, len);
     assert(buf);
     assert(len > 0 && len <= std::numeric_limits<uint32_t>::max());
 
