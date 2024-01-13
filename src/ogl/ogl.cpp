@@ -387,8 +387,9 @@ VertexBuffer* createVertexBuffer(GLsizeiptr numBytes, GLenum usage)
     VertexBuffer* vbo = new VertexBuffer();
     assert(vbo);
 
-    GLuint buffer;
+    GLuint buffer = 0;
     glGenBuffers(1, &buffer);
+    assert(buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, numBytes, NULL, usage);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -524,8 +525,9 @@ Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY
     assert(c > 2 && c < 5);
     SPDLOG_INFO("loadTexture2D: {} (width:{}, height:{}, channel:{})", path, x, y, c);
 
-    GLuint tex;
+    GLuint tex = 0;
     glGenTextures(1, &tex);
+    assert(tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -555,8 +557,9 @@ Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum f
     Texture2D* t = new Texture2D();
     assert(t);
 
-    GLuint tex;
+    GLuint tex = 0;
     glGenTextures(1, &tex);
+    assert(tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
