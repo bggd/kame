@@ -54,7 +54,7 @@ add_library(pystring STATIC pystring/pystring.cpp)
 target_include_directories(pystring PUBLIC pystring)
 
 FetchContent_Declare(imgui
-    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.90.tar.gz
+    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.90.1.tar.gz
 )
 FetchContent_MakeAvailable(imgui)
 add_library(imgui STATIC
