@@ -619,8 +619,9 @@ FrameBuffer* createFrameBuffer()
     FrameBuffer* fbo = new FrameBuffer();
     assert(fbo);
 
-    GLuint buffer;
+    GLuint buffer = 0;
     glGenFramebuffers(1, &buffer);
+    assert(buffer);
     glBindFramebuffer(GL_FRAMEBUFFER, buffer);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
