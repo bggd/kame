@@ -60,6 +60,7 @@ static void initSDL(py::module& m)
 
     using WindowOGL = kame::sdl::WindowOGL;
     py::class_<WindowOGL, WindowBase>(m, "WindowOGL")
+        .def(py::init())
         .def("openWindow", &WindowOGL::openWindow)
         .def("closeWindow", &WindowOGL::closeWindow)
         .def("swapWindow", &WindowOGL::swapWindow)
