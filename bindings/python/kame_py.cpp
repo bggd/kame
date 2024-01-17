@@ -14,7 +14,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(kame, m)
+PYBIND11_MODULE(kame_py, m)
 {
     auto math = m.def_submodule("math");
     initVector3(math);
