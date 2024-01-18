@@ -192,6 +192,14 @@ struct RasterizerStateBuilder {
     }
 };
 
+struct GBuffer {
+    GLuint fbo = 0;
+    GLuint tex_0_rgba16f = 0;
+    GLuint tex_1_rgba16f = 0;
+    GLuint tex_2_rgba8 = 0;
+    GLuint rboDepth = 0;
+};
+
 const char* getGlslVersionString();
 
 void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
@@ -201,6 +209,7 @@ void setDepthStencilState(DepthStencilState state);
 void setRasterizerState(RasterizerState state);
 void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
+void setGBuffer(GBuffer* gbuffer);
 void setRenderTarget(FrameBuffer* fbo);
 
 Shader* createShader(const char* vert, const char* frag);
@@ -219,5 +228,8 @@ void deleteTexture2D(Texture2D* tex);
 
 FrameBuffer* createFrameBuffer();
 void deleteFrameBuffer(FrameBuffer* fbo);
+
+GBuffer* createGBuffer(int width, int height);
+void deleteGBuffer(GBuffer* gb);
 
 } // namespace kame::ogl
