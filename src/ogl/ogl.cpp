@@ -697,6 +697,9 @@ GBuffer* createGBuffer(int width, int height)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
     return gb;
 }
 
