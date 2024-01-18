@@ -13,7 +13,7 @@ static void initGltf(py::module& m)
     py::class_<Gltf>(m, "Gltf")
         .def_readonly("basePath", &Gltf::basePath);
 
-    m.def("loadGltf", kame::gltf::loadGLTF);
-    m.def("loadGLTFFromMemory", kame::gltf::loadGLTFFromMemory);
-    m.def("deleteGLTF", kame::gltf::deleteGLTF);
+    m.def("loadGltf", &kame::gltf::loadGLTF);
+    m.def("loadGLTFFromMemory", &kame::gltf::loadGLTFFromMemory);
+    m.def("deleteGLTF", &kame::gltf::deleteGLTF);
 }

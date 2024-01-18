@@ -60,6 +60,9 @@ static void initOGL(py::module& m)
         .def("checkStatus", &FrameBuffer::checkStatus)
         .def("setDrawBuffer", &FrameBuffer::setDrawBuffer);
 
+    using GBuffer = kame::ogl::GBuffer;
+    py::class_<GBuffer>(m, "GBuffer");
+
     using BlendState = kame::ogl::BlendState;
     py::class_<BlendState>(m, "BlendState");
 
@@ -85,31 +88,34 @@ static void initOGL(py::module& m)
         .def("cullFace", &RasterizerStateBuilder::cullFace)
         .def("build", &RasterizerStateBuilder::build);
 
-    m.def("getGlslVersionString", kame::ogl::getGlslVersionString);
+    m.def("getGlslVersionString", &kame::ogl::getGlslVersionString);
 
-    m.def("setViewport", kame::ogl::setViewport);
-    m.def("setClearBuffer", kame::ogl::setClearBuffer);
-    m.def("setBlendState", kame::ogl::setBlendState);
-    m.def("setDepthStencilState", kame::ogl::setDepthStencilState);
-    m.def("setRasterizerState", kame::ogl::setRasterizerState);
-    m.def("setShader", kame::ogl::setShader);
-    m.def("setTexture2D", kame::ogl::setTexture2D);
-    m.def("setRenderTarget", kame::ogl::setRenderTarget);
+    m.def("setViewport", &kame::ogl::setViewport);
+    m.def("setClearBuffer", &kame::ogl::setClearBuffer);
+    m.def("setBlendState", &kame::ogl::setBlendState);
+    m.def("setDepthStencilState", &kame::ogl::setDepthStencilState);
+    m.def("setRasterizerState", &kame::ogl::setRasterizerState);
+    m.def("setShader", &kame::ogl::setShader);
+    m.def("setTexture2D", &kame::ogl::setTexture2D);
+    m.def("setRenderTarget", &kame::ogl::setRenderTarget);
 
-    m.def("createShader", kame::ogl::createShader);
-    m.def("deleteShader", kame::ogl::deleteShader);
+    m.def("createShader", &kame::ogl::createShader);
+    m.def("deleteShader", &kame::ogl::deleteShader);
 
-    m.def("createVertexBuffer", kame::ogl::createVertexBuffer);
-    m.def("deleteVertexBuffer", kame::ogl::deleteVertexBuffer);
+    m.def("createVertexBuffer", &kame::ogl::createVertexBuffer);
+    m.def("deleteVertexBuffer", &kame::ogl::deleteVertexBuffer);
 
-    m.def("createIndexBuffer", kame::ogl::createIndexBuffer);
-    m.def("deleteIndexBuffer", kame::ogl::deleteIndexBuffer);
+    m.def("createIndexBuffer", &kame::ogl::createIndexBuffer);
+    m.def("deleteIndexBuffer", &kame::ogl::deleteIndexBuffer);
 
-    m.def("loadTexture2D", kame::ogl::loadTexture2D);
-    m.def("loadTexture2DFromMemory", kame::ogl::loadTexture2DFromMemory);
-    m.def("createTexture2D", kame::ogl::createTexture2D);
-    m.def("deleteTexture2D", kame::ogl::deleteTexture2D);
+    m.def("loadTexture2D", &kame::ogl::loadTexture2D);
+    m.def("loadTexture2DFromMemory", &kame::ogl::loadTexture2DFromMemory);
+    m.def("createTexture2D", &kame::ogl::createTexture2D);
+    m.def("deleteTexture2D", &kame::ogl::deleteTexture2D);
 
-    m.def("createFrameBuffer", kame::ogl::createFrameBuffer);
-    m.def("deleteFrameBuffer", kame::ogl::deleteFrameBuffer);
+    m.def("createFrameBuffer", &kame::ogl::createFrameBuffer);
+    m.def("deleteFrameBuffer", &kame::ogl::deleteFrameBuffer);
+
+    m.def("createGBuffer", &kame::ogl::createGBuffer);
+    m.def("createGBuffer", &kame::ogl::deleteGBuffer);
 }
