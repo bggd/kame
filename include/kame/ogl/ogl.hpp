@@ -82,6 +82,14 @@ struct VertexArrayObject {
     void drawElementsInstanced(GLenum mode, GLsizei count, GLenum type, GLsizei primCount);
 };
 
+struct UniformBuffer {
+    GLuint id;
+    GLsizeiptr numBytes;
+    GLenum usage;
+
+    void setBuffer(const float* vertices);
+};
+
 struct Shader {
     GLint id;
     std::unordered_map<std::string, GLint> attributeMap;
@@ -208,6 +216,9 @@ void deleteVertexBuffer(VertexBuffer* vbo);
 
 IndexBuffer* createIndexBuffer(GLsizeiptr numBytes, GLenum usage);
 void deleteIndexBuffer(IndexBuffer* ibo);
+
+UniformBuffer* createUniformBuffer(GLsizeiptr numBytes, GLenum usage);
+void deleteUniformBuffer(UniformBuffer* ubo);
 
 Texture2D* loadTexture2D(const char* path, bool flipY = false);
 Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY = false, const char* path = "");

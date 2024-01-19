@@ -500,6 +500,36 @@ void IndexBuffer::setBuffer(const std::vector<unsigned int>& vertices)
     setBuffer((const unsigned int*)vertices.data());
 }
 
+UniformBuffer* createUniformBuffer(GLsizeiptr numBytes, GLenum usage)
+{
+    UniformBuffer* ubo = new UniformBuffer();
+    assert(ubo);
+
+    GLuint buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+    glBufferData(GL_UNIFORM_BUFFER, numBytes, NULL, usage);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    ubo->id = buffer;
+    ubo->numBytes = numBytes;
+    ubo->usage = usage;
+    return ubo;
+}
+
+void deleteUniformBuffer(UniformBuffer* ubo)
+{
+    glDeleteBuffers(1, &ubo->id);
+    delete ubo;
+}
+
+void UniformBuffer::setBuffer(const float* vertices)
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, id);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, numBytes, vertices);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 Texture2D* loadTexture2D(const char* path, bool flipY)
 {
     assert(path);
