@@ -106,18 +106,6 @@ struct Texture2D {
     void generateMipmap();
 };
 
-struct FrameBuffer {
-    GLuint id;
-    GLuint depthRBO;
-    bool useDepthRBO;
-
-    void setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel = 0);
-    void setDepthAttachment(Texture2D* tex, GLint mipmapLevel = 0);
-    void setDepthAttachmentFromRenderBuffer(int width, int height);
-    bool checkStatus();
-    void setDrawBuffer(GLenum mode);
-};
-
 struct BlendState {
     bool useBlend = false;
     GLenum srcRGB, srcA, dstRGB, dstA;
@@ -210,7 +198,6 @@ void setRasterizerState(RasterizerState state);
 void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
 void setGBuffer(GBuffer* gbuffer);
-void setRenderTarget(FrameBuffer* fbo);
 
 Shader* createShader(const char* vert, const char* frag);
 void deleteShader(Shader* shader);
@@ -225,9 +212,6 @@ Texture2D* loadTexture2D(const char* path, bool flipY = false);
 Texture2D* loadTexture2DFromMemory(const unsigned char* src, int len, bool flipY = false, const char* path = "");
 Texture2D* createTexture2D(GLint internalFormat, int width, int height, GLenum format, GLenum type);
 void deleteTexture2D(Texture2D* tex);
-
-FrameBuffer* createFrameBuffer();
-void deleteFrameBuffer(FrameBuffer* fbo);
 
 GBuffer* createGBuffer(int width, int height);
 void deleteGBuffer(GBuffer* gb);

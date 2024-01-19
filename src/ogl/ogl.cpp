@@ -157,18 +157,6 @@ void setGBuffer(GBuffer* gbuffer)
     glBindTexture(GL_TEXTURE_2D, gbuffer->tex_2_rgba8);
 }
 
-void setRenderTarget(FrameBuffer* fbo)
-{
-    if (fbo)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo->id);
-    }
-    else
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-}
-
 void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count)
 {
     for (const auto& i : vao.attributes)
@@ -626,32 +614,6 @@ void Texture2D::generateMipmap()
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-FrameBuffer* createFrameBuffer()
-{
-    FrameBuffer* fbo = new FrameBuffer();
-    assert(fbo);
-
-    GLuint buffer = 0;
-    glGenFramebuffers(1, &buffer);
-    assert(buffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, buffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    fbo->id = buffer;
-    fbo->depthRBO = 0;
-    return fbo;
-}
-
-void deleteFrameBuffer(FrameBuffer* fbo)
-{
-    if (fbo->useDepthRBO)
-    {
-        glDeleteRenderbuffers(1, &fbo->depthRBO);
-    }
-    glDeleteFramebuffers(1, &fbo->id);
-    delete fbo;
-}
-
 GBuffer* createGBuffer(int width, int height)
 {
     GBuffer* gb = new GBuffer();
@@ -716,51 +678,6 @@ void deleteGBuffer(GBuffer* gb)
     glDeleteFramebuffers(1, &gb->fbo);
 
     delete gb;
-}
-
-void FrameBuffer::setColorAttachment(GLuint index, Texture2D* tex, GLint mipmapLevel)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, id);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, tex->id, mipmapLevel);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void FrameBuffer::setDepthAttachment(Texture2D* tex, GLint mipmapLevel)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, id);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex->id, mipmapLevel);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void FrameBuffer::setDepthAttachmentFromRenderBuffer(int width, int height)
-{
-    assert(useDepthRBO == false);
-
-    glGenRenderbuffers(1, &depthRBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, id);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    useDepthRBO = true;
-}
-
-bool FrameBuffer::checkStatus()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, id);
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    return status == GL_FRAMEBUFFER_COMPLETE;
-}
-
-void FrameBuffer::setDrawBuffer(GLenum mode)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, id);
-    glDrawBuffer(mode);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 } // namespace kame::ogl
