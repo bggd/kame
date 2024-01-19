@@ -93,19 +93,6 @@ if(KAME_BUILD_TESTS)
     gtest_discover_tests(unit_test)
 endif()
 
-if(KAME_BINDING_PYTHON)
-    pybind11_add_module(kame_py bindings/python/kame_py.cpp)
-    set_target_properties(kame_py PROPERTIES
-        C_STANDARD 99
-        C_EXTENSIONS OFF
-        C_STANDARD_REQUIRED ON
-        CXX_STANDARD 20
-        CXX_EXTENSIONS OFF
-        CXX_STANDARD_REQUIRED ON
-    )
-    target_link_libraries(kame_py PRIVATE kame-cpp)
-endif()
-
 #install(TARGETS kame-cpp
 #    EXPORT kame-cpp
 #    LIBRARY DESTINATION lib
