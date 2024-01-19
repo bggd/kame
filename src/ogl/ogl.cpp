@@ -157,6 +157,11 @@ void setGBuffer(GBuffer* gbuffer)
     glBindTexture(GL_TEXTURE_2D, gbuffer->tex_2_rgba8);
 }
 
+void setRenderTargetDefault()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void drawArrays(const VertexArrayObject& vao, GLenum mode, GLint first, GLsizei count)
 {
     for (const auto& i : vao.attributes)

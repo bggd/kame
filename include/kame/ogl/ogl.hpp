@@ -198,6 +198,7 @@ void setRasterizerState(RasterizerState state);
 void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
 void setGBuffer(GBuffer* gbuffer);
+void setRenderTargetDefault();
 
 Shader* createShader(const char* vert, const char* frag);
 void deleteShader(Shader* shader);
