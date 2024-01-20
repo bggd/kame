@@ -15,7 +15,7 @@ void kameInit()
 {
     if (SPDLOG_ACTIVE_LEVEL != SPDLOG_LEVEL_OFF)
     {
-        spdlog::set_pattern("[%H:%M:%S:%e] [%^%l%$] %v [%@:%!]");
+        spdlog::set_pattern("[%H:%M:%S:%e] [%^%l%$] [%s:%#:%!] %v ");
     }
     SPDLOG_INFO("kameInit");
     // stbi_set_flip_vertically_on_load(true);
