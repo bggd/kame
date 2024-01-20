@@ -384,7 +384,7 @@ int main(int argc, char** argv)
 
         kame::ogl::setViewport(0, 0, state.drawableSizeX, state.drawableSizeY);
         glDepthMask(GL_TRUE);
-        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4(0.5, 0.5, 0.5, 1));
+        kame::ogl::setClearState(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4(0.5, 0.5, 0.5, 1));
         kame::ogl::RasterizerState rasterState = kame::ogl::RasterizerStateBuilder().cullFace(GL_BACK).build();
         kame::ogl::setRasterizerState(rasterState);
         kame::ogl::BlendState blendState = kame::ogl::BlendStateBuilder()

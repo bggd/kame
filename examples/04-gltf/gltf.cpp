@@ -151,7 +151,7 @@ int main(int argc, char** argv)
         if (state.isCloseRequest)
             break;
         kame::ogl::setViewport(0, 0, 640, 480);
-        kame::ogl::setClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4(0, 0, 0, 1));
+        kame::ogl::setClearState(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, Vector4(0, 0, 0, 1));
         kame::ogl::setShader(shader);
         kame::ogl::BlendState blendState = kame::ogl::BlendStateBuilder()
                                                .blendEquation(GL_FUNC_ADD, GL_FUNC_ADD)

@@ -35,6 +35,12 @@ char* loadFile(const char* fileName, int64_t& len)
     return res;
 }
 
+char* loadFile(const char* fileName)
+{
+    int64_t _;
+    return loadFile(fileName, _);
+}
+
 std::vector<char> loadSPIRV(const char* fileName)
 {
     assert(fileName);

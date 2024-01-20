@@ -199,7 +199,7 @@ struct GBuffer {
 const char* getGlslVersionString();
 
 void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
-void setClearBuffer(GLbitfield mask, kame::math::Vector4 color);
+void setClearState(GLbitfield mask, kame::math::Vector4 color);
 void setBlendState(BlendState state);
 void setDepthStencilState(DepthStencilState state);
 void setRasterizerState(RasterizerState state);

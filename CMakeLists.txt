@@ -6,8 +6,6 @@ endif()
 
 project(kame-proj LANGUAGES C CXX)
 
-option(KAME_BINDING_PYTHON "Build python binding" OFF)
-
 add_subdirectory(thirdparty)
 
 add_library(kame-cpp

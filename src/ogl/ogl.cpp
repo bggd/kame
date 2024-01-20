@@ -87,7 +87,7 @@ void setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     glViewport(x, y, width, height);
 }
 
-void setClearBuffer(GLbitfield mask, kame::math::Vector4 color)
+void setClearState(GLbitfield mask, kame::math::Vector4 color)
 {
     glClear(mask);
     glClearColor(color.x, color.y, color.z, color.w);
