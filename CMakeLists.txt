@@ -8,7 +8,7 @@ project(kame-proj LANGUAGES C CXX)
 
 add_subdirectory(thirdparty)
 
-add_library(kame-cpp
+add_library(kame_cpp
     src/kame.cpp
     src/math/vector3.cpp
     src/math/vector4.cpp
@@ -32,7 +32,7 @@ add_library(kame-cpp
     src/squirtle/camera.cpp
 )
 
-set_target_properties(kame-cpp PROPERTIES
+set_target_properties(kame_cpp PROPERTIES
     C_STANDARD 99
     C_EXTENSIONS OFF
     C_STANDARD_REQUIRED ON
@@ -42,15 +42,15 @@ set_target_properties(kame-cpp PROPERTIES
 )
 
 if (MSVC)
-    target_compile_options(kame-cpp PRIVATE /W4)
+    target_compile_options(kame_cpp PRIVATE /W4)
 else()
-    set_target_properties(kame-cpp PROPERTIES
+    set_target_properties(kame_cpp PROPERTIES
         COMPILE_WARNING_AS_ERROR ON
     )
-    target_compile_options(kame-cpp PRIVATE -Wall -Wextra -pedantic)
+    target_compile_options(kame_cpp PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-target_link_libraries(kame-cpp PUBLIC
+target_link_libraries(kame_cpp PUBLIC
     SDL3::SDL3
     spdlog::spdlog
     nlohmann_json::nlohmann_json
@@ -62,7 +62,7 @@ target_link_libraries(kame-cpp PUBLIC
     soloud
 )
 
-target_include_directories(kame-cpp
+target_include_directories(kame_cpp
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
@@ -91,7 +91,7 @@ if(KAME_BUILD_TESTS)
     gtest_discover_tests(unit_test)
 endif()
 
-#install(TARGETS kame-cpp
+#install(TARGETS kame_cpp
 #    EXPORT kame-cpp
 #    LIBRARY DESTINATION lib
 #    INCLUDES DESTINATION include
