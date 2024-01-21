@@ -12,9 +12,9 @@ kame::math::Vector3 kame::math::Vector3::transform(kame::math::Vector3 v, kame::
 {
     kame::math::Vector3 qv(q.x, q.y, q.z);
 
-    return qv * 2.0f * kame::math::Vector3::dot(qv, v) +
-           v * (q.w * q.w - kame::math::Vector3::dot(qv, qv)) +
-           kame::math::Vector3::cross(qv, v) * 2.0f * q.w;
+    return qv * 2.0f * Vector3::dot(qv, v) +
+           v * (q.w * q.w - Vector3::dot(qv, qv)) +
+           Vector3::cross(qv, v) * 2.0f * q.w;
 }
 
 kame::math::Vector3 kame::math::Vector3::lerp(kame::math::Vector3 a, kame::math::Vector3 b, float amount)
