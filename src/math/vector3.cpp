@@ -10,7 +10,7 @@ kame::math::Vector3 kame::math::Vector3::transform(kame::math::Vector3 v, const 
 
 kame::math::Vector3 kame::math::Vector3::transform(kame::math::Vector3 v, kame::math::Quaternion q)
 {
-    kame::math::Vector3 qv(q.x, q.y, q.z);
+    Vector3 qv(q.x, q.y, q.z);
 
     return qv * 2.0f * Vector3::dot(qv, v) +
            v * (q.w * q.w - Vector3::dot(qv, qv)) +
