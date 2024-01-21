@@ -153,18 +153,18 @@ void loadMaterials(Gltf* gltf, json& j)
         {
             auto& normal = e["normalTexture"];
 
-            material.normal.normalTexture.index = normal["index"].get<integer>();
+            material.normalTexture.normalTextureInfo.index = normal["index"].get<integer>();
             if (normal["texCoord"])
             {
-                material.normal.normalTexture.texCoord = normal["texCoord"].get<integer>();
+                material.normalTexture.normalTextureInfo.texCoord = normal["texCoord"].get<integer>();
             }
 
             if (normal["scale"])
             {
-                material.normal.scale = normal["scale"].get<float>();
+                material.normalTexture.scale = normal["scale"].get<float>();
             }
 
-            material.normal.hasNormalTexture = true;
+            material.normalTexture.hasNormalTexture = true;
         }
         if (e.contains("alphaMode"))
         {
