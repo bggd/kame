@@ -51,7 +51,14 @@ struct Material {
         bool hasMetallicRoughnessTexture = false;
     };
 
+    struct Normal {
+        TextureInfo normalTexture;
+        float scale = 1.0f;
+        bool hasNormalTexture = false;
+    };
+
     PBRMetallicRoughness pbrMetallicRoughness;
+    Normal normal;
     std::string alphaMode = "OPAQUE";
     float alphaCutoff = 0.5f;
     bool doubleSided = false;

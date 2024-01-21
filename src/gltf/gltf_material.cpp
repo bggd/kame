@@ -149,6 +149,23 @@ void loadMaterials(Gltf* gltf, json& j)
                 }
             }
         }
+        if (e.contains("normalTexture"))
+        {
+            auto& normal = e["normalTexture"];
+
+            material.normal.normalTexture.index = normal["index"].get<integer>();
+            if (normal["texCoord"])
+            {
+                material.normal.normalTexture.texCoord = normal["texCoord"].get<integer>();
+            }
+
+            if (normal["scale"])
+            {
+                material.normal.scale = normal["scale"].get<float>();
+            }
+
+            material.normal.hasNormalTexture = true;
+        }
         if (e.contains("alphaMode"))
         {
             material.alphaMode = e["alphaMode"].get<std::string>();
