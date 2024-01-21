@@ -152,9 +152,7 @@ void setGBuffer(GBuffer* gbuffer)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gbuffer->tex_0_rgba16f);
     glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_2D, gbuffer->tex_1_rgba16f);
-    glActiveTexture(GL_TEXTURE0 + 2);
-    glBindTexture(GL_TEXTURE_2D, gbuffer->tex_2_rgba8);
+    glBindTexture(GL_TEXTURE_2D, gbuffer->tex_1_rgba8);
 }
 
 void setRenderTargetDefault()
@@ -665,24 +663,16 @@ GBuffer* createGBuffer(int width, int height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gb->tex_0_rgba16f, 0);
 
-    glGenTextures(1, &gb->tex_1_rgba16f);
-    assert(gb->tex_1_rgba16f);
-    glBindTexture(GL_TEXTURE_2D, gb->tex_1_rgba16f);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gb->tex_1_rgba16f, 0);
-
-    glGenTextures(1, &gb->tex_2_rgba8);
-    assert(gb->tex_2_rgba8);
-    glBindTexture(GL_TEXTURE_2D, gb->tex_2_rgba8);
+    glGenTextures(1, &gb->tex_1_rgba8);
+    assert(gb->tex_1_rgba8);
+    glBindTexture(GL_TEXTURE_2D, gb->tex_1_rgba8);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gb->tex_2_rgba8, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gb->tex_1_rgba8, 0);
 
-    GLuint attachments[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
-    glDrawBuffers(3, attachments);
+    GLuint attachments[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(2, attachments);
 
     glGenRenderbuffers(1, &gb->rboDepth);
     glBindRenderbuffer(GL_RENDERBUFFER, gb->rboDepth);
@@ -705,8 +695,7 @@ void deleteGBuffer(GBuffer* gb)
     assert(gb);
 
     glDeleteTextures(1, &gb->tex_0_rgba16f);
-    glDeleteTextures(1, &gb->tex_1_rgba16f);
-    glDeleteTextures(1, &gb->tex_2_rgba8);
+    glDeleteTextures(1, &gb->tex_1_rgba8);
 
     glDeleteRenderbuffers(1, &gb->rboDepth);
 

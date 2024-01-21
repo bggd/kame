@@ -191,8 +191,7 @@ struct RasterizerStateBuilder {
 struct GBuffer {
     GLuint fbo = 0;
     GLuint tex_0_rgba16f = 0;
-    GLuint tex_1_rgba16f = 0;
-    GLuint tex_2_rgba8 = 0;
+    GLuint tex_1_rgba8 = 0;
     GLuint rboDepth = 0;
 };
 
