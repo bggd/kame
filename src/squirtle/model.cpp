@@ -7,6 +7,16 @@ const std::vector<kame::math::Vector3>& Primitive::getPositions() const
     return positions;
 }
 
+const std::vector<kame::math::Vector3>& Primitive::getNormals() const
+{
+    return normals;
+}
+
+const std::vector<kame::math::Vector3>& Primitive::getTangents() const
+{
+    return tangents;
+}
+
 const std::vector<std::vector<kame::math::Vector2>>& Primitive::getUvSets() const
 {
     return uvSets;
@@ -30,6 +40,16 @@ const std::vector<unsigned int>& Primitive::getIndices() const
 size_t Primitive::getBytesOfPositions() const
 {
     return sizeof(float) * 3 * positions.size();
+}
+
+size_t Primitive::getBytesOfNormals() const
+{
+    return sizeof(float) * 3 * normals.size();
+}
+
+size_t Primitive::getBytesOfTangents() const
+{
+    return sizeof(float) * 3 * tangents.size();
 }
 
 size_t Primitive::getBytesOfUV(size_t i)
@@ -64,6 +84,54 @@ std::vector<kame::math::Vector3> toVertexPositions(const kame::gltf::Gltf* gltf,
     }
 
     return positions;
+}
+
+std::vector<kame::math::Vector3> toVertexNormals(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
+{
+    std::vector<kame::math::Vector3> normals;
+
+    for (auto& item : pri.attributes)
+    {
+        if (item.first == "NORMAL")
+        {
+            auto& acc = gltf->accessors[item.second];
+            auto& bv = gltf->bufferViews[acc.bufferView];
+            auto& b = gltf->buffers[bv.buffer];
+            normals.reserve(acc.count);
+            assert(acc.componentType == GL_FLOAT);
+            for (unsigned int i = 0; i < acc.count; ++i)
+            {
+                auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                normals.emplace_back(v);
+            }
+        }
+    }
+
+    return normals;
+}
+
+std::vector<kame::math::Vector3> toVertexTangents(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
+{
+    std::vector<kame::math::Vector3> tangents;
+
+    for (auto& item : pri.attributes)
+    {
+        if (item.first == "TANGENT")
+        {
+            auto& acc = gltf->accessors[item.second];
+            auto& bv = gltf->bufferViews[acc.bufferView];
+            auto& b = gltf->buffers[bv.buffer];
+            tangents.reserve(acc.count);
+            assert(acc.componentType == GL_FLOAT);
+            for (unsigned int i = 0; i < acc.count; ++i)
+            {
+                auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                tangents.emplace_back(v);
+            }
+        }
+    }
+
+    return tangents;
 }
 
 std::vector<std::vector<kame::math::Vector2>> toVertexUVSets(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
@@ -245,6 +313,8 @@ Model* importModel(const kame::gltf::Gltf* gltf)
             mesh.primitives.emplace_back();
             auto& pri = mesh.primitives.back();
             pri.positions = toVertexPositions(gltf, p);
+            pri.normals = toVertexNormals(gltf, p);
+            pri.tangents = toVertexTangents(gltf, p);
             pri.uvSets = toVertexUVSets(gltf, p);
             pri.joints = toVertexJoints(gltf, p);
             pri.weights = toVertexWeights(gltf, p);
