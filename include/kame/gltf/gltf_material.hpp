@@ -51,17 +51,16 @@ struct Material {
         bool hasMetallicRoughnessTexture = false;
     };
 
-    struct NormalTexture {
-        TextureInfo normalTextureInfo;
+    struct NormalTextureInfo : TextureInfo {
         float scale = 1.0f;
-        bool hasNormalTexture = false;
     };
 
     PBRMetallicRoughness pbrMetallicRoughness;
-    NormalTexture normalTexture;
+    NormalTextureInfo normalTexture;
     std::string alphaMode = "OPAQUE";
     float alphaCutoff = 0.5f;
     bool doubleSided = false;
+    bool hasNormalTexture = false;
 };
 
 } // namespace kame::gltf
