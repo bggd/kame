@@ -20,7 +20,7 @@ using u8Array4 = std::array<uint8_t, 4>;
 struct Primitive {
     std::vector<kame::math::Vector3> positions;
     std::vector<kame::math::Vector3> normals;
-    std::vector<kame::math::Vector3> tangents;
+    std::vector<kame::math::Vector4> tangents;
     std::vector<std::vector<kame::math::Vector2>> uvSets;
     std::vector<u16Array4> joints;
     std::vector<kame::math::Vector4> weights;
@@ -31,7 +31,7 @@ struct Primitive {
 
     const std::vector<kame::math::Vector3>& getPositions() const;
     const std::vector<kame::math::Vector3>& getNormals() const;
-    const std::vector<kame::math::Vector3>& getTangents() const;
+    const std::vector<kame::math::Vector4>& getTangents() const;
     const std::vector<std::vector<kame::math::Vector2>>& getUvSets() const;
     const std::vector<u16Array4>& getJoints() const;
     const std::vector<kame::math::Vector4>& getWeights() const;

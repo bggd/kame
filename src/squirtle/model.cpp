@@ -12,7 +12,7 @@ const std::vector<kame::math::Vector3>& Primitive::getNormals() const
     return normals;
 }
 
-const std::vector<kame::math::Vector3>& Primitive::getTangents() const
+const std::vector<kame::math::Vector4>& Primitive::getTangents() const
 {
     return tangents;
 }
@@ -110,9 +110,9 @@ std::vector<kame::math::Vector3> toVertexNormals(const kame::gltf::Gltf* gltf, c
     return normals;
 }
 
-std::vector<kame::math::Vector3> toVertexTangents(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
+std::vector<kame::math::Vector4> toVertexTangents(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh::Primitive& pri)
 {
-    std::vector<kame::math::Vector3> tangents;
+    std::vector<kame::math::Vector4> tangents;
 
     for (auto& item : pri.attributes)
     {
@@ -125,7 +125,7 @@ std::vector<kame::math::Vector3> toVertexTangents(const kame::gltf::Gltf* gltf, 
             assert(acc.componentType == GL_FLOAT);
             for (unsigned int i = 0; i < acc.count; ++i)
             {
-                auto v = ((kame::math::Vector3*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
+                auto v = ((kame::math::Vector4*)(b.data() + bv.byteOffset + acc.byteOffset))[i];
                 tangents.emplace_back(v);
             }
         }
