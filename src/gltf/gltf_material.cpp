@@ -152,14 +152,15 @@ void loadMaterials(Gltf* gltf, json& j)
         if (e.contains("normalTexture"))
         {
             auto& normal = e["normalTexture"];
-
+            assert(normal.contains("index"));
             material.normalTexture.index = normal["index"].get<integer>();
-            if (normal["texCoord"])
+
+            if (normal.contains("texCoord"))
             {
                 material.normalTexture.texCoord = normal["texCoord"].get<integer>();
             }
 
-            if (normal["scale"])
+            if (normal.contains("scale"))
             {
                 material.normalTexture.scale = normal["scale"].get<float>();
             }
