@@ -39,8 +39,9 @@ struct VertexBuffer {
 
     void setBuffer(const unsigned char* vertices);
     void setBuffer(const float* vertices);
-    void setBuffer(const std::vector<kame::math::Vector3>& vertices);
     void setBuffer(const std::vector<kame::math::Vector2>& vertices);
+    void setBuffer(const std::vector<kame::math::Vector3>& vertices);
+    void setBuffer(const std::vector<kame::math::Vector4>& vertices);
     void setBuffer(const std::vector<kame::math::Matrix>& vertices);
     void setBufferSubData(GLintptr offset, GLsizeiptr size, const float* vertices); // glBufferSubData
     void setBufferSubData(GLintptr offset, GLsizeiptr size, const std::vector<kame::math::Vector3>& vertices);
@@ -190,9 +191,7 @@ struct RasterizerStateBuilder {
 
 struct GBuffer {
     GLuint fbo = 0;
-    GLuint tex_0_rgba16f = 0;
-    GLuint tex_1_rgba8 = 0;
-    GLuint rboDepth = 0;
+    std::vector<Texture2D> textures;
 };
 
 const char* getGlslVersionString();
@@ -204,7 +203,7 @@ void setDepthStencilState(DepthStencilState state);
 void setRasterizerState(RasterizerState state);
 void setShader(Shader* shader);
 void setTexture2D(GLuint slot, Texture2D* tex);
-void setGBuffer(GBuffer* gbuffer);
+void setRenderTarget(GBuffer* gbuffer);
 void setRenderTargetDefault();
 
 Shader* createShader(const char* vert, const char* frag);

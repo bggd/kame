@@ -36,7 +36,7 @@ void CameraOrbit::update(kame::sdl::State& state)
 
     if (state.wheelY != 0)
     {
-        zoom += float(state.wheelY) * -1.0f;
+        zoom += float(state.wheelY) * -1.0f * 0.5f;
         if (zoom < 0.0f)
         {
             zoom = 0.0f;
@@ -62,8 +62,8 @@ void CameraOrbit::update(kame::sdl::State& state)
     prevMouseX = state.mouseX;
     prevMouseY = state.mouseY;
 
-    viewMtx = kame::math::Matrix::createLookAt(kame::math::Vector3(0.0f, 0.0f, 2.5f + zoom), kame::math::Vector3::zero(), kame::math::Vector3(0.0f, 1.0f, 0.0f));
-    projMtx = kame::math::Matrix::createPerspectiveFieldOfView_NO(verticalFov, float(state.drawableSizeX) / float(state.drawableSizeY), 1.0f, 1000.0f);
+    viewMtx = kame::math::Matrix::createLookAt(kame::math::Vector3(0.0f, 0.0f, 1.0f + zoom), kame::math::Vector3::zero(), kame::math::Vector3(0.0f, 1.0f, 0.0f));
+    projMtx = kame::math::Matrix::createPerspectiveFieldOfView_NO(verticalFov, float(state.drawableSizeX) / float(state.drawableSizeY), 0.1f, 100.0f);
 }
 
 } // namespace kame::squirtle

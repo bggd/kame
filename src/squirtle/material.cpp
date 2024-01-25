@@ -68,6 +68,12 @@ void importMaterial(Model* model, const kame::gltf::Gltf* gltf)
             mat.baseColorTextureIndex = m.pbrMetallicRoughness.baseColorTexture.index;
             mat.baseColorTexCoord = m.pbrMetallicRoughness.baseColorTexture.texCoord;
         }
+        if (m.hasNormalTexture)
+        {
+            mat.normalTextureIndex = m.normalTexture.index;
+            mat.normalTextureTexCoord = m.normalTexture.texCoord;
+            mat.normalTextureScale = m.normalTexture.scale;
+        }
         model->materials.emplace_back(mat);
     }
 }

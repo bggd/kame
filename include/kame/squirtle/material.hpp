@@ -29,6 +29,9 @@ struct Material {
     int baseColorTexCoord = -1;
     float metallicFactor = 1.0f;
     float roughnessFactor = 1.0f;
+    int normalTextureIndex = -1;
+    int normalTextureTexCoord = -1;
+    float normalTextureScale = 1.0f;
     AlphaMode alphaMode = kALPHA_MODE_OPAQUE;
     float alphaCutoff = 0.5f;
     bool doubleSided;

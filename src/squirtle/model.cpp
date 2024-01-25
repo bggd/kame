@@ -49,7 +49,7 @@ size_t Primitive::getBytesOfNormals() const
 
 size_t Primitive::getBytesOfTangents() const
 {
-    return sizeof(float) * 3 * tangents.size();
+    return sizeof(float) * 4 * tangents.size();
 }
 
 size_t Primitive::getBytesOfUV(size_t i)

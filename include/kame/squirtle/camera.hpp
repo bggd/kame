@@ -13,7 +13,7 @@ struct CameraOrbit {
     float sensitivity = 0.4f;
     kame::math::Vector2 rot = kame::math::Vector2::zero();
     kame::math::Vector2 pan = kame::math::Vector2::zero();
-    float zoom = 0.0f;
+    float zoom = 1.0f;
 
     // hor+
     float targetHorizontalFov;
