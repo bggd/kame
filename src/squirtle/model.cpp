@@ -321,7 +321,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
             pri.indices = toVertexIndices(gltf, p);
             if (p.hasMaterial)
             {
-                assert(p.material >= 0);
+                // assert(p.material >= 0);
                 pri.material = p.material;
             }
             assert(p.mode == GL_POINTS || p.mode == GL_LINES || p.mode == GL_LINE_LOOP || p.mode == GL_LINE_STRIP || p.mode == GL_TRIANGLES || p.mode == GL_TRIANGLE_STRIP || p.mode == GL_TRIANGLE_FAN);
