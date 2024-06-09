@@ -150,9 +150,9 @@ void loadBuffers(Gltf* gltf, json& j)
             {
                 std::filesystem::path path(gltf->basePath);
                 path /= buffer.uri;
-                SDL_RWops* fp = SDL_RWFromFile(path.string().c_str(), "rb");
+                SDL_IOStream* fp = SDL_IOFromFile(path.string().c_str(), "rb");
                 assert(fp);
-                Sint64 len = SDL_RWsize(fp);
+                Sint64 len = SDL_GetIOSize(fp);
                 assert(len >= 0);
                 assert(kame::gltf::integer(len) == buffer.byteLength);
                 buffer.binaryData.resize(len + 1);
@@ -161,11 +161,11 @@ void loadBuffers(Gltf* gltf, json& j)
                 auto* buf = buffer.binaryData.data();
                 while (nb_read_total < len && nb_read != 0)
                 {
-                    nb_read = SDL_RWread(fp, buf, (len - nb_read_total));
+                    nb_read = SDL_ReadIO(fp, buf, (len - nb_read_total));
                     nb_read_total += nb_read;
                     buf += nb_read;
                 }
-                SDL_RWclose(fp);
+                SDL_CloseIO(fp);
                 assert(nb_read_total == len);
 
                 buffer.binaryData.back() = '\0';

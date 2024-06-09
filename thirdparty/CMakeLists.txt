@@ -1,9 +1,9 @@
 include(FetchContent)
 
-# Feb 24, 2024
+# Jun 8, 2024
 FetchContent_Declare(SDL
     GIT_REPOSITORY https://github.com/libsdl-org/SDL
-    GIT_TAG 38d24778ed528db361a991b5e449ec907b35711b
+    GIT_TAG f62a1bed161099f734b777ebc38a18d2fb52a8f2
 )
 set(SDL_SHARED_DEFAULT OFF CACHE INTERNAL "")
 set(SDL_SHARED OFF CACHE INTERNAL "")
@@ -54,7 +54,7 @@ add_library(pystring STATIC pystring/pystring.cpp)
 target_include_directories(pystring PUBLIC pystring)
 
 FetchContent_Declare(imgui
-    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.90.1.tar.gz
+    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.90.8.tar.gz
 )
 FetchContent_MakeAvailable(imgui)
 add_library(imgui STATIC
