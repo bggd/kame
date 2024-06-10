@@ -11,7 +11,7 @@ set(SDL_STATIC ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(SDL)
 
 FetchContent_Declare(spdlog
-    URL https://github.com/gabime/spdlog/archive/refs/tags/v1.12.0.tar.gz
+    URL https://github.com/gabime/spdlog/archive/refs/tags/v1.14.1.tar.gz
 )
 FetchContent_MakeAvailable(spdlog)
 
