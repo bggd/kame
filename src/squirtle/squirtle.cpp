@@ -9,7 +9,10 @@ char* loadFile(const char* fileName, int64_t& len)
     len = 0;
     SDL_IOStream* io = SDL_IOFromFile(fileName, "rb");
     if (io == nullptr)
+    {
+        SPDLOG_CRITICAL("{}", SDL_GetError());
         return nullptr;
+    }
 
     Sint64 res_size = SDL_GetIOSize(io);
     char* res = (char*)malloc(res_size + 1);

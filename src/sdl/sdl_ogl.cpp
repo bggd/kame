@@ -10,7 +10,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 #if !defined(NDEBUG)
     SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
 #endif
-    SDL_SetLogOutputFunction(spdlogSDL2, NULL);
+    // SDL_SetLogOutputFunction(spdlogSDL2, NULL);
 
     // without audio
     SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS |
