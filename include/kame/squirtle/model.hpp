@@ -54,6 +54,9 @@ std::vector<u16Array4> toVertexJoints(const kame::gltf::Gltf* gltf, const kame::
 std::vector<kame::math::Vector4> toVertexWeights(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m);
 std::vector<unsigned int> toVertexIndices(const kame::gltf::Gltf* gltf, const kame::gltf::Mesh& m);
 
+
+namespace detail {
+
 struct Node {
     kame::math::Vector3 position = kame::math::Vector3::zero();
     kame::math::Vector3 scale = kame::math::Vector3::one();
@@ -75,6 +78,8 @@ struct Node {
     }
 };
 
+}
+
 struct Skin {
     std::vector<kame::math::Matrix> inverseBindMatrices;
     std::vector<int> joints;
@@ -91,7 +96,7 @@ using UpdateCB = std::function<void(const UpdateData&)>;
 
 struct Model {
     std::vector<Mesh> meshes;
-    std::vector<Node> nodes;
+    std::vector<detail::Node> nodes;
     std::vector<Skin> skins;
     std::vector<Material> materials;
     std::vector<Texture> textures;
@@ -107,6 +112,6 @@ struct Model {
 };
 
 Model* importModel(const kame::gltf::Gltf* gltf);
-float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime);
+float animate(AnimationClip& clip, std::vector<detail::Node>& nodes, float playTime);
 
 } // namespace kame::squirtle

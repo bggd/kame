@@ -334,7 +334,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
     size_t nodeID = 0;
     for (auto& n : gltf->nodes)
     {
-        Node& node = model->nodes[nodeID];
+        detail::Node& node = model->nodes[nodeID];
         if (n.hasMesh)
         {
             node.meshID = n.mesh;
@@ -489,7 +489,7 @@ Model* importModel(const kame::gltf::Gltf* gltf)
 
 void updateGlobalXForm(Model* model, int id)
 {
-    Node& node = model->nodes[id];
+    detail::Node& node = model->nodes[id];
     auto local = node.updateLocalXForm();
     auto global = kame::math::Matrix::identity();
 
@@ -511,7 +511,7 @@ void updateSkinMatrices(Model* model)
     {
         for (uint32_t i = 0; i < skin.joints.size(); ++i)
         {
-            Node& joint = model->nodes[skin.joints[i]];
+            detail::Node& joint = model->nodes[skin.joints[i]];
             skin.matrices[i] = skin.inverseBindMatrices[i] * joint.globalXForm;
         }
     }
@@ -591,7 +591,7 @@ void updateMesh(Model* model, std::vector<kame::math::Vector3>& positions, Updat
     }
 }
 
-float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime)
+float animate(AnimationClip& clip, std::vector<detail::Node>& nodes, float playTime)
 {
     if (playTime > clip.endTime)
     {
@@ -607,7 +607,7 @@ float animate(AnimationClip& clip, std::vector<Node>& nodes, float playTime)
             continue;
         }
 
-        Node& node = nodes[c.targetID];
+        detail::Node& node = nodes[c.targetID];
 
         auto& s = clip.samplers[c.samplerID];
         if (s.inputs.size() > s.outputsVec4.size())
