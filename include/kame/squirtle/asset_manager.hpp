@@ -1,3 +1,5 @@
+#pragma once
+
 #include <kame/ogl/ogl.hpp>
 #include <kame/gltf/gltf.hpp>
 
@@ -8,12 +10,12 @@ namespace kame::squirtle {
 
 namespace detail {
 
-void loadAsset(std::string path, kame::ogl::Texture2D** pptr)
+static void loadAsset(std::string path, kame::ogl::Texture2D** pptr)
 {
     *pptr = kame::ogl::loadTexture2D(path.c_str());
 }
 
-void loadAsset(std::string path, kame::gltf::Gltf** pptr)
+static void loadAsset(std::string path, kame::gltf::Gltf** pptr)
 {
     *pptr = kame::gltf::loadGLTF(path.c_str());
 }
