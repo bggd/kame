@@ -44,8 +44,8 @@ void WindowBase::updateInput()
 
     int numKeys;
     auto* scancodeState = SDL_GetKeyboardState(&numKeys);
-    assert(numKeys <= SDL_NUM_SCANCODES);
-    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+    assert(numKeys <= SDL_SCANCODE_COUNT);
+    for (int i = 0; i < SDL_SCANCODE_COUNT; ++i)
     {
         state.isDownScancode[i] = false;
     }

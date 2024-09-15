@@ -164,7 +164,7 @@ void WindowOGL::openWindow(const char* title, int w, int h)
 void WindowOGL::closeWindow()
 {
     kame::ogl::Context::getInstance().isAvaliable = false;
-    SDL_GL_DeleteContext(glc);
+    SDL_GL_DestroyContext(glc);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
@@ -173,7 +173,7 @@ void WindowOGL::swapWindow()
 {
     if (isVsync)
     {
-        if (SDL_GL_SetSwapInterval(-1) < 0)
+        if (!SDL_GL_SetSwapInterval(-1))
         {
             SDL_GL_SetSwapInterval(1);
         }

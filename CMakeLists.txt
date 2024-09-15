@@ -56,7 +56,7 @@ target_link_libraries(kame_cpp PUBLIC
     spdlog::spdlog
     nlohmann_json::nlohmann_json
     volk::volk_headers
-    spirv-cross-core
+    #spirv-cross-core
     magic_enum::magic_enum
     pystring
     stb

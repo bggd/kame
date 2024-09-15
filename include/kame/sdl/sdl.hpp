@@ -22,7 +22,7 @@ struct State {
     bool isDownRMB = false;
     bool isDownX1 = false;
     bool isDownX2 = false;
-    bool isDownScancode[SDL_NUM_SCANCODES] = {false};
+    bool isDownScancode[SDL_SCANCODE_COUNT] = {false};
     int32_t drawableSizeX = 0;
     int32_t drawableSizeY = 0;
 };

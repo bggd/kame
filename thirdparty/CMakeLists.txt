@@ -1,9 +1,9 @@
 include(FetchContent)
 
-# Jun 8, 2024
+# Sep 15, 2024
 FetchContent_Declare(SDL
     GIT_REPOSITORY https://github.com/libsdl-org/SDL
-    GIT_TAG f62a1bed161099f734b777ebc38a18d2fb52a8f2
+    GIT_TAG 604d0c519ecb4f9ea1c14423e9cb1c2a822ce764
 )
 set(SDL_SHARED_DEFAULT OFF CACHE INTERNAL "")
 set(SDL_SHARED OFF CACHE INTERNAL "")
@@ -29,20 +29,20 @@ FetchContent_Declare(volk
 set(VOLK_HEADERS_ONLY ON CACHE INTERNAL "")
 FetchContent_MakeAvailable(volk)
 
-FetchContent_Declare(spirvcross
-    URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.268.0.tar.gz
-)
-set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_CLI OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_ENABLE_GLSL OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_ENABLE_HLSL OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_ENABLE_MSL OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_ENABLE_CPP OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_ENABLE_REFLECT OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_ENABLE_UTIL OFF CACHE INTERNAL "")
-set(SPIRV_CROSS_SKIP_INSTALL ON CACHE INTERNAL "")
-FetchContent_MakeAvailable(spirvcross)
+#FetchContent_Declare(spirvcross
+#    URL https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.3.268.0.tar.gz
+#)
+#set(SPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_CLI OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_ENABLE_TESTS OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_ENABLE_GLSL OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_ENABLE_HLSL OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_ENABLE_MSL OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_ENABLE_CPP OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_ENABLE_REFLECT OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_ENABLE_UTIL OFF CACHE INTERNAL "")
+#set(SPIRV_CROSS_SKIP_INSTALL ON CACHE INTERNAL "")
+#FetchContent_MakeAvailable(spirvcross)
 
 FetchContent_Declare(magic_enum
     URL https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.5.tar.gz
@@ -54,7 +54,7 @@ add_library(pystring STATIC pystring/pystring.cpp)
 target_include_directories(pystring PUBLIC pystring)
 
 FetchContent_Declare(imgui
-    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.90.8.tar.gz
+    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.91.1.tar.gz
 )
 FetchContent_MakeAvailable(imgui)
 add_library(imgui STATIC
