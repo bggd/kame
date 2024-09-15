@@ -30,6 +30,7 @@ add_library(kame_cpp
     src/squirtle/animation.cpp
     src/squirtle/material.cpp
     src/squirtle/camera.cpp
+    src/squirtle/engine_ogl.cpp
 )
 
 set_target_properties(kame_cpp PROPERTIES

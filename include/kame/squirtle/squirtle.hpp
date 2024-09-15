@@ -1,4 +1,9 @@
+#pragma once
+
+
 #include "model.hpp"
+
+#include "engine_ogl.hpp"
 
 namespace kame::squirtle {
 
